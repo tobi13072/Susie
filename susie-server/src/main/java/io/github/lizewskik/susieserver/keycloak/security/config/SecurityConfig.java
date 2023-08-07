@@ -36,4 +36,9 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+//    @Bean
+//    public Jwt currentUserCredentials() {
+//        return (Jwt) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+//    }
 }

@@ -1,5 +1,7 @@
 package io.github.lizewskik.susieserver.keycloak.controller;
 
+import io.github.lizewskik.susieserver.keycloak.security.service.KeycloakService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,7 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/demo")
+@RequiredArgsConstructor
 public class DemoController {
+
+    private final KeycloakService service;
 
     @GetMapping
     @PreAuthorize("hasRole('client_user')")

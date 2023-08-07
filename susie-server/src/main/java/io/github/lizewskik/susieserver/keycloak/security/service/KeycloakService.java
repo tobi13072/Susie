@@ -15,6 +15,7 @@ import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -58,6 +59,16 @@ public class KeycloakService {
         return AuthzClient
                 .create(keycloakConfig.getConfiguration())
                 .obtainAccessToken(credentials.getUsername(), credentials.getPassword());
+    }
+
+    public String getCurrentUserID() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return keycloakConfig.getInstance()
+                .realm(keycloakConfig.getRealm())
+                .users()
+                .searchByUsername(username, Boolean.TRUE)
+                .get(0)
+                .getId();
     }
 
     private List<RoleRepresentation> getClientRolesByName(List<String> clientRoles) {
