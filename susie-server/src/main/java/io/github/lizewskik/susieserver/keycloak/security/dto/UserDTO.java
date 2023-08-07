@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -17,5 +16,5 @@ public class UserDTO implements Serializable {
     private String password;
     private String firstName;
     private String lastName;
-    private Set<String> roles;
+    private Boolean isScrumMaster;
 }

@@ -3,8 +3,10 @@ package io.github.lizewskik.susieserver.keycloak.security.service;
 import dev.mccue.guava.base.Joiner;
 import io.github.lizewskik.susieserver.keycloak.security.config.KeycloakConfig;
 import io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary;
+import io.github.lizewskik.susieserver.keycloak.security.dto.SimpleRoleRepresentation;
 import io.github.lizewskik.susieserver.keycloak.security.dto.UserDTO;
 import io.github.lizewskik.susieserver.keycloak.security.dto.request.SignInRequest;
+import io.github.lizewskik.susieserver.keycloak.security.dto.response.AccessTokenExtendedResponse;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.RegistrationResponse;
 import io.github.lizewskik.susieserver.keycloak.security.utils.builder.UserRepresentationBuilder;
 import jakarta.ws.rs.core.Response;
@@ -18,7 +20,15 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_DEVELOPER;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_SCRUM_MASTER;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +42,11 @@ public class KeycloakService {
     public Map.Entry<Integer, RegistrationResponse> register(UserDTO user) {
 
         UserRepresentation userRepresentation = UserRepresentationBuilder.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
+                .username(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .password(user.getPassword())
                 .enabled(Boolean.TRUE)
-                .emailVerified(Boolean.TRUE)
                 .build();
 
         Response response = keycloakConfig.getInstance()
@@ -47,18 +55,48 @@ public class KeycloakService {
                 .create(userRepresentation);
 
         RegistrationResponse info = RegistrationResponse.builder().result(response.getStatusInfo().getReasonPhrase()).success(Boolean.FALSE).build();
+        String userUUID = getUserUUIDFromResponse(response.getLocation().toString());
+
         if (response.getStatus() == HttpStatus.SC_CREATED) {
             info.setSuccess(Boolean.TRUE);
-            assignRoleToUser(getUserUUIDFromResponse(response.getLocation().toString()));
+            assignRoleToUser(userUUID, KEYCLOAK_CLIENT_ROLE_USER);
+            if (user.getIsScrumMaster()) {
+                assignRoleToUser(userUUID, KEYCLOAK_CLIENT_ROLE_SCRUM_MASTER);
+            } else {
+                assignRoleToUser(userUUID, KEYCLOAK_CLIENT_ROLE_DEVELOPER);
+            }
         }
 
         return new AbstractMap.SimpleEntry<>(response.getStatus(), info);
     }
 
-    public AccessTokenResponse signIn(SignInRequest credentials) {
-        return AuthzClient
+    public AccessTokenExtendedResponse signIn(SignInRequest credentials) {
+
+        AccessTokenResponse tokenInfo = AuthzClient
                 .create(keycloakConfig.getConfiguration())
                 .obtainAccessToken(credentials.getUsername(), credentials.getPassword());
+
+        AccessTokenExtendedResponse response = new AccessTokenExtendedResponse(tokenInfo);
+
+        UserRepresentation userRepresentation = keycloakConfig.getInstance()
+                .realm(keycloakConfig.getRealm()).users()
+                .searchByUsername(credentials.getUsername(), Boolean.TRUE)
+                .get(0);
+
+        List<SimpleRoleRepresentation> userRoles = this.keycloakConfig
+                .getInstance()
+                .realm(keycloakConfig.getRealm())
+                .users()
+                .get(userRepresentation.getId())
+                .roles().clientLevel(getIDForClientID(keycloakConfig.getClientId()))
+                .listAll().stream().map(role -> SimpleRoleRepresentation.builder()
+                        .id(role.getId())
+                        .name(role.getName())
+                        .build())
+                .toList();
+
+        response.setUserRoles(userRoles);
+        return response;
     }
 
     public String getCurrentUserID() {
@@ -80,7 +118,7 @@ public class KeycloakService {
         return roles;
     }
 
-    private void assignRoleToUser(String userUUID) {
+    private void assignRoleToUser(String userUUID, String clientRole) {
         this.keycloakConfig
                 .getInstance()
                 .realm(keycloakConfig.getRealm())
@@ -88,7 +126,7 @@ public class KeycloakService {
                 .get(userUUID)
                 .roles()
                 .clientLevel(getIDForClientID(keycloakConfig.getClientId()))
-                .add(getClientRolesByName(List.of(KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_USER)));
+                .add(getClientRolesByName(List.of(clientRole)));
     }
 
     private String getIDForClientID(String clientID) {
