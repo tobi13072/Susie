@@ -9,15 +9,19 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
+@Builder
 @Entity
 @Table(name = "comments")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+public class Comment implements Serializable {
 
     @Id
     @Column(name = "CommentID")

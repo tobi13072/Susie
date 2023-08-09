@@ -99,12 +99,11 @@ public class KeycloakService {
         return response;
     }
 
-    public String getCurrentUserID() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    public String getUserUUIDByEmail(String email) {
         return keycloakConfig.getInstance()
                 .realm(keycloakConfig.getRealm())
                 .users()
-                .searchByUsername(username, Boolean.TRUE)
+                .searchByUsername(email, Boolean.TRUE)
                 .get(0)
                 .getId();
     }

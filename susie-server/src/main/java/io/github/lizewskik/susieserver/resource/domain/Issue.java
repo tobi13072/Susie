@@ -10,16 +10,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Set;
 
-@Entity
 @Data
+@Builder
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Issue {
+public class Issue implements Serializable {
 
     @Id
     @Column(name = "IssueID")
