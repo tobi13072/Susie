@@ -44,7 +44,7 @@ public class Issue implements Serializable {
     @JoinColumn(name = "BacklogID", nullable = false)
     private Backlog backlog;
 
-    @OneToMany
+    @OneToMany(mappedBy = "issue")
     private Set<Comment> comments;
 
     @ManyToOne
