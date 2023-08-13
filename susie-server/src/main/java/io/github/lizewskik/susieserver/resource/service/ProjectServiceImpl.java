@@ -4,6 +4,7 @@ import io.github.lizewskik.susieserver.exception.ProjectAlreadyExistsException;
 import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
+import io.github.lizewskik.susieserver.resource.repository.BacklogRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +37,12 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = Project.builder()
                 .name(projectDTO.getName())
                 .description(projectDTO.getDescription())
-                .backlog(backlog)
                 .projectOwner(currentLoggedUser)
+                .backlog(backlog)
                 .userIDs(usersAssociatedWithProject)
                 .build();
-
         projectRepository.save(project);
+
         return project;
     }
 
