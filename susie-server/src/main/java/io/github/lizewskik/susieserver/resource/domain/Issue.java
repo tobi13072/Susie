@@ -1,5 +1,7 @@
 package io.github.lizewskik.susieserver.resource.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,12 +44,15 @@ public class Issue implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "BacklogID", nullable = false)
+    @JsonBackReference
     private Backlog backlog;
 
     @OneToMany(mappedBy = "issue")
+    @JsonManagedReference
     private Set<Comment> comments;
 
     @ManyToOne
     @JoinColumn(name = "SprintID")
+    @JsonBackReference
     private Sprint sprint;
 }

@@ -1,5 +1,6 @@
 package io.github.lizewskik.susieserver.resource.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,6 +39,7 @@ public class Comment implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "IssueID", nullable = false)
+    @JsonBackReference
     private Issue issue;
 
     @NotNull

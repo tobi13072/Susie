@@ -1,7 +1,10 @@
 package io.github.lizewskik.susieserver.resource.service;
 
+import io.github.lizewskik.susieserver.resource.dto.UserDTO;
+
 public interface UserService {
 
-    String getCurrentLoggedUserUUID();
-    String getUserUUIDByEmail(String email);
+    UserDTO getCurrentLoggedUser();
+    UserDTO getUserByEmail(String email);
+    UserDTO getUserByUUID(String uuid);
 }

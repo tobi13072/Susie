@@ -13,6 +13,8 @@ public interface KeycloakDictionary {
     String KEYCLOAK_URI_USERS_PARAMETER = "users";
     String KEYCLOAK_URI_REALMS_PARAMETER = "realms";
     String KEYCLOAK_URI_SECRET_PARAMETER = "secret";
+    String KEYCLOAK_FIRSTNAME_TOKEN_CLAIM = "given_name";
+    String KEYCLOAK_LASTNAME_TOKEN_CLAIM = "family_name";
     String DEV_PERMISSION = "hasRole('dev')";
     String SM_PERMISSION = "hasRole('sm')";
     String PO_PERMISSION = "hasRole('po')";

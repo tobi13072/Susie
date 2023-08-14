@@ -4,7 +4,6 @@ import io.github.lizewskik.susieserver.exception.ProjectAlreadyExistsException;
 import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
-import io.github.lizewskik.susieserver.resource.repository.BacklogRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ProjectAlreadyExistsException();
         }
 
-        String currentLoggedUser = userService.getCurrentLoggedUserUUID();
+        String currentLoggedUser = userService.getCurrentLoggedUser().getUuid();
         HashSet<String> usersAssociatedWithProject = new HashSet<>();
         usersAssociatedWithProject.add(currentLoggedUser);
 
@@ -67,14 +66,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> getAllProjects() {
-        String currentLoggedUser = userService.getCurrentLoggedUserUUID();
+        String currentLoggedUser = userService.getCurrentLoggedUser().getUuid();
         return projectRepository.findAllByUserIDsContains(currentLoggedUser);
     }
 
     @Override
     public void associateUserWithProject(String email, Integer projectID) {
 
-        String userUUID = userService.getUserUUIDByEmail(email);
+        String userUUID = userService.getUserByEmail(email).getUuid();
         Project updated = projectRepository.findById(projectID).orElseThrow(RuntimeException::new);
 
         Set<String> usersAssociatedWithProject = updated.getUserIDs();

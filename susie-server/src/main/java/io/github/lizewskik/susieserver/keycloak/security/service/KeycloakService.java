@@ -4,7 +4,7 @@ import dev.mccue.guava.base.Joiner;
 import io.github.lizewskik.susieserver.keycloak.security.config.KeycloakConfig;
 import io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary;
 import io.github.lizewskik.susieserver.keycloak.security.dto.SimpleRoleRepresentation;
-import io.github.lizewskik.susieserver.keycloak.security.dto.UserDTO;
+import io.github.lizewskik.susieserver.keycloak.security.dto.request.RegistrationRequest;
 import io.github.lizewskik.susieserver.keycloak.security.dto.request.SignInRequest;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.AccessTokenExtendedResponse;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.RegistrationResponse;
@@ -17,7 +17,6 @@ import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
@@ -39,13 +38,15 @@ public class KeycloakService {
 
     private final KeycloakConfig keycloakConfig;
 
-    public Map.Entry<Integer, RegistrationResponse> register(UserDTO user) {
+    public Map.Entry<Integer, RegistrationResponse> register(RegistrationRequest user) {
 
         UserRepresentation userRepresentation = UserRepresentationBuilder.builder()
                 .username(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .password(user.getPassword())
+                .email(user.getEmail())
+                .emailVerified(Boolean.TRUE)
                 .enabled(Boolean.TRUE)
                 .build();
 
@@ -99,13 +100,22 @@ public class KeycloakService {
         return response;
     }
 
-    public String getUserUUIDByEmail(String email) {
+    public UserRepresentation getUserUUIDByEmail(String email) {
+
         return keycloakConfig.getInstance()
                 .realm(keycloakConfig.getRealm())
                 .users()
                 .searchByUsername(email, Boolean.TRUE)
-                .get(0)
-                .getId();
+                .get(0);
+    }
+
+    public UserRepresentation getUserUUIDByUUID(String uuid) {
+
+        return keycloakConfig.getInstance()
+                .realm(keycloakConfig.getRealm())
+                .users()
+                .get(uuid)
+                .toRepresentation();
     }
 
     private List<RoleRepresentation> getClientRolesByName(List<String> clientRoles) {

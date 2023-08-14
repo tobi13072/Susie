@@ -1,15 +1,16 @@
 package io.github.lizewskik.susieserver.resource.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
-public class IssueDTO {
+@AllArgsConstructor
+public class IssueGeneralDTO {
 
-    private Integer issueID;
     private String name;
-    private String description;
-    private Integer estimation;
-    private Integer projectID;
+    private UserDTO assignee;
 }

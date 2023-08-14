@@ -1,4 +1,4 @@
-package io.github.lizewskik.susieserver.keycloak.security.dto;
+package io.github.lizewskik.susieserver.keycloak.security.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO implements Serializable {
+public class RegistrationRequest implements Serializable {
 
     private String username;
     private String email;
