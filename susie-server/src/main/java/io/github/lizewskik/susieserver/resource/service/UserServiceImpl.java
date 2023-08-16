@@ -2,7 +2,9 @@ package io.github.lizewskik.susieserver.resource.service;
 
 import io.github.lizewskik.susieserver.exception.KeycloakUserDoesNotExist;
 import io.github.lizewskik.susieserver.keycloak.security.service.KeycloakService;
+import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.UserDTO;
+import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +21,7 @@ import static io.github.lizewskik.susieserver.keycloak.security.dictionary.Keycl
 public class UserServiceImpl implements UserService {
 
     private final KeycloakService keycloakService;
+    private final ProjectRepository projectRepository;
 
     @Override
     public UserDTO getCurrentLoggedUser() {
@@ -53,5 +56,15 @@ public class UserServiceImpl implements UserService {
                 .firstName(userRepresentation.getFirstName())
                 .lastName(userRepresentation.getLastName())
                 .build();
+    }
+
+    @Override
+    public boolean isProjectOwner(Integer projectID) {
+
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        String currentLoggedUserUUID = jwt.getSubject();
+        Project project = projectRepository.findById(projectID).orElseThrow(RuntimeException::new);
+        String projectOwnerUUID = project.getProjectOwner();
+        return projectOwnerUUID.equals(currentLoggedUserUUID);
     }
 }

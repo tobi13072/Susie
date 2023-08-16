@@ -73,6 +73,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void associateUserWithProject(String email, Integer projectID) {
 
+        if (!userService.isProjectOwner(projectID)) {
+            throw new RuntimeException("Current user is not allowed to perform this action");
+        }
+
         String userUUID = userService.getUserByEmail(email).getUuid();
         Project updated = projectRepository.findById(projectID).orElseThrow(RuntimeException::new);
 

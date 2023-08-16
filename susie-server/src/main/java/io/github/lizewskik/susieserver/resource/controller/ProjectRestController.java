@@ -2,6 +2,7 @@ package io.github.lizewskik.susieserver.resource.controller;
 
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
+import io.github.lizewskik.susieserver.resource.dto.UserAssociationDTO;
 import io.github.lizewskik.susieserver.resource.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -53,9 +53,9 @@ public class ProjectRestController {
         return ResponseEntity.ok(projectService.deleteProject(id));
     }
 
-    @GetMapping("/user-association")
+    @PostMapping("/user-association")
     @PreAuthorize(SM_PERMISSION)
-    public void associateUserWithProject(@RequestParam String email, @RequestParam Integer projectID) {
-        projectService.associateUserWithProject(email, projectID);
+    public void associateUserWithProject(@RequestBody UserAssociationDTO associationRequest) {
+        projectService.associateUserWithProject(associationRequest.getEmail(), associationRequest.getProjectID());
     }
 }

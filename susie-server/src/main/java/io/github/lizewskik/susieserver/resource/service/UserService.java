@@ -7,4 +7,5 @@ public interface UserService {
     UserDTO getCurrentLoggedUser();
     UserDTO getUserByEmail(String email);
     UserDTO getUserByUUID(String uuid);
+    boolean isProjectOwner(Integer projectID);
 }

@@ -75,13 +75,13 @@ public class KeycloakService {
 
         AccessTokenResponse tokenInfo = AuthzClient
                 .create(keycloakConfig.getConfiguration())
-                .obtainAccessToken(credentials.getUsername(), credentials.getPassword());
+                .obtainAccessToken(credentials.getEmail(), credentials.getPassword());
 
         AccessTokenExtendedResponse response = new AccessTokenExtendedResponse(tokenInfo);
 
         UserRepresentation userRepresentation = keycloakConfig.getInstance()
                 .realm(keycloakConfig.getRealm()).users()
-                .searchByUsername(credentials.getUsername(), Boolean.TRUE)
+                .searchByUsername(credentials.getEmail(), Boolean.TRUE)
                 .get(0);
 
         List<SimpleRoleRepresentation> userRoles = this.keycloakConfig

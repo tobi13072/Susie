@@ -5,7 +5,6 @@ import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
 
 import java.util.List;
 
-
 public interface ProjectService {
 
     Project createProject(ProjectDTO projectDTO);
