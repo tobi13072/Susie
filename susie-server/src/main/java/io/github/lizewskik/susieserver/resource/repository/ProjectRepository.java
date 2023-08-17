@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Integer> {
 
-    boolean existsByName(String name);
+    boolean existsByNameAndProjectOwner(String projectName, String projectOwner);
     List<Project> findAllByUserIDsContains(String email);
 }

@@ -4,6 +4,8 @@ import io.github.lizewskik.susieserver.exception.ProjectAlreadyExistsException;
 import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
+import io.github.lizewskik.susieserver.resource.dto.request.ProjectCreationRequest;
+import io.github.lizewskik.susieserver.resource.mapper.ProjectDTOMapper;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -19,23 +22,24 @@ import java.util.Set;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ProjectDTOMapper projectDTOMapper;
     private final UserService userService;
 
     @Override
-    public Project createProject(ProjectDTO projectDTO) {
+    public Project createProject(ProjectCreationRequest projectCreationRequest) {
 
-        if (projectRepository.existsByName(projectDTO.getName())) {
+        String currentLoggedUser = userService.getCurrentLoggedUser().getUuid();
+        if (projectRepository.existsByNameAndProjectOwner(projectCreationRequest.getName(), currentLoggedUser)) {
             throw new ProjectAlreadyExistsException();
         }
 
-        String currentLoggedUser = userService.getCurrentLoggedUser().getUuid();
         HashSet<String> usersAssociatedWithProject = new HashSet<>();
         usersAssociatedWithProject.add(currentLoggedUser);
 
         Backlog backlog = new Backlog();
         Project project = Project.builder()
-                .name(projectDTO.getName())
-                .description(projectDTO.getDescription())
+                .name(projectCreationRequest.getName())
+                .description(projectCreationRequest.getDescription())
                 .projectOwner(currentLoggedUser)
                 .backlog(backlog)
                 .userIDs(usersAssociatedWithProject)
@@ -65,9 +69,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> getAllProjects() {
+    public List<ProjectDTO> getAllProjects() {
         String currentLoggedUser = userService.getCurrentLoggedUser().getUuid();
-        return projectRepository.findAllByUserIDsContains(currentLoggedUser);
+        return projectRepository.findAllByUserIDsContains(currentLoggedUser)
+                .stream()
+                .map(projectDTOMapper::map)
+                .collect(Collectors.toList());
     }
 
     @Override
