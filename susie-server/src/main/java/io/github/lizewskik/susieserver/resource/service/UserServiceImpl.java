@@ -1,6 +1,5 @@
 package io.github.lizewskik.susieserver.resource.service;
 
-import io.github.lizewskik.susieserver.exception.KeycloakUserDoesNotExist;
 import io.github.lizewskik.susieserver.keycloak.security.service.KeycloakService;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.UserDTO;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.KEYCLOAK_USER_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_FIRSTNAME_TOKEN_CLAIM;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_LASTNAME_TOKEN_CLAIM;
 
@@ -38,7 +38,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByEmail(String email) {
-        UserRepresentation userRepresentation = Optional.of(keycloakService.getUserUUIDByEmail(email)).orElseThrow(KeycloakUserDoesNotExist::new);
+        UserRepresentation userRepresentation = Optional.of(keycloakService.getUserUUIDByEmail(email))
+                .orElseThrow(() -> new RuntimeException(KEYCLOAK_USER_DOES_NOT_EXISTS));
         return UserDTO.builder()
                 .uuid(userRepresentation.getId())
                 .email(userRepresentation.getEmail())
@@ -49,7 +50,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByUUID(String uuid) {
-        UserRepresentation userRepresentation = Optional.of(keycloakService.getUserUUIDByUUID(uuid)).orElseThrow(KeycloakUserDoesNotExist::new);
+        UserRepresentation userRepresentation = Optional.of(keycloakService.getUserUUIDByUUID(uuid))
+                .orElseThrow(() -> new RuntimeException(KEYCLOAK_USER_DOES_NOT_EXISTS));
         return UserDTO.builder()
                 .uuid(uuid)
                 .email(userRepresentation.getEmail())

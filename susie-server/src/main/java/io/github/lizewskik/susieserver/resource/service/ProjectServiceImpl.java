@@ -1,6 +1,5 @@
 package io.github.lizewskik.susieserver.resource.service;
 
-import io.github.lizewskik.susieserver.exception.ProjectAlreadyExistsException;
 import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
@@ -16,6 +15,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ACTION_NOT_ALLOWED;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_NAME_NOT_UNIQUE;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         String currentLoggedUser = userService.getCurrentLoggedUser().getUuid();
         if (projectRepository.existsByNameAndProjectOwner(projectCreationRequest.getName(), currentLoggedUser)) {
-            throw new ProjectAlreadyExistsException();
+            throw new RuntimeException(PROJECT_NAME_NOT_UNIQUE);
         }
 
         HashSet<String> usersAssociatedWithProject = new HashSet<>();
@@ -52,10 +55,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project updateProject(ProjectDTO projectDTO) {
 
-        Project updated = projectRepository.findById(projectDTO.getProjectID()).orElseThrow(RuntimeException::new);
+        Project updated = projectRepository.findById(projectDTO.getProjectID())
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
         updated.setName(projectDTO.getName());
         updated.setDescription(projectDTO.getDescription());
-
         projectRepository.save(updated);
         return updated;
     }
@@ -63,7 +66,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project deleteProject(Integer projectID) {
 
-        Project project = projectRepository.findById(projectID).orElseThrow(RuntimeException::new);
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
         projectRepository.deleteById(projectID);
         return project;
     }
@@ -81,12 +85,12 @@ public class ProjectServiceImpl implements ProjectService {
     public void associateUserWithProject(String email, Integer projectID) {
 
         if (!userService.isProjectOwner(projectID)) {
-            throw new RuntimeException("Current user is not allowed to perform this action");
+            throw new RuntimeException(ACTION_NOT_ALLOWED);
         }
 
+        Project updated = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
         String userUUID = userService.getUserByEmail(email).getUuid();
-        Project updated = projectRepository.findById(projectID).orElseThrow(RuntimeException::new);
-
         Set<String> usersAssociatedWithProject = updated.getUserIDs();
         usersAssociatedWithProject.add(userUUID);
         updated.setUserIDs(usersAssociatedWithProject);

@@ -55,4 +55,8 @@ public class Issue implements Serializable {
     @JoinColumn(name = "SprintID")
     @JsonBackReference
     private Sprint sprint;
+
+    @ManyToOne
+    @JoinColumn(name = "IssueStatusID")
+    private IssueStatus issueStatus;
 }
