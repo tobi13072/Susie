@@ -1,6 +1,7 @@
 package io.github.lizewskik.susieserver.resource.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,7 +35,7 @@ public class Backlog implements Serializable {
     @JsonManagedReference
     private Project project;
 
-    @OneToMany(mappedBy = "backlog")
+    @OneToMany(mappedBy = "backlog", cascade = CascadeType.ALL)
     @JsonManagedReference
     private Set<Issue> issues;
 }

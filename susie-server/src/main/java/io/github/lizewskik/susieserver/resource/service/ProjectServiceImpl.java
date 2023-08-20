@@ -3,6 +3,8 @@ package io.github.lizewskik.susieserver.resource.service;
 import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
+import io.github.lizewskik.susieserver.resource.dto.ProjectDetailsDTO;
+import io.github.lizewskik.susieserver.resource.dto.UserDTO;
 import io.github.lizewskik.susieserver.resource.dto.request.ProjectCreationRequest;
 import io.github.lizewskik.susieserver.resource.mapper.ProjectDTOMapper;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
@@ -29,7 +31,20 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserService userService;
 
     @Override
-    public Project createProject(ProjectCreationRequest projectCreationRequest) {
+    public ProjectDetailsDTO getProjectDetails(Integer projectID) {
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+        ProjectDetailsDTO detailsDTO = new ProjectDetailsDTO();
+        detailsDTO.setProjectID(project.getId());
+        detailsDTO.setName(project.getName());
+        detailsDTO.setDescription(project.getDescription());
+        detailsDTO.setOwner(userService.getUserByUUID(project.getProjectOwner()));
+        detailsDTO.setMembers(mapUserUUIDsToUserDTOs(project.getUserIDs()));
+        return detailsDTO;
+    }
+
+    @Override
+    public ProjectDTO createProject(ProjectCreationRequest projectCreationRequest) {
 
         String currentLoggedUser = userService.getCurrentLoggedUser().getUuid();
         if (projectRepository.existsByNameAndProjectOwner(projectCreationRequest.getName(), currentLoggedUser)) {
@@ -49,27 +64,39 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
         projectRepository.save(project);
 
-        return project;
+        return ProjectDTO.builder()
+                .projectID(project.getId())
+                .name(project.getName())
+                .description(project.getDescription())
+                .build();
     }
 
     @Override
-    public Project updateProject(ProjectDTO projectDTO) {
+    public ProjectDTO updateProject(ProjectDTO projectDTO) {
 
         Project updated = projectRepository.findById(projectDTO.getProjectID())
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
         updated.setName(projectDTO.getName());
         updated.setDescription(projectDTO.getDescription());
         projectRepository.save(updated);
-        return updated;
+        return ProjectDTO.builder()
+                .projectID(updated.getId())
+                .name(updated.getName())
+                .description(updated.getDescription())
+                .build();
     }
 
     @Override
-    public Project deleteProject(Integer projectID) {
+    public ProjectDTO deleteProject(Integer projectID) {
 
         Project project = projectRepository.findById(projectID)
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
         projectRepository.deleteById(projectID);
-        return project;
+        return ProjectDTO.builder()
+                .projectID(project.getId())
+                .name(project.getName())
+                .description(project.getDescription())
+                .build();
     }
 
     @Override
@@ -95,5 +122,11 @@ public class ProjectServiceImpl implements ProjectService {
         usersAssociatedWithProject.add(userUUID);
         updated.setUserIDs(usersAssociatedWithProject);
         projectRepository.save(updated);
+    }
+
+    private List<UserDTO> mapUserUUIDsToUserDTOs(Set<String> uuids) {
+        return uuids.stream()
+                .map(userService::getUserByUUID)
+                .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,7 @@
 package io.github.lizewskik.susieserver.resource.controller;
 
-import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
+import io.github.lizewskik.susieserver.resource.dto.ProjectDetailsDTO;
 import io.github.lizewskik.susieserver.resource.dto.UserAssociationDTO;
 import io.github.lizewskik.susieserver.resource.dto.request.ProjectCreationRequest;
 import io.github.lizewskik.susieserver.resource.service.ProjectService;
@@ -36,21 +36,26 @@ public class ProjectRestController {
 
     @PostMapping
     @PreAuthorize(SM_PERMISSION)
-    public ResponseEntity<Project> createProject(@RequestBody ProjectCreationRequest project) {
+    public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectCreationRequest project) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(projectService.createProject(project));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectDetailsDTO> getProjectDetailsByProjectID(@PathVariable Integer id) {
+        return ResponseEntity.ok(projectService.getProjectDetails(id));
+    }
+
     @PutMapping
     @PreAuthorize(SM_PERMISSION)
-    public ResponseEntity<Project> updateProject(@RequestBody ProjectDTO project) {
+    public ResponseEntity<ProjectDTO> updateProject(@RequestBody ProjectDTO project) {
         return ResponseEntity.ok(projectService.updateProject(project));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize(SM_PERMISSION)
-    public ResponseEntity<Project> deleteProject(@PathVariable Integer id) {
+    public ResponseEntity<ProjectDTO> deleteProject(@PathVariable Integer id) {
         return ResponseEntity.ok(projectService.deleteProject(id));
     }
 

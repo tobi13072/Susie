@@ -56,6 +56,6 @@ public class Project implements Serializable {
     private String projectOwner;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Sprint> sprints;
 }

@@ -6,6 +6,8 @@ import io.github.lizewskik.susieserver.resource.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 public class IssueDTOMapper {
@@ -19,7 +21,9 @@ public class IssueDTOMapper {
                 .description(from.getDescription())
                 .estimation(from.getEstimation())
                 .reporter(userService.getUserByUUID(from.getReporterID()))
-                .assignee(userService.getUserByUUID(from.getAssigneeID()))
+                .assignee(
+                        Objects.isNull(from.getAssigneeID()) ? null : userService.getUserByUUID(from.getAssigneeID())
+                )
                 .build();
     }
 }

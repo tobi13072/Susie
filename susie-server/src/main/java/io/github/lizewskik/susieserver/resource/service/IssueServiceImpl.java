@@ -7,6 +7,7 @@ import io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID;
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
 import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
 import io.github.lizewskik.susieserver.resource.dto.request.IssueCreationRequest;
+import io.github.lizewskik.susieserver.resource.dto.request.IssueUpdateRequest;
 import io.github.lizewskik.susieserver.resource.mapper.IssueDTOMapper;
 import io.github.lizewskik.susieserver.resource.repository.IssueRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssueStatusRepository;
@@ -35,7 +36,7 @@ public class IssueServiceImpl implements IssueService{
     private final IssueDTOMapper issueDTOMapper;
 
     @Override
-    public Issue createIssue(IssueCreationRequest issueDTO) {
+    public IssueDTO createIssue(IssueCreationRequest issueDTO) {
 
         Project project = projectRepository.findById(issueDTO.getProjectID())
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
@@ -50,19 +51,19 @@ public class IssueServiceImpl implements IssueService{
                 .backlog(project.getBacklog())
                 .build();
         issueRepository.save(issue);
-        return issue;
+        return issueDTOMapper.map(issue);
     }
 
     @Override
-    public Issue updateIssue(IssueDTO issueDTO) {
+    public IssueDTO updateIssue(IssueUpdateRequest issueDTO) {
 
-        Issue updated = issueRepository.findById(issueDTO.getIssueID())
+        Issue updated = issueRepository.findById(issueDTO.getId())
                 .orElseThrow(() -> new RuntimeException(ISSUE_DOES_NOT_EXISTS));
         updated.setName(issueDTO.getName());
         updated.setDescription(issueDTO.getDescription());
         updated.setEstimation(issueDTO.getEstimation());
         issueRepository.save(updated);
-        return updated;
+        return issueDTOMapper.map(updated);
     }
 
     @Override
