@@ -15,6 +15,10 @@ public interface KeycloakDictionary {
     String KEYCLOAK_URI_SECRET_PARAMETER = "secret";
     String KEYCLOAK_FIRSTNAME_TOKEN_CLAIM = "given_name";
     String KEYCLOAK_LASTNAME_TOKEN_CLAIM = "family_name";
+    String CLIENT_SECRET_REQUEST_PARAMETER = "client_secret";
+    String CLIENT_ID_REQUEST_PARAMETER = "client_id";
+    String GRANT_TYPE_REQUEST_PARAMETER = "grant_type";
+    String REFRESH_TOKEN_REQUEST_PARAMETER = "refresh_token";
     String DEV_PERMISSION = "hasRole('dev')";
     String SM_PERMISSION = "hasRole('sm')";
     String PO_PERMISSION = "hasRole('po')";

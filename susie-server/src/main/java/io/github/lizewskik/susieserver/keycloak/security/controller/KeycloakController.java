@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -34,6 +37,11 @@ public class KeycloakController {
     @PostMapping("/sign-in")
     public ResponseEntity<AccessTokenExtendedResponse> signIn(@RequestBody SignInRequest credentials) {
         return ResponseEntity.ok(keycloakService.signIn(credentials));
+    }
+
+    @PostMapping("/refresh")
+    public Map<String, String> refreshToken(@RequestParam String refreshToken) throws URISyntaxException, ExecutionException, InterruptedException {
+        return keycloakService.refreshToken(refreshToken);
     }
 
     @GetMapping("/user-info")

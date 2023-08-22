@@ -27,6 +27,8 @@ public class KeycloakConfig {
     private String realm;
     @Value("${auth-server.client.clientId}")
     private String clientId;
+    @Value("${auth-server.token-endpoint}")
+    private String tokenEndpoint;
 
     public Keycloak getInstance() {
         return KeycloakBuilder.builder()

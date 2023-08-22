@@ -8,6 +8,7 @@ import io.github.lizewskik.susieserver.keycloak.security.dto.request.Registratio
 import io.github.lizewskik.susieserver.keycloak.security.dto.request.SignInRequest;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.AccessTokenExtendedResponse;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.RegistrationResponse;
+import io.github.lizewskik.susieserver.keycloak.security.utils.HttpCustomClient;
 import io.github.lizewskik.susieserver.keycloak.security.utils.builder.UserRepresentationBuilder;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,22 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 
+import java.net.URISyntaxException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.CLIENT_ID_REQUEST_PARAMETER;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.CLIENT_SECRET_REQUEST_PARAMETER;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.GRANT_TYPE_REQUEST_PARAMETER;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_DEVELOPER;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_SCRUM_MASTER;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_USER;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.REFRESH_TOKEN_REQUEST_PARAMETER;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +45,7 @@ public class KeycloakService {
     private static final String ROLE_DOES_NOT_EXIST = "Corresponding client role does not exist: ";
 
     private final KeycloakConfig keycloakConfig;
+    private final HttpCustomClient httpCustomClient;
 
     public Map.Entry<Integer, RegistrationResponse> register(RegistrationRequest user) {
 
@@ -98,6 +107,16 @@ public class KeycloakService {
 
         response.setUserRoles(userRoles);
         return response;
+    }
+
+    public Map<String, String> refreshToken(String refreshToken) throws URISyntaxException, ExecutionException, InterruptedException {
+        Map<String, String> httpParameters = new HashMap<>();
+        httpParameters.put(GRANT_TYPE_REQUEST_PARAMETER, REFRESH_TOKEN_REQUEST_PARAMETER);
+        httpParameters.put(CLIENT_SECRET_REQUEST_PARAMETER, keycloakConfig.getClientSecret());
+        httpParameters.put(REFRESH_TOKEN_REQUEST_PARAMETER, refreshToken);
+        httpParameters.put(CLIENT_ID_REQUEST_PARAMETER, keycloakConfig.getClientId());
+        String URL = keycloakConfig.getTokenEndpoint();
+        return httpCustomClient.getResponse(URL, httpParameters);
     }
 
     public UserRepresentation getUserUUIDByEmail(String email) {
