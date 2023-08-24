@@ -60,4 +60,12 @@ public class Issue implements Serializable {
     @ManyToOne
     @JoinColumn(name = "IssueStatusID")
     private IssueStatus issueStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "IssueTypeID")
+    private IssueType issueType;
+
+    @ManyToOne
+    @JoinColumn(name = "IssuePriorityID")
+    private IssuePriority issuePriority;
 }

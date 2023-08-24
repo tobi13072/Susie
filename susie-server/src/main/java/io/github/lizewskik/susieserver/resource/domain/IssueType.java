@@ -1,6 +1,6 @@
 package io.github.lizewskik.susieserver.resource.domain;
 
-import io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusEnum;
+import io.github.lizewskik.susieserver.resource.domain.dictionary.IssueTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,21 +10,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class IssueStatus {
+public class IssueType {
 
     @Id
-    @Column(name = "StatusID")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_status_seq_gen")
-    @SequenceGenerator(name = "issue_status_seq_gen", sequenceName = "issue_status_seq")
+    @Column(name = "IssueTypeID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_type_seq_gen")
+    @SequenceGenerator(name = "issue_type_seq_gen", sequenceName = "issue_type_seq")
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-    private IssueStatusEnum statusName;
+    private IssueTypeEnum type;
 }
