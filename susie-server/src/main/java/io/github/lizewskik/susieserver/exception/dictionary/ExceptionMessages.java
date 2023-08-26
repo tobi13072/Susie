@@ -18,4 +18,6 @@ public interface ExceptionMessages {
     String SPRINT_ALREADY_STARTED = "Given Sprint is lasting at this point of time";
     String SPRINT_NOT_ACTIVE = "Given sprint is not active";
     String ACTIVE_SPRINT_EXISTS = "There is already exists active sprint";
+    String IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_EMPTY = "Status change is impossible because issue is not within active sprint";
+    String IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_NOT_ACTIVE = "Status change is impossible because issue does not belong to active sprint";
 }

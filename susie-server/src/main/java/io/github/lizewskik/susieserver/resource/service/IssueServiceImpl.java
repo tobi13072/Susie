@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_EMPTY;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_NOT_ACTIVE;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_PRIORITY_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_TYPE_DOES_NOT_EXISTS;
@@ -181,6 +183,15 @@ public class IssueServiceImpl implements IssueService{
         Issue updated = issueRepository
                 .findById(ofNullable(issueID).orElseThrow(NullIdentifierException::new))
                 .orElseThrow(() -> new IllegalArgumentException(ISSUE_DOES_NOT_EXISTS));
+
+        Optional<Sprint> issueSprint = ofNullable(updated.getSprint());
+        if (issueSprint.isEmpty()) {
+            throw new RuntimeException(IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_EMPTY);
+        }
+
+        if (!issueSprint.get().getActive()) {
+            throw new RuntimeException(IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_NOT_ACTIVE);
+        }
 
         IssueStatus currentStatus = updated.getIssueStatus();
         IssueStatus newStatus = issueStatusRepository.findById(ofNullable(statusID).orElseThrow(NullIdentifierException::new))

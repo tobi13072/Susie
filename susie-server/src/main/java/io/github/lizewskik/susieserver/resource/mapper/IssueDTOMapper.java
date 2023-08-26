@@ -24,6 +24,7 @@ public class IssueDTOMapper {
                 .assignee(
                         Objects.isNull(from.getAssigneeID()) ? null : userService.getUserByUUID(from.getAssigneeID())
                 )
+                .projectID(from.getBacklog().getProject().getId())
                 .build();
     }
 }

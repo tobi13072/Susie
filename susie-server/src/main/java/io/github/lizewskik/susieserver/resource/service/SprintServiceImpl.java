@@ -16,7 +16,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ACTIVE_SPRINT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_ALREADY_HAS_SPRINT;
@@ -42,6 +44,23 @@ public class SprintServiceImpl implements SprintService {
     private final IssueRepository issueRepository;
     private final ProjectRepository projectRepository;
     private final SprintDTOMapper sprintDTOMapper;
+
+    @Override
+    public SprintDTO getActiveSprint() {
+        if (sprintRepository.findByActive(TRUE).isPresent()) {
+            return sprintDTOMapper.map(sprintRepository.findByActive(TRUE).get());
+        }
+        return null;
+    }
+
+    @Override
+    public List<SprintDTO> getAllNonActivatedSprints() {
+        return sprintRepository.findAll()
+                .stream()
+                .filter(sprint -> sprint.getActive().equals(FALSE))
+                .map(sprintDTOMapper::map)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public SprintDTO createSprint(SprintCreationRequest sprintDTO) {
