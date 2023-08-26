@@ -1,0 +1,26 @@
+package io.github.lizewskik.susieserver.resource.mapper;
+
+import io.github.lizewskik.susieserver.resource.domain.Issue;
+import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
+import io.github.lizewskik.susieserver.resource.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import static java.util.Objects.isNull;
+
+@Component
+@RequiredArgsConstructor
+public class IssueGeneralDTOMapper {
+
+    private final UserService userService;
+
+    public IssueGeneralDTO map(Issue from) {
+        return IssueGeneralDTO.builder()
+                .id(from.getId())
+                .name(from.getName())
+                .assignee(
+                        isNull(from.getAssigneeID()) ? null : userService.getUserByUUID(from.getAssigneeID())
+                )
+                .build();
+    }
+}

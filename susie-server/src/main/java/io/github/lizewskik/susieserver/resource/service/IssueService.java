@@ -14,6 +14,8 @@ public interface IssueService {
     void deleteIssue(Integer issueID);
     IssueDTO getIssueDetails(Integer issueID);
     List<IssueGeneralDTO> getIssuesGeneral(Integer projectID);
+    List<IssueGeneralDTO> getGeneralIssuesInfoBySprintID(Integer sprintID);
     void assignCurrentUserToIssue(Integer issueID);
     void deleteUserToIssueAssignment(Integer issueID);
+    void changeIssueStatus(Integer issueID, Integer statusID);
 }

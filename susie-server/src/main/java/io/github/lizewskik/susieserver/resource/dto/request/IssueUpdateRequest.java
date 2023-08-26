@@ -11,4 +11,5 @@ public class IssueUpdateRequest {
     private String name;
     private String description;
     private Integer estimation;
+    private Integer issuePriorityID;
 }

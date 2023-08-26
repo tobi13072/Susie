@@ -7,4 +7,6 @@ public interface SprintService {
 
     SprintDTO createSprint(SprintCreationRequest sprintDTO);
     void addIssueToSprint(Integer issueID, Integer sprintID);
+    void startSprint(Integer sprintID);
+    void stopSprint(Integer sprintID);
 }

@@ -43,4 +43,6 @@ public class Sprint implements Serializable {
 
     @OneToMany(mappedBy = "sprint")
     private Set<Issue> sprintIssues;
+
+    private Boolean active;
 }

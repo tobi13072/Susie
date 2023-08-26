@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -30,6 +31,11 @@ public class IssueRestController {
     @GetMapping
     public ResponseEntity<List<IssueGeneralDTO>> getGeneralIssuesInfoByProjectID(@RequestParam Integer projectID) {
         return ResponseEntity.ok(issueService.getIssuesGeneral(projectID));
+    }
+
+    @GetMapping("/sprint/{id}")
+    public ResponseEntity<List<IssueGeneralDTO>> getGeneralIssuesInfoBySprintID(@PathVariable Integer id) {
+        return ResponseEntity.ok(issueService.getGeneralIssuesInfoBySprintID(id));
     }
 
     @GetMapping("/details/{id}")
@@ -60,5 +66,10 @@ public class IssueRestController {
     @PutMapping("/{id}/delete-assignment")
     public void deleteUserToIssueAssignment(@PathVariable Integer id) {
         issueService.deleteUserToIssueAssignment(id);
+    }
+
+    @PatchMapping("/{id}/status/{statusID}")
+    public void changeIssueStatus(@PathVariable Integer id, @PathVariable Integer statusID) {
+        issueService.changeIssueStatus(id, statusID);
     }
 }

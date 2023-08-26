@@ -11,4 +11,6 @@ public class IssueCreationRequest {
     private String description;
     private Integer estimation;
     private Integer projectID;
+    private Integer issueTypeID;
+    private Integer issuePriorityID;
 }
