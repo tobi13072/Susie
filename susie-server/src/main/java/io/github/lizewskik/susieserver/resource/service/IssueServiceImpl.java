@@ -1,6 +1,6 @@
 package io.github.lizewskik.susieserver.resource.service;
 
-import io.github.lizewskik.susieserver.exception.NullIdentifierException;
+import io.github.lizewskik.susieserver.exception.definition.NullIdentifierException;
 import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.domain.IssuePriority;
 import io.github.lizewskik.susieserver.resource.domain.IssueStatus;

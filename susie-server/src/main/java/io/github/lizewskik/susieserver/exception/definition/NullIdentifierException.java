@@ -1,4 +1,4 @@
-package io.github.lizewskik.susieserver.exception;
+package io.github.lizewskik.susieserver.exception.definition;
 
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.NULL_IDENTIFIER;
 

@@ -1,6 +1,6 @@
 package io.github.lizewskik.susieserver.resource.service;
 
-import io.github.lizewskik.susieserver.exception.NullIdentifierException;
+import io.github.lizewskik.susieserver.exception.definition.NullIdentifierException;
 import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.domain.Sprint;
@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ACTIVE_SPRINT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.EMPTY_SPRINT;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_ALREADY_HAS_SPRINT;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
@@ -70,6 +71,7 @@ public class SprintServiceImpl implements SprintService {
         Sprint sprint = Sprint.builder()
                 .name(sprintDTO.getName())
                 .startDate(sprintDTO.getStartTime())
+                .active(FALSE)
                 .project(project)
                 .build();
         sprintRepository.save(sprint);
@@ -99,6 +101,10 @@ public class SprintServiceImpl implements SprintService {
 
         Sprint updated = sprintRepository.findById(ofNullable(sprintID).orElseThrow(NullIdentifierException::new))
                 .orElseThrow(() -> new IllegalArgumentException(SPRINT_DOES_NOT_EXISTS));
+
+        if (updated.getSprintIssues().isEmpty()) {
+            throw new RuntimeException(EMPTY_SPRINT);
+        }
 
         Pair<Boolean, String> validationResult = validateSprintDatesForStart(updated);
         if (!validationResult.getKey()) {

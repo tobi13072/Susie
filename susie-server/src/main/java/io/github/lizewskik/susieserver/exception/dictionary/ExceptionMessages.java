@@ -20,4 +20,5 @@ public interface ExceptionMessages {
     String ACTIVE_SPRINT_EXISTS = "There is already exists active sprint";
     String IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_EMPTY = "Status change is impossible because issue is not within active sprint";
     String IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_NOT_ACTIVE = "Status change is impossible because issue does not belong to active sprint";
+    String EMPTY_SPRINT = "It is not allowed to start sprint without any issue";
 }
