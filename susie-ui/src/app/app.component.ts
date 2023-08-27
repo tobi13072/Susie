@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {MenuControlService} from "./service/menu-control.service";
+import {MenuItem} from "primeng/api";
 
 
 @Component({
@@ -9,16 +9,8 @@ import {MenuControlService} from "./service/menu-control.service";
 })
 export class AppComponent implements OnInit {
 
-  showMenuBar: boolean = false;
+  menuStructure: MenuItem[] | undefined;
+
   ngOnInit(): void {
-    this.menuBarService.getMenuStatus.subscribe((menuStatus) => {
-      this.showMenuBar = menuStatus;
-    })
   }
-
-  constructor(private menuBarService: MenuControlService) {
-  }
-
-
-  protected readonly Component = Component;
 }
