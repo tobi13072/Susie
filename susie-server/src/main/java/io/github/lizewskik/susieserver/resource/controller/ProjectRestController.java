@@ -3,7 +3,6 @@ package io.github.lizewskik.susieserver.resource.controller;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDetailsDTO;
 import io.github.lizewskik.susieserver.resource.dto.UserAssociationDTO;
-import io.github.lizewskik.susieserver.resource.dto.request.ProjectCreationRequest;
 import io.github.lizewskik.susieserver.resource.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,7 +35,7 @@ public class ProjectRestController {
 
     @PostMapping
     @PreAuthorize(SM_PERMISSION)
-    public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectCreationRequest project) {
+    public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO project) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(projectService.createProject(project));

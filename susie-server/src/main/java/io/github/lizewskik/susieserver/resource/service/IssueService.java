@@ -2,15 +2,13 @@ package io.github.lizewskik.susieserver.resource.service;
 
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
 import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
-import io.github.lizewskik.susieserver.resource.dto.request.IssueCreationRequest;
-import io.github.lizewskik.susieserver.resource.dto.request.IssueUpdateRequest;
 
 import java.util.List;
 
 public interface IssueService {
 
-    IssueDTO createIssue(IssueCreationRequest issue);
-    IssueDTO updateIssue(IssueUpdateRequest issue);
+    IssueDTO createIssue(IssueDTO issue);
+    IssueDTO updateIssue(IssueDTO issue);
     void deleteIssue(Integer issueID);
     IssueDTO getIssueDetails(Integer issueID);
     List<IssueGeneralDTO> getIssuesGeneral(Integer projectID);

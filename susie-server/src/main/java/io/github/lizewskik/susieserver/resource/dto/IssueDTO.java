@@ -18,4 +18,6 @@ public class IssueDTO {
     private UserDTO reporter;
     private UserDTO assignee;
     private Integer projectID;
+    private Integer issueTypeID;
+    private Integer issuePriorityID;
 }

@@ -5,7 +5,6 @@ import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.domain.Sprint;
 import io.github.lizewskik.susieserver.resource.dto.SprintDTO;
-import io.github.lizewskik.susieserver.resource.dto.request.SprintCreationRequest;
 import io.github.lizewskik.susieserver.resource.mapper.SprintDTOMapper;
 import io.github.lizewskik.susieserver.resource.repository.IssueRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
@@ -64,7 +63,7 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
-    public SprintDTO createSprint(SprintCreationRequest sprintDTO) {
+    public SprintDTO createSprint(SprintDTO sprintDTO) {
 
         Project project = projectRepository.findById(sprintDTO.getProjectID())
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
