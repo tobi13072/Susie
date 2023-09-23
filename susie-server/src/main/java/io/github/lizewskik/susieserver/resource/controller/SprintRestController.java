@@ -1,7 +1,6 @@
 package io.github.lizewskik.susieserver.resource.controller;
 
 import io.github.lizewskik.susieserver.resource.dto.SprintDTO;
-import io.github.lizewskik.susieserver.resource.dto.request.SprintCreationRequest;
 import io.github.lizewskik.susieserver.resource.service.SprintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,7 +33,7 @@ public class SprintRestController {
     }
 
     @PostMapping
-    public ResponseEntity<SprintDTO> createSprint(@RequestBody SprintCreationRequest sprintDTO) {
+    public ResponseEntity<SprintDTO> createSprint(@RequestBody SprintDTO sprintDTO) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(sprintService.createSprint(sprintDTO));

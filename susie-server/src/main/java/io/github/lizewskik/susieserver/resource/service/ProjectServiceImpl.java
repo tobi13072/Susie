@@ -5,7 +5,6 @@ import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDetailsDTO;
 import io.github.lizewskik.susieserver.resource.dto.UserDTO;
-import io.github.lizewskik.susieserver.resource.dto.request.ProjectCreationRequest;
 import io.github.lizewskik.susieserver.resource.mapper.ProjectDTOMapper;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import jakarta.transaction.Transactional;
@@ -44,7 +43,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDTO createProject(ProjectCreationRequest projectCreationRequest) {
+    public ProjectDTO createProject(ProjectDTO projectCreationRequest) {
 
         String currentLoggedUser = userService.getCurrentLoggedUser().getUuid();
         if (projectRepository.existsByNameAndProjectOwner(projectCreationRequest.getName(), currentLoggedUser)) {
