@@ -6,7 +6,7 @@ import io.github.lizewskik.susieserver.resource.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
+import static java.util.Objects.isNull;
 
 @Component
 @RequiredArgsConstructor
@@ -22,9 +22,18 @@ public class IssueDTOMapper {
                 .estimation(from.getEstimation())
                 .reporter(userService.getUserByUUID(from.getReporterID()))
                 .assignee(
-                        Objects.isNull(from.getAssigneeID()) ? null : userService.getUserByUUID(from.getAssigneeID())
+                        isNull(from.getAssigneeID()) ? null : userService.getUserByUUID(from.getAssigneeID())
                 )
                 .projectID(from.getBacklog().getProject().getId())
+                .issueTypeID(
+                        isNull(from.getIssueType()) ? null : from.getIssueType().getId()
+                )
+                .issuePriorityID(
+                        isNull(from.getIssuePriority()) ? null : from.getIssuePriority().getId()
+                )
+                .issueStatusID(
+                        isNull(from.getIssueStatus()) ? null : from.getIssueStatus().getId()
+                )
                 .build();
     }
 }

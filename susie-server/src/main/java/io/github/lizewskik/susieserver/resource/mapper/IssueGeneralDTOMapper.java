@@ -21,6 +21,9 @@ public class IssueGeneralDTOMapper {
                 .assignee(
                         isNull(from.getAssigneeID()) ? null : userService.getUserByUUID(from.getAssigneeID())
                 )
+                .issueStatusID(
+                        isNull(from.getIssueStatus()) ? null : from.getIssueStatus().getId()
+                )
                 .build();
     }
 }
