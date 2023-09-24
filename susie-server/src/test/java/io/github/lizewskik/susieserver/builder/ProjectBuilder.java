@@ -1,6 +1,12 @@
 package io.github.lizewskik.susieserver.builder;
 
+import io.github.lizewskik.susieserver.resource.domain.Backlog;
+import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
+
+import java.util.Set;
+
+import static io.github.lizewskik.susieserver.builder.UserBuilder.CURRENT_USER_UUID;
 
 public class ProjectBuilder {
 
@@ -20,6 +26,16 @@ public class ProjectBuilder {
         return ProjectDTO.builder()
                 .name(ANOTHER_PROJECT_NAME)
                 .description(ANOTHER_PROJECT_DESCRIPTION)
+                .build();
+    }
+
+    public static Project createProjectEntity() {
+        return Project.builder()
+                .name(PROJECT_NAME)
+                .description(PROJECT_DESCRIPTION)
+                .projectOwner(CURRENT_USER_UUID)
+                .userIDs(Set.of(CURRENT_USER_UUID))
+                .backlog(new Backlog())
                 .build();
     }
 }

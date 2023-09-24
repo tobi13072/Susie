@@ -10,6 +10,7 @@ import io.github.lizewskik.susieserver.resource.domain.Sprint;
 import io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID;
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
 import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
+import io.github.lizewskik.susieserver.resource.dto.request.IssueMRO;
 import io.github.lizewskik.susieserver.resource.mapper.IssueDTOMapper;
 import io.github.lizewskik.susieserver.resource.mapper.IssueGeneralDTOMapper;
 import io.github.lizewskik.susieserver.resource.repository.IssuePriorityRepository;
@@ -59,7 +60,7 @@ public class IssueServiceImpl implements IssueService{
     private final IssueGeneralDTOMapper issueGeneralDTOMapper;
 
     @Override
-    public IssueDTO createIssue(IssueDTO issueDTO) {
+    public IssueDTO createIssue(IssueMRO issueDTO) {
 
         Project project = projectRepository.findById(issueDTO.getProjectID())
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
@@ -96,7 +97,7 @@ public class IssueServiceImpl implements IssueService{
     }
 
     @Override
-    public IssueDTO updateIssue(IssueDTO issueDTO) {
+    public IssueDTO updateIssue(IssueMRO issueDTO) {
 
         Issue updated = issueRepository.findById(
                 ofNullable(issueDTO.getIssueID()).orElseThrow(

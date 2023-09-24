@@ -6,6 +6,7 @@ import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDetailsDTO;
 import io.github.lizewskik.susieserver.resource.dto.UserDTO;
 import io.github.lizewskik.susieserver.resource.mapper.ProjectDTOMapper;
+import io.github.lizewskik.susieserver.resource.repository.BacklogRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectDTOMapper projectDTOMapper;
+    private final BacklogRepository backlogRepository;
     private final UserService userService;
 
     @Override
@@ -62,6 +64,8 @@ public class ProjectServiceImpl implements ProjectService {
                 .userIDs(usersAssociatedWithProject)
                 .build();
         projectRepository.save(project);
+        backlog.setProject(project);
+        backlogRepository.save(backlog);
 
         return ProjectDTO.builder()
                 .projectID(project.getId())

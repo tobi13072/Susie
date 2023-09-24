@@ -34,7 +34,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = TestConfiguration.class)
-@Transactional
 public class ProjectServiceTest {
 
     @Autowired
@@ -48,6 +47,8 @@ public class ProjectServiceTest {
 
     @BeforeEach
     public void setUp() {
+        projectRepository.deleteAll();
+        projectRepository.flush();
         when(userService.getCurrentLoggedUser()).thenReturn(UserBuilder.createCurrentLoggedInUser());
     }
 
@@ -60,8 +61,9 @@ public class ProjectServiceTest {
         List<ProjectDTO> projects = new ArrayList<>(Collections.nCopies(3, exampleProject));
 
         //when
+        int nameLength = 10;
         projects.forEach(pro -> {
-            pro.setName(RandomStringUtils.random(3, true, true));
+            pro.setName(RandomStringUtils.random(nameLength));
             projectService.createProject(pro);
         });
         long actualProjectsAmount = projectRepository.count();
@@ -168,6 +170,7 @@ public class ProjectServiceTest {
     }
 
     @Test
+    @Transactional
     public void associateUserWithProject_happyPathTest() {
 
         //given

@@ -2,6 +2,7 @@ package io.github.lizewskik.susieserver.resource.controller;
 
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
 import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
+import io.github.lizewskik.susieserver.resource.dto.request.IssueMRO;
 import io.github.lizewskik.susieserver.resource.service.IssueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,12 +43,12 @@ public class IssueRestController {
     }
 
     @PostMapping
-    public ResponseEntity<IssueDTO> createIssue(@RequestBody IssueDTO issueDTO) {
+    public ResponseEntity<IssueDTO> createIssue(@RequestBody IssueMRO issueDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(issueService.createIssue(issueDTO));
     }
 
     @PutMapping
-    public ResponseEntity<IssueDTO> updateIssue(@RequestBody IssueDTO issueDTO) {
+    public ResponseEntity<IssueDTO> updateIssue(@RequestBody IssueMRO issueDTO) {
         return ResponseEntity.ok(issueService.updateIssue(issueDTO));
     }
 
