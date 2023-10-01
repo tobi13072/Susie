@@ -1,23 +1,27 @@
 package io.github.lizewskik.susieserver.service;
 
 import io.github.lizewskik.susieserver.builder.IssueBuilder;
+import io.github.lizewskik.susieserver.builder.SprintBuilder;
 import io.github.lizewskik.susieserver.builder.UserBuilder;
 import io.github.lizewskik.susieserver.config.TestConfiguration;
 import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Issue;
+import io.github.lizewskik.susieserver.resource.domain.IssueStatus;
 import io.github.lizewskik.susieserver.resource.domain.Project;
+import io.github.lizewskik.susieserver.resource.domain.Sprint;
+import io.github.lizewskik.susieserver.resource.domain.dictionary.IssuePriorityID;
 import io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID;
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
 import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
 import io.github.lizewskik.susieserver.resource.dto.request.IssueMRO;
 import io.github.lizewskik.susieserver.resource.repository.BacklogRepository;
-import io.github.lizewskik.susieserver.resource.repository.IssuePriorityRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssueRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssueStatusRepository;
-import io.github.lizewskik.susieserver.resource.repository.IssueTypeRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
+import io.github.lizewskik.susieserver.resource.repository.SprintRepository;
 import io.github.lizewskik.susieserver.resource.service.IssueService;
 import io.github.lizewskik.susieserver.resource.service.UserService;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,20 +30,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-import static io.github.lizewskik.susieserver.builder.DictionaryBuilder.createAllIssuePriorities;
-import static io.github.lizewskik.susieserver.builder.DictionaryBuilder.createAllIssueStatuses;
-import static io.github.lizewskik.susieserver.builder.DictionaryBuilder.createAllIssueTypes;
+import static io.github.lizewskik.susieserver.builder.IssueBuilder.OTHER_ISSUE_DESCRIPTION;
+import static io.github.lizewskik.susieserver.builder.IssueBuilder.OTHER_ISSUE_ESTIMATION;
+import static io.github.lizewskik.susieserver.builder.IssueBuilder.OTHER_ISSUE_NAME;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createDefaultIssue;
+import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntity;
+import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntityWithIssueStatus;
+import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntityWithSprint;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueWithFakeIssuePriorityID;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueWithFakeIssueTypeID;
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.createProjectEntity;
 import static io.github.lizewskik.susieserver.builder.UserBuilder.createCurrentLoggedInUser;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_EMPTY;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_NOT_ACTIVE;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_PRIORITY_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_TYPE_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.NULL_IDENTIFIER;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.STATUS_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.STATUS_FLOW_ORDER_VIOLATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -47,16 +61,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = TestConfiguration.class)
+@Transactional
 public class IssueServiceTest {
 
     @Autowired
-    private IssueTypeRepository issueTypeRepository;
-
-    @Autowired
     private IssueStatusRepository issueStatusRepository;
-
-    @Autowired
-    private IssuePriorityRepository issuePriorityRepository;
 
     @Autowired
     private BacklogRepository backlogRepository;
@@ -70,34 +79,25 @@ public class IssueServiceTest {
     @Autowired
     private IssueRepository issueRepository;
 
+    @Autowired
+    private SprintRepository sprintRepository;
+
     @MockBean
     private UserService userService;
 
-    private Project globalProject;
+    private Project defaultScrumProject;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
 
-        // dictionaries initialization
-        issueTypeRepository.saveAll(createAllIssueTypes());
-        issueStatusRepository.saveAll(createAllIssueStatuses());
-        issuePriorityRepository.saveAll(createAllIssuePriorities());
-
-        // global project configuration
-        globalProject = projectRepository.save(createProjectEntity());
-        Backlog backlog = globalProject.getBacklog();
-        backlog.setProject(globalProject);
+        // global default project configuration
+        defaultScrumProject = projectRepository.save(createProjectEntity());
+        Backlog backlog = defaultScrumProject.getBacklog();
+        backlog.setProject(defaultScrumProject);
         backlogRepository.save(backlog);
 
         // mocks
         when(userService.getCurrentLoggedUser()).thenReturn(createCurrentLoggedInUser());
-
-        issuePriorityRepository.flush();
-        issueStatusRepository.flush();
-        issueTypeRepository.flush();
-        backlogRepository.flush();
-        projectRepository.flush();
-        issueRepository.flush();
     }
 
     @Test
@@ -105,12 +105,12 @@ public class IssueServiceTest {
 
         //given
         int issuesAmount = 10;
-        List<IssueMRO> issueMROList = IssueBuilder.createManyIssues(issuesAmount, globalProject.getId());
+        List<IssueMRO> issueMROList = IssueBuilder.createManyIssues(issuesAmount, defaultScrumProject.getId());
         long expectedIssueAmount = issueRepository.count() + issuesAmount;
-        Integer projectID = globalProject.getId();
+        Integer projectID = defaultScrumProject.getId();
+        issueMROList.forEach(issue -> issueService.createIssue(issue));
 
         //when
-        issueMROList.forEach(issue -> issueService.createIssue(issue));
         long actualIssueAmount = issueRepository.count();
         List<IssueGeneralDTO> actualReturnList = issueService.getIssuesGeneral(projectID);
 
@@ -124,7 +124,7 @@ public class IssueServiceTest {
     public void getIssuesGeneral_throwsProjectDoesNotExistsExceptionTest() {
 
         //given
-        Integer fakeProjectID = globalProject.getId() + 1;
+        Integer fakeProjectID = defaultScrumProject.getId() + 1;
 
         //when
         Exception exception = assertThrows(RuntimeException.class, () -> issueService.getIssuesGeneral(fakeProjectID));
@@ -134,23 +134,66 @@ public class IssueServiceTest {
     }
 
     @Test
+    public void getProductBacklog_happyPathTest() {
+
+        //given
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.FALSE);
+        Issue issueInSprint = createIssueEntityWithSprint(sprint);
+        sprintRepository.save(sprint);
+        issueRepository.save(issueInSprint);
+        IssueStatus status = issueStatusRepository.findById(1).orElse(null);
+        Issue issueBeyondSprint = createIssueEntityWithIssueStatus(status);
+        issueRepository.save(issueBeyondSprint);
+
+        Backlog backlog = defaultScrumProject.getBacklog();
+        Set<Issue> backlogIssues = backlog.getIssues();
+        backlogIssues.add(issueBeyondSprint);
+        backlogIssues.add(issueInSprint);
+        backlogRepository.save(backlog);
+
+        long expectedElementsAmountInProductBacklog = 1;
+
+        //when
+        List<IssueGeneralDTO> productBacklog = issueService.getProductBacklog(defaultScrumProject.getId());
+        int actualElementsAmountInProductBacklog = productBacklog.size();
+        IssueGeneralDTO backlogElement = productBacklog.stream().findAny().isPresent() ? productBacklog.stream().findAny().get() : null;
+
+        //then
+        assertNotNull(backlogElement);
+        assertEquals(expectedElementsAmountInProductBacklog, actualElementsAmountInProductBacklog);
+        assertEquals(issueBeyondSprint.getId(), backlogElement.getId());
+        assertEquals(issueBeyondSprint.getName(), backlogElement.getName());
+        assertEquals(issueBeyondSprint.getIssueStatus().getId(), backlogElement.getIssueStatusID());
+        assertNull(issueBeyondSprint.getAssigneeID());
+    }
+
+    @Test
+    public void getProductBacklog_throwsProjectDoesNotExistsExceptionTest() {
+
+        //given
+        Integer fakeProjectID = defaultScrumProject.getId() + 1;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.getProductBacklog(fakeProjectID));
+
+        //then
+        assertEquals(PROJECT_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
     public void getIssueDetails_happyPathTest() {
 
         //given
-        IssueMRO issueMRO = createDefaultIssue(globalProject.getId());
-        Integer issueID = issueService.createIssue(issueMRO).getIssueID();
+        Issue issue = createIssueEntity();
+        issueRepository.save(issue);
 
         //when
-        IssueDTO actualReturnedIssueDetails = issueService.getIssueDetails(issueID);
+        IssueDTO actualReturnedIssueDetails = issueService.getIssueDetails(issue.getId());
 
         //then
-        assertEquals(issueMRO.getName(), actualReturnedIssueDetails.getName());
-        assertEquals(issueMRO.getDescription(), actualReturnedIssueDetails.getDescription());
-        assertEquals(issueMRO.getEstimation(), actualReturnedIssueDetails.getEstimation());
-        assertEquals(issueMRO.getProjectID(), actualReturnedIssueDetails.getProjectID());
-        assertEquals(issueMRO.getIssueTypeID(), actualReturnedIssueDetails.getIssueTypeID());
-        assertEquals(issueMRO.getIssuePriorityID(), actualReturnedIssueDetails.getIssuePriorityID());
-        assertEquals(IssueStatusID.TO_DO.getStatusID(), actualReturnedIssueDetails.getIssueStatusID());
+        assertEquals(issue.getName(), actualReturnedIssueDetails.getName());
+        assertEquals(issue.getDescription(), actualReturnedIssueDetails.getDescription());
+        assertEquals(issue.getEstimation(), actualReturnedIssueDetails.getEstimation());
     }
 
     @Test
@@ -170,7 +213,7 @@ public class IssueServiceTest {
     public void createIssue_happyPathTest() {
 
         //given
-        Integer projectID = globalProject.getId();
+        Integer projectID = defaultScrumProject.getId();
         IssueMRO issueMRO = createDefaultIssue(projectID);
         long expectedIssueAmount = issueRepository.count() + 1;
 
@@ -183,7 +226,6 @@ public class IssueServiceTest {
         assertEquals(issueMRO.getName(), createdIssue.getName());
         assertEquals(issueMRO.getDescription(), createdIssue.getDescription());
         assertEquals(issueMRO.getEstimation(), createdIssue.getEstimation());
-        assertEquals(issueMRO.getProjectID(), createdIssue.getProjectID());
         assertEquals(issueMRO.getIssueTypeID(), createdIssue.getIssueTypeID());
         assertEquals(issueMRO.getIssuePriorityID(), createdIssue.getIssuePriorityID());
     }
@@ -192,7 +234,7 @@ public class IssueServiceTest {
     public void createIssue_throwsProjectDoesNotExistsExceptionTest() {
 
         //given
-        Integer fakeProjectID = globalProject.getId() + 1;
+        Integer fakeProjectID = defaultScrumProject.getId() + 1;
         IssueMRO issueMRO = createDefaultIssue(fakeProjectID);
 
         //when
@@ -206,7 +248,7 @@ public class IssueServiceTest {
     public void createIssue_throwsIssueTypeDoesNotExistsExceptionTest() {
 
         //given
-        IssueMRO issueMRO = createIssueWithFakeIssueTypeID(globalProject.getId());
+        IssueMRO issueMRO = createIssueWithFakeIssueTypeID(defaultScrumProject.getId());
 
         //when
         Exception exception = assertThrows(RuntimeException.class, () -> issueService.createIssue(issueMRO));
@@ -219,7 +261,7 @@ public class IssueServiceTest {
     public void createIssue_throwsIssuePriorityDoesNotExistsExceptionTest() {
 
         //given
-        IssueMRO issueMRO = createIssueWithFakeIssuePriorityID(globalProject.getId());
+        IssueMRO issueMRO = createIssueWithFakeIssuePriorityID(defaultScrumProject.getId());
 
         //when
         Exception exception = assertThrows(RuntimeException.class, () -> issueService.createIssue(issueMRO));
@@ -229,27 +271,107 @@ public class IssueServiceTest {
     }
 
     @Test
+    public void updateIssue_happyPathTest() {
+
+        //given
+        Issue issueToUpdate = createIssueEntity();
+        issueRepository.save(issueToUpdate);
+
+        IssueMRO updatedIssue = IssueMRO.builder()
+                .issueID(issueToUpdate.getId())
+                .name(OTHER_ISSUE_NAME)
+                .description(OTHER_ISSUE_DESCRIPTION)
+                .estimation(OTHER_ISSUE_ESTIMATION)
+                .issuePriorityID(IssuePriorityID.TRIVIAL.getPriorityID())
+                .build();
+
+        //when
+        IssueDTO issueAfterUpdate = issueService.updateIssue(updatedIssue);
+
+        //then
+        assertEquals(OTHER_ISSUE_NAME, issueAfterUpdate.getName());
+        assertEquals(OTHER_ISSUE_DESCRIPTION, issueAfterUpdate.getDescription());
+        assertEquals(OTHER_ISSUE_ESTIMATION, issueAfterUpdate.getEstimation());
+        assertEquals(IssuePriorityID.TRIVIAL.getPriorityID(), issueAfterUpdate.getIssuePriorityID());
+    }
+
+    @Test
+    public void updateIssue_throwsNullIdentifierExceptionTest() {
+
+        //given
+        IssueMRO issueWithNullIdentifier = new IssueMRO();
+
+        //when
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> issueService.updateIssue(issueWithNullIdentifier));
+
+        //then
+        assertEquals(NULL_IDENTIFIER, exception.getMessage());
+    }
+
+    @Test
+    public void updateIssue_throwsIssueDoesNotExistsExceptionTest() {
+
+        //given
+        Issue issueToUpdate = createIssueEntity();
+        issueRepository.save(issueToUpdate);
+
+        Integer fakeIssueID = issueToUpdate.getId() + 1;
+
+        IssueMRO updatedIssueWithFakeIssueID = IssueMRO.builder()
+                .issueID(fakeIssueID)
+                .build();
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.updateIssue(updatedIssueWithFakeIssueID));
+
+        //then
+        assertEquals(ISSUE_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
+    public void updateIssue_throwsIssuePriorityDoesNotExistsExceptionTest() {
+
+        //given
+        Issue issueToUpdate = createIssueEntity();
+        issueRepository.save(issueToUpdate);
+
+        Integer fakeIssuePriorityID = 6;
+
+        IssueMRO updatedIssueWithFakeIssuePriorityID = IssueMRO.builder()
+                .issueID(issueToUpdate.getId())
+                .issuePriorityID(fakeIssuePriorityID)
+                .build();
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.updateIssue(updatedIssueWithFakeIssuePriorityID));
+
+        //then
+        assertEquals(ISSUE_PRIORITY_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
     public void deleteIssue_happyPathTest() {
 
         //given
-        Integer projectID = globalProject.getId();
-        IssueMRO issueMRO = createDefaultIssue(projectID);
+        Issue issue = createIssueEntity();
+        issueRepository.save(issue);
+        long expectedIssuesAmount = issueRepository.count() - 1;
 
         //when
-        Integer issueID = issueService.createIssue(issueMRO).getIssueID();
-        long expectedIssueAmount = issueRepository.count() - 1;
-        issueService.deleteIssue(issueID);
-        long actualIssueAmount = issueRepository.count();
+        issueService.deleteIssue(issue.getId());
+        long actualIssuesAmount = issueRepository.count();
 
         //then
-        assertEquals(expectedIssueAmount, actualIssueAmount);
+        assertEquals(expectedIssuesAmount, actualIssuesAmount);
     }
 
     @Test
     public void assignCurrentUserToIssue_happyPathTest() {
 
         //given
-        Integer issueID = issueService.createIssue(createDefaultIssue(globalProject.getId())).getIssueID();
+        Issue issue = createIssueEntity();
+        issueRepository.save(issue);
+        Integer issueID = issue.getId();
         String uuid = UUID.randomUUID().toString();
         when(userService.getCurrentLoggedUser()).thenReturn(UserBuilder.createAnotherCurrentLoggedInUser(uuid));
 
@@ -279,7 +401,9 @@ public class IssueServiceTest {
     public void deleteUserToIssueAssignment_happyPathTest() {
 
         //given
-        Integer issueID = issueService.createIssue(createDefaultIssue(globalProject.getId())).getIssueID();
+        Issue issue = createIssueEntity();
+        issueRepository.save(issue);
+        Integer issueID = issue.getId();
         String uuid = UUID.randomUUID().toString();
         when(userService.getCurrentLoggedUser()).thenReturn(UserBuilder.createAnotherCurrentLoggedInUser(uuid));
         issueService.assignCurrentUserToIssue(issueID);
@@ -304,5 +428,208 @@ public class IssueServiceTest {
 
         //then
         assertEquals(ISSUE_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
+    public void getGeneralIssuesInfoBySprintID_happyPathTest() {
+
+        //given
+        long expectedIssuesInSprintAmount = 1;
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.FALSE);
+        Issue issue = IssueBuilder.createIssueEntityWithSprint(sprint);
+
+        sprintRepository.save(sprint);
+        issueRepository.save(issue);
+
+        //when
+        List<IssueGeneralDTO> sprintIssues = issueService.getGeneralIssuesInfoBySprintID(sprint.getId());
+        int actualSprintIssuesAmount = sprintIssues.size();
+
+        //then
+        assertEquals(expectedIssuesInSprintAmount, actualSprintIssuesAmount);
+    }
+
+    @Test
+    public void getGeneralIssuesInfoBySprintID_throwsSprintDoesNotExistsExceptionTest() {
+
+        //given
+        Integer fakeSprintID = -10;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.getGeneralIssuesInfoBySprintID(fakeSprintID));
+
+        //then
+        assertEquals(SPRINT_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
+    public void changeIssueStatus_happyPathTest() {
+
+        //given
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.TRUE);
+        Issue issue = createIssueEntityWithSprint(sprint);
+        issue.setIssueStatus(issueStatusRepository.findById(IssueStatusID.TO_DO.getStatusID()).orElse(null));
+
+        sprintRepository.save(sprint);
+        issueRepository.save(issue);
+
+        Integer inProgressStatusID = IssueStatusID.IN_PROGRESS.getStatusID();
+
+        //when
+        issueService.changeIssueStatus(issue.getId(), inProgressStatusID);
+        Issue issueStateAfterStatusChange = issueRepository.findById(issue.getId()).orElse(null);
+
+        //then
+        assertNotNull(issueStateAfterStatusChange);
+        assertEquals(inProgressStatusID, issueStateAfterStatusChange.getIssueStatus().getId());
+    }
+
+    @Test
+    public void changeIssueStatus_throwsIssueDoesNotExistsExceptionTest() {
+
+        //given
+        Integer fakeIssueID = -10;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.changeIssueStatus(fakeIssueID, null));
+
+        //then
+        assertEquals(ISSUE_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
+    public void changeIssueStatus_throwsStatusChangeImpossibleSprintUnassignedExceptionTest() {
+
+        //given
+        Issue issue = createIssueEntity();
+        issueRepository.save(issue);
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.changeIssueStatus(issue.getId(), null));
+
+        //then
+        assertEquals(IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_EMPTY, exception.getMessage());
+    }
+
+    @Test
+    public void changeIssueStatus_throwsStatusChangeImpossibleSprintNotActiveExceptionTest() {
+
+        //given
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.FALSE);
+        Issue issue = createIssueEntityWithSprint(sprint);
+        issue.setIssueStatus(issueStatusRepository.findById(IssueStatusID.TO_DO.getStatusID()).orElse(null));
+
+        sprintRepository.save(sprint);
+        issueRepository.save(issue);
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.changeIssueStatus(issue.getId(), null));
+
+        //then
+        assertEquals(IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_NOT_ACTIVE, exception.getMessage());
+    }
+
+    @Test
+    public void changeIssueStatus_throwsStatusChangeImpossibleGivenStatusDoesNotExistsExceptionTest() {
+
+        //given
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.TRUE);
+        Issue issue = createIssueEntityWithSprint(sprint);
+        issue.setIssueStatus(issueStatusRepository.findById(IssueStatusID.TO_DO.getStatusID()).orElse(null));
+
+        sprintRepository.save(sprint);
+        issueRepository.save(issue);
+
+        Integer fakeIssueStatusID = 6;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.changeIssueStatus(issue.getId(), fakeIssueStatusID));
+
+        //then
+        assertEquals(STATUS_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
+    public void changeIssueStatus_throwsStatusFlowOrderViolation_StatusChangeOfDONEIssue() {
+
+        //given
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.TRUE);
+        Issue issue = createIssueEntityWithSprint(sprint);
+        issue.setIssueStatus(issueStatusRepository.findById(IssueStatusID.DONE.getStatusID()).orElse(null));
+
+        sprintRepository.save(sprint);
+        issueRepository.save(issue);
+
+        Integer toDOStatusID = IssueStatusID.TO_DO.getStatusID();
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.changeIssueStatus(issue.getId(), toDOStatusID));
+
+        //then
+        assertEquals(STATUS_FLOW_ORDER_VIOLATION, exception.getMessage());
+    }
+
+    @Test
+    public void changeIssueStatus_throwsStatusFlowOrderViolation_UnnaturalStatusFlowOrder() {
+
+        //given
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.TRUE);
+        Issue issue = createIssueEntityWithSprint(sprint);
+        issue.setIssueStatus(issueStatusRepository.findById(IssueStatusID.IN_PROGRESS.getStatusID()).orElse(null));
+
+        sprintRepository.save(sprint);
+        issueRepository.save(issue);
+
+        Integer doneStatusID = IssueStatusID.DONE.getStatusID();
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> issueService.changeIssueStatus(issue.getId(), doneStatusID));
+
+        //then
+        assertEquals(STATUS_FLOW_ORDER_VIOLATION, exception.getMessage());
+    }
+
+    @Test
+    public void changeIssueStatus_throwsStatusFlowOrderViolation_happyPath_IssueComesBackFromCodeReviewToInProgress() {
+
+        //given
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.TRUE);
+        Issue issue = createIssueEntityWithSprint(sprint);
+        issue.setIssueStatus(issueStatusRepository.findById(IssueStatusID.CODE_REVIEW.getStatusID()).orElse(null));
+
+        sprintRepository.save(sprint);
+        issueRepository.save(issue);
+
+        Integer inProgressStatusID = IssueStatusID.IN_PROGRESS.getStatusID();
+
+        //when
+        issueService.changeIssueStatus(issue.getId(), inProgressStatusID);
+        Issue issueStateAfterStatusChange = issueRepository.findById(issue.getId()).orElse(null);
+
+        //then
+        assertNotNull(issueStateAfterStatusChange);
+        assertEquals(inProgressStatusID, issueStateAfterStatusChange.getIssueStatus().getId());
+    }
+
+    @Test
+    public void changeIssueStatus_throwsStatusFlowOrderViolation_happyPath_IssueComesBackFromTestsToInProgress() {
+
+        //given
+        Sprint sprint = SprintBuilder.createSprintEntity(defaultScrumProject, Boolean.TRUE);
+        Issue issue = createIssueEntityWithSprint(sprint);
+        issue.setIssueStatus(issueStatusRepository.findById(IssueStatusID.IN_TESTS.getStatusID()).orElse(null));
+
+        sprintRepository.save(sprint);
+        issueRepository.save(issue);
+
+        Integer inProgressStatusID = IssueStatusID.IN_PROGRESS.getStatusID();
+
+        //when
+        issueService.changeIssueStatus(issue.getId(), inProgressStatusID);
+        Issue issueStateAfterStatusChange = issueRepository.findById(issue.getId()).orElse(null);
+
+        //then
+        assertNotNull(issueStateAfterStatusChange);
+        assertEquals(inProgressStatusID, issueStateAfterStatusChange.getIssueStatus().getId());
     }
 }

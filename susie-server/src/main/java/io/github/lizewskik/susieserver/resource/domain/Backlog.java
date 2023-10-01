@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -35,7 +36,7 @@ public class Backlog implements Serializable {
     @JsonManagedReference
     private Project project;
 
-    @OneToMany(mappedBy = "backlog", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JsonManagedReference
-    private Set<Issue> issues;
+    private Set<Issue> issues = new HashSet<>();
 }

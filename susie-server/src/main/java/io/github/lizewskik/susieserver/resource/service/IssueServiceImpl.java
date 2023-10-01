@@ -1,6 +1,7 @@
 package io.github.lizewskik.susieserver.resource.service;
 
 import io.github.lizewskik.susieserver.exception.definition.NullIdentifierException;
+import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.domain.IssuePriority;
 import io.github.lizewskik.susieserver.resource.domain.IssueStatus;
@@ -13,6 +14,7 @@ import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
 import io.github.lizewskik.susieserver.resource.dto.request.IssueMRO;
 import io.github.lizewskik.susieserver.resource.mapper.IssueDTOMapper;
 import io.github.lizewskik.susieserver.resource.mapper.IssueGeneralDTOMapper;
+import io.github.lizewskik.susieserver.resource.repository.BacklogRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssuePriorityRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssueRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssueStatusRepository;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_EMPTY;
@@ -55,6 +58,7 @@ public class IssueServiceImpl implements IssueService{
     private final IssuePriorityRepository issuePriorityRepository;
     private final IssueTypeRepository issueTypeRepository;
     private final SprintRepository sprintRepository;
+    private final BacklogRepository backlogRepository;
     private final UserService userService;
     private final IssueDTOMapper issueDTOMapper;
     private final IssueGeneralDTOMapper issueGeneralDTOMapper;
@@ -90,9 +94,14 @@ public class IssueServiceImpl implements IssueService{
                 .issueStatus(isNull(status) ? null : status)
                 .issueType(isNull(type) ? null : type)
                 .issuePriority(isNull(priority) ? null : priority)
-                .backlog(project.getBacklog())
                 .build();
         issueRepository.save(issue);
+
+        Backlog backlog = project.getBacklog();
+        Set<Issue> backlogIssues = backlog.getIssues();
+        backlogIssues.add(issue);
+        backlogRepository.save(backlog);
+
         return issueDTOMapper.map(issue);
     }
 
@@ -142,6 +151,18 @@ public class IssueServiceImpl implements IssueService{
         return project.getBacklog()
                 .getIssues()
                 .stream()
+                .map(issueGeneralDTOMapper::map)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<IssueGeneralDTO> getProductBacklog(Integer projectID) {
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+        return project.getBacklog()
+                .getIssues()
+                .stream()
+                .filter(issue -> isNull(issue.getSprint()))
                 .map(issueGeneralDTOMapper::map)
                 .collect(Collectors.toList());
     }

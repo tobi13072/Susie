@@ -15,8 +15,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ACTIVE_SPRINT_EXISTS;
@@ -26,8 +28,10 @@ import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMess
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_ALREADY_STARTED;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_NAME_NOT_UNIQUE;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_NOT_ACTIVE;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_START_DATE_IN_THE_FUTURE;
+import static io.github.lizewskik.susieserver.utils.DateUtils.reduceTimeFromZonedDateTime;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.isNull;
@@ -67,9 +71,15 @@ public class SprintServiceImpl implements SprintService {
 
         Project project = projectRepository.findById(sprintDTO.getProjectID())
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+
+        if (sprintRepository.existsByNameAndProject(sprintDTO.getName(), project)) {
+            throw new RuntimeException(SPRINT_NAME_NOT_UNIQUE);
+        }
+
         Sprint sprint = Sprint.builder()
                 .name(sprintDTO.getName())
                 .startDate(sprintDTO.getStartTime())
+                .sprintIssues(new HashSet<>())
                 .active(FALSE)
                 .project(project)
                 .build();
@@ -88,7 +98,18 @@ public class SprintServiceImpl implements SprintService {
             throw new RuntimeException(ISSUE_ALREADY_HAS_SPRINT);
         }
 
+        Set<Issue> sprintIssues;
+        if (isNull(sprint.getSprintIssues())) {
+            sprintIssues = new HashSet<>(List.of(issue));
+        } else {
+            sprintIssues = sprint.getSprintIssues();
+            sprintIssues.add(issue);
+        }
+        sprint.setSprintIssues(sprintIssues);
+        sprintRepository.save(sprint);
+
         issue.setSprint(sprint);
+        issueRepository.save(issue);
     }
 
     @Override
@@ -134,7 +155,7 @@ public class SprintServiceImpl implements SprintService {
 
     private Pair<Boolean, String> validateSprintDatesForStart(Sprint sprint) {
 
-        ZonedDateTime currentSystemDate = ZonedDateTime.now();
+        ZonedDateTime currentSystemDate = reduceTimeFromZonedDateTime(ZonedDateTime.now());
         Optional<ZonedDateTime> startSprintDate = ofNullable(sprint.getStartDate());
         boolean isSprintActive = sprint.getActive();
 
@@ -146,7 +167,8 @@ public class SprintServiceImpl implements SprintService {
             return Pair.of(TRUE, DATES_VALID);
         }
 
-        boolean isLaterThanCurrentSystemDate = startSprintDate.get().isAfter(currentSystemDate);
+        ZonedDateTime startSprintDateReduced = reduceTimeFromZonedDateTime(startSprintDate.get());
+        boolean isLaterThanCurrentSystemDate = startSprintDateReduced.isAfter(currentSystemDate);
         if (isLaterThanCurrentSystemDate) {
             return Pair.of(FALSE, SPRINT_START_DATE_IN_THE_FUTURE);
         }

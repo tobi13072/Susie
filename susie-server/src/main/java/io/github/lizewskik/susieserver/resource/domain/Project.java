@@ -49,13 +49,15 @@ public class Project implements Serializable {
     @JoinColumn(name = "BacklogID", referencedColumnName = "BacklogID")
     private Backlog backlog;
 
+    @Builder.Default
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "users", joinColumns = @JoinColumn(name = "user_id"))
     private Set<String> userIDs = new HashSet<>();
 
     private String projectOwner;
 
+    @Builder.Default
     @JsonManagedReference
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-    private Set<Sprint> sprints;
+    private Set<Sprint> sprints = new HashSet<>();
 }

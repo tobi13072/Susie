@@ -32,6 +32,11 @@ public class IssueRestController {
         return ResponseEntity.ok(issueService.getIssuesGeneral(projectID));
     }
 
+    @GetMapping("/product-backlog")
+    public ResponseEntity<List<IssueGeneralDTO>> getProductBacklogByProjectID(@RequestParam Integer projectID) {
+        return ResponseEntity.ok(issueService.getProductBacklog(projectID));
+    }
+
     @GetMapping("/sprint/{id}")
     public ResponseEntity<List<IssueGeneralDTO>> getGeneralIssuesInfoBySprintID(@PathVariable Integer id) {
         return ResponseEntity.ok(issueService.getGeneralIssuesInfoBySprintID(id));

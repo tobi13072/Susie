@@ -17,7 +17,6 @@ public class IssueDTO {
     private Integer estimation;
     private UserDTO reporter;
     private UserDTO assignee;
-    private Integer projectID;
     private Integer issueTypeID;
     private Integer issuePriorityID;
     private Integer issueStatusID;
