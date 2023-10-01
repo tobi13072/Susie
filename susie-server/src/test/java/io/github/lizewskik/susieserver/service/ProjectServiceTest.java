@@ -1,10 +1,15 @@
 package io.github.lizewskik.susieserver.service;
 
+import io.github.lizewskik.susieserver.builder.ProjectBuilder;
 import io.github.lizewskik.susieserver.builder.UserBuilder;
 import io.github.lizewskik.susieserver.config.TestConfiguration;
+import io.github.lizewskik.susieserver.resource.domain.Backlog;
+import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
 import io.github.lizewskik.susieserver.resource.dto.UserDTO;
+import io.github.lizewskik.susieserver.resource.repository.BacklogRepository;
+import io.github.lizewskik.susieserver.resource.repository.IssueRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import io.github.lizewskik.susieserver.resource.service.ProjectService;
 import io.github.lizewskik.susieserver.resource.service.UserService;
@@ -18,7 +23,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.createAnotherProject;
@@ -34,6 +41,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = TestConfiguration.class)
+@Transactional
 public class ProjectServiceTest {
 
     @Autowired
@@ -42,13 +50,17 @@ public class ProjectServiceTest {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private IssueRepository issueRepository;
+
+    @Autowired
+    private BacklogRepository backlogRepository;
+
     @MockBean
     private UserService userService;
 
     @BeforeEach
     public void setUp() {
-        projectRepository.deleteAll();
-        projectRepository.flush();
         when(userService.getCurrentLoggedUser()).thenReturn(UserBuilder.createCurrentLoggedInUser());
     }
 
@@ -118,6 +130,32 @@ public class ProjectServiceTest {
 
         //then
         assertEquals(expectedProjectsAmount, actualProjectsAmount);
+    }
+
+    @Test
+    public void deleteProject_containingIssuesTest() {
+
+        //given
+        Project project = ProjectBuilder.createProjectEntity();
+        projectRepository.save(project);
+
+        Issue issue = Issue.builder()
+                .name("Test name")
+                .build();
+        issueRepository.save(issue);
+
+        Backlog backlog = project.getBacklog();
+        backlog.setIssues(new HashSet<>(Set.of(issue)));
+        backlogRepository.save(backlog);
+
+        long expectedIssuesAmount = 0;
+
+        //when
+        projectService.deleteProject(project.getId());
+        long actualIssuesAmount = issueRepository.count();
+
+        //then
+        assertEquals(expectedIssuesAmount, actualIssuesAmount);
     }
 
     @Test

@@ -13,6 +13,7 @@ public interface ExceptionMessages {
     String ISSUE_TYPE_DOES_NOT_EXISTS = "Issue type with given ID does not exists";
     String ISSUE_PRIORITY_DOES_NOT_EXISTS = "Issue priority with given ID does not exists";
     String NULL_IDENTIFIER = "Identifier cannot be null value";
+    String SPRINT_NAME_NOT_UNIQUE = "The sprint name is not unique within the scope of the project";
     String STATUS_FLOW_ORDER_VIOLATION = "The principles of proper status flow violation";
     String SPRINT_START_DATE_IN_THE_FUTURE = "The start sprint date is in the future. It is not allowed to start sprint now";
     String SPRINT_ALREADY_STARTED = "Given Sprint is lasting at this point of time";
