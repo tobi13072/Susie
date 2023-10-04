@@ -2,9 +2,13 @@ package io.github.lizewskik.susieserver.resource.mapper;
 
 import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
+import io.github.lizewskik.susieserver.resource.service.CommentService;
 import io.github.lizewskik.susieserver.resource.service.UserService;
+import io.github.lizewskik.susieserver.utils.CollectionsUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 
 import static java.util.Objects.isNull;
 
@@ -13,6 +17,7 @@ import static java.util.Objects.isNull;
 public class IssueDTOMapper {
 
     private final UserService userService;
+    private final CommentService commentService;
 
     public IssueDTO map(Issue from) {
         return IssueDTO.builder()
@@ -32,6 +37,9 @@ public class IssueDTOMapper {
                 )
                 .issueStatusID(
                         isNull(from.getIssueStatus()) ? null : from.getIssueStatus().getId()
+                )
+                .comments(
+                        CollectionsUtils.isNullOrEmpty(from.getComments()) ? new ArrayList<>() : commentService.getAllCommentsForIssueID(from.getId())
                 )
                 .build();
     }

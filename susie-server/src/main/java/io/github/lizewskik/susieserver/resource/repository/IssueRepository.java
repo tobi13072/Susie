@@ -1,5 +1,6 @@
 package io.github.lizewskik.susieserver.resource.repository;
 
+import io.github.lizewskik.susieserver.resource.domain.Comment;
 import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.domain.Sprint;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,5 @@ import java.util.List;
 public interface IssueRepository extends JpaRepository<Issue, Integer> {
 
     List<Issue> findAllBySprint(Sprint sprint);
+    Issue findByCommentsContaining(Comment comment);
 }
