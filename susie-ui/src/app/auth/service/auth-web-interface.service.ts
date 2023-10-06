@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import {RegistrationRequest} from "../types/registration-request";
+import {RegistrationRequest} from "../../types/registration-request";
 import {Observable} from "rxjs";
-import {RegistrationResponse} from "../types/registration-response";
+import {RegistrationResponse} from "../../types/registration-response";
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import {MenuItem} from "primeng/api";
 
 
 @Component({
@@ -8,8 +7,6 @@ import {MenuItem} from "primeng/api";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
-  menuStructure: MenuItem[] | undefined;
 
   ngOnInit(): void {
   }

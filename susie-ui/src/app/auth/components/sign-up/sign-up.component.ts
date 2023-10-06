@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
 import {RegistrationRequest} from "../../../types/registration-request";
-import {AuthWebInterfaceService} from "../../../service/auth-web-interface.service";
+import {AuthWebInterfaceService} from "../../service/auth-web-interface.service";
 import {Router} from "@angular/router";
 
 @Component({

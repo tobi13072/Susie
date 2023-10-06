@@ -1,5 +1,5 @@
 <nav>
-  <p-menubar [model]="menuStructure">
+  <p-menubar>
     <ng-template pTemplate="start">
       <img src="https://primefaces.org/cdn/primeng/images/primeng.svg"
            height="40"
@@ -13,6 +13,10 @@
                 label="Sign-up"
                 styleClass="p-button-outlined p-button-secondary">
       </p-button>
+      <p-button class="m-1"
+                [routerLink]="['project']"
+                label="Project"
+                styleClass="p-button-outlined p-button-secondary"></p-button>
     </ng-template>
   </p-menubar>
 </nav>

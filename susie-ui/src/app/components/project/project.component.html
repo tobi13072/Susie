@@ -1,0 +1,11 @@
+<div class="d-flex justify-content-center">
+  <form [formGroup]="projectForm" (ngSubmit)="sendForm()">
+    <div class="d-flex flex-column mt-5">
+      <label for="name">Name</label>
+      <input type="text" id="name" pInputText formControlName="name">
+      <label for="description">Description</label>
+      <input type="text" id="description" pInputText formControlName="description">
+      <button pButton pRipple label="Submit" class="p-button-success mt-2"></button>
+    </div>
+  </form>
+</div>
