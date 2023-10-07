@@ -5,6 +5,7 @@ import io.github.lizewskik.susieserver.resource.service.SprintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +43,16 @@ public class SprintRestController {
     @PostMapping("/{sprintID}/issue/{issueID}")
     public void addIssueToSprint(@PathVariable Integer sprintID, @PathVariable Integer issueID) {
         sprintService.addIssueToSprint(issueID, sprintID);
+    }
+
+    @DeleteMapping("/{sprintID}/issue/delete/{issueID}")
+    public void deleteIssueFromSprint(@PathVariable Integer sprintID, @PathVariable Integer issueID) {
+        sprintService.deleteIssueFromSprint(sprintID, issueID);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteSprint(@PathVariable Integer id) {
+        sprintService.deleteSprint(id);
     }
 
     @PatchMapping("/start/{id}")

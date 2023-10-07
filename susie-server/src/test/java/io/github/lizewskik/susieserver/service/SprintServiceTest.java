@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,6 +47,7 @@ import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMess
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -357,5 +359,99 @@ public class SprintServiceTest {
 
         //then
         assertEquals(SPRINT_NOT_ACTIVE, exception.getMessage());
+    }
+
+    @Test
+    public void deleteSprint_emptySprint_happyPathTest() {
+
+        //given
+        Integer sprintToDeleteID = sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.FALSE)).getId();
+        long expectedSprintsAmount = sprintRepository.count() - 1;
+
+        //when
+        sprintService.deleteSprint(sprintToDeleteID);
+        long actualSprintsAmount = sprintRepository.count();
+
+        //then
+        assertEquals(expectedSprintsAmount, actualSprintsAmount);
+    }
+
+    @Test
+    public void deleteSprint_withIssues_happyPathTest() {
+
+        //given
+        Sprint sprint = sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.FALSE));
+        Issue issue = issueRepository.save(createIssueEntityWithSprint(sprint));
+        sprint.setSprintIssues(new HashSet<>(Sets.newSet(issue)));
+        sprintRepository.save(sprint);
+        long expectedSprintsAmount = sprintRepository.count() - 1;
+
+        //when
+        sprintService.deleteSprint(sprint.getId());
+        long actualSprintsAmount = sprintRepository.count();
+
+        //then
+        assertEquals(expectedSprintsAmount, actualSprintsAmount);
+        assertNull(issue.getSprint());
+    }
+
+    @Test
+    public void deleteSprint_throwsSprintDoesNotExistsExceptionTest() {
+
+        //given
+        Integer fakeSprintID = -10;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> sprintService.deleteSprint(fakeSprintID));
+
+        //then
+        assertEquals(SPRINT_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
+    public void deleteIssueFromSprint_happyPathTest() {
+
+        //given
+        Sprint sprint = sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.FALSE));
+        Issue issue = issueRepository.save(createIssueEntityWithSprint(sprint));
+        sprint.setSprintIssues(new HashSet<>(Sets.newSet(issue)));
+        sprintRepository.save(sprint);
+
+        //when
+        sprintService.deleteIssueFromSprint(sprint.getId(), issue.getId());
+
+        //then
+        assertNull(issue.getSprint());
+        assertFalse(sprint.getSprintIssues().contains(issue));
+    }
+
+    @Test
+    public void deleteIssueFromSprint_throwsSprintDoesNotExistsExceptionTest() {
+
+        //given
+        Sprint sprint = sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.FALSE));
+        issueRepository.save(createIssueEntityWithSprint(sprint));
+        Integer fakeSprintID = sprint.getId() + 1;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> sprintService.deleteIssueFromSprint(fakeSprintID, null));
+
+        //then
+        assertEquals(SPRINT_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
+    public void deleteIssueFromSprint_throwsIssueDoesNotExistsExceptionTest() {
+
+        //given
+        Sprint sprint = sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.FALSE));
+        Issue issue = issueRepository.save(createIssueEntityWithSprint(sprint));
+        Integer fakeIssueID = issue.getId() + 1;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> sprintService.deleteIssueFromSprint(sprint.getId(), fakeIssueID));
+
+        //then
+        assertEquals(ISSUE_DOES_NOT_EXISTS, exception.getMessage());
     }
 }
