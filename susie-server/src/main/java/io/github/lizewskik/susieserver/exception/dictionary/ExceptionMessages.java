@@ -9,7 +9,7 @@ public interface ExceptionMessages {
     String KEYCLOAK_USER_DOES_NOT_EXISTS = "Keycloak user with given email or UUID does not exist";
     String STATUS_DOES_NOT_EXISTS = "Issue status with given ID does not exists";
     String ISSUE_ALREADY_HAS_SPRINT = "Given issue is assigned to another Sprint";
-    String SPRINT_DOES_NOT_EXISTS = "Spring with given ID does not exists";
+    String SPRINT_DOES_NOT_EXISTS = "Sprint with given ID does not exists";
     String ISSUE_TYPE_DOES_NOT_EXISTS = "Issue type with given ID does not exists";
     String ISSUE_PRIORITY_DOES_NOT_EXISTS = "Issue priority with given ID does not exists";
     String NULL_IDENTIFIER = "Identifier cannot be null value";

@@ -101,6 +101,26 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
+    public void deleteSprint(Integer sprintID) {
+
+        Sprint sprintToBeDeleted = sprintRepository.findById(sprintID)
+                .orElseThrow(() -> new RuntimeException(SPRINT_DOES_NOT_EXISTS));
+
+        if (!sprintToBeDeleted.getSprintIssues().isEmpty()) {
+            List<Issue> issues = issueRepository.findAllBySprint(sprintToBeDeleted)
+                    .stream()
+                    .peek(sprint -> sprint.setSprint(null))
+                    .toList();
+            issueRepository.saveAll(issues);
+        }
+
+        sprintToBeDeleted.setSprintIssues(new HashSet<>());
+        sprintRepository.save(sprintToBeDeleted);
+
+        sprintRepository.deleteById(sprintID);
+    }
+
+    @Override
     public void addIssueToSprint(Integer issueID, Integer sprintID) {
 
         Issue issue = issueRepository.findById(issueID)
@@ -122,6 +142,23 @@ public class SprintServiceImpl implements SprintService {
         sprintRepository.save(sprint);
 
         issue.setSprint(sprint);
+        issueRepository.save(issue);
+    }
+
+    @Override
+    public void deleteIssueFromSprint(Integer sprintID, Integer issueID) {
+
+        Sprint sprint = sprintRepository.findById(sprintID)
+                .orElseThrow(() -> new RuntimeException(SPRINT_DOES_NOT_EXISTS));
+        Issue issue = issueRepository.findById(issueID)
+                .orElseThrow(() -> new RuntimeException(ISSUE_DOES_NOT_EXISTS));
+
+        Set<Issue> sprintIssues = sprint.getSprintIssues();
+        sprintIssues.remove(issue);
+        sprint.setSprintIssues(sprintIssues);
+        sprintRepository.save(sprint);
+
+        issue.setSprint(null);
         issueRepository.save(issue);
     }
 
