@@ -76,4 +76,13 @@ public class IssueBuilder {
                 .sprint(sprint)
                 .build();
     }
+
+    public static Issue createIssueEntityWithAssignee(String uuid) {
+        return Issue.builder()
+                .name(DEFAULT_ISSUE_NAME)
+                .description(DEFAULT_ISSUE_DESCRIPTION)
+                .estimation(DEFAULT_ISSUE_ESTIMATION)
+                .assigneeID(uuid)
+                .build();
+    }
 }

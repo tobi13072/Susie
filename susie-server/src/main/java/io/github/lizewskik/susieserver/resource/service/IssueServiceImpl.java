@@ -168,6 +168,15 @@ public class IssueServiceImpl implements IssueService{
     }
 
     @Override
+    public List<IssueGeneralDTO> getGeneralIssuesInfoByUserID() {
+        return issueRepository
+                .findAllByAssigneeID(userService.getCurrentLoggedUser().getUuid())
+                .stream()
+                .map(issueGeneralDTOMapper::map)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<IssueGeneralDTO> getGeneralIssuesInfoBySprintID(Integer sprintID) {
 
         Sprint sprint = sprintRepository.findById(ofNullable(sprintID).orElseThrow(NullIdentifierException::new))
