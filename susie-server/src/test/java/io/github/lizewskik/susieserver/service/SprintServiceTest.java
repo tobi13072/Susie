@@ -87,12 +87,11 @@ public class SprintServiceTest {
         sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.TRUE));
 
         //when
-        SprintDTO activeSprint = sprintService.getActiveSprint();
+        SprintDTO activeSprint = sprintService.getActiveSprint(defaultScrumProject.getId());
 
         //then
         assertEquals(Boolean.TRUE, activeSprint.getActive());
         assertEquals(SPRINT_NAME, activeSprint.getName());
-        //TODO resolve the problem of time verifying
         assertEquals(defaultScrumProject.getId(), activeSprint.getProjectID());
     }
 
@@ -100,10 +99,23 @@ public class SprintServiceTest {
     public void getActiveSprint_returnsNullWhenThereIsNoActiveSprint() {
 
         //given + when
-        SprintDTO activeSprint = sprintService.getActiveSprint();
+        SprintDTO activeSprint = sprintService.getActiveSprint(defaultScrumProject.getId());
 
         //then
         Assertions.assertNull(activeSprint);
+    }
+
+    @Test
+    public void getActiveSprint_throwsProjectDoesNotExistsExceptionText() {
+
+        //given
+        Integer fakeProjectID = defaultScrumProject.getId() + 1;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> sprintService.getActiveSprint(fakeProjectID));
+
+        //then
+        assertEquals(PROJECT_DOES_NOT_EXISTS, exception.getMessage());
     }
 
     @Test
@@ -241,7 +253,7 @@ public class SprintServiceTest {
 
         //when
         sprintService.startSprint(sprint.getId());
-        boolean existsActiveSprint = sprintRepository.findByActive(Boolean.TRUE).isPresent() ? sprintRepository.findByActive(Boolean.TRUE).get().getActive() : false;
+        boolean existsActiveSprint = sprintRepository.findByActiveAndProject(Boolean.TRUE, defaultScrumProject).isPresent() ? sprintRepository.findByActiveAndProject(Boolean.TRUE, defaultScrumProject).get().getActive() : false;
 
         //then
         assertTrue(existsActiveSprint);

@@ -22,14 +22,14 @@ public class SprintRestController {
 
     private final SprintService sprintService;
 
-    @GetMapping("/active")
-    public ResponseEntity<SprintDTO> getActiveSprint() {
-        return ResponseEntity.ok(sprintService.getActiveSprint());
+    @GetMapping("/active/{projectID}")
+    public ResponseEntity<SprintDTO> getActiveSprint(@PathVariable Integer projectID) {
+        return ResponseEntity.ok(sprintService.getActiveSprint(projectID));
     }
 
-    @GetMapping("/non-activated")
-    public ResponseEntity<List<SprintDTO>> getAllSprints() {
-        return ResponseEntity.ok(sprintService.getAllNonActivatedSprints());
+    @GetMapping("/non-activated/{projectID}")
+    public ResponseEntity<List<SprintDTO>> getAllSprints(@PathVariable Integer projectID) {
+        return ResponseEntity.ok(sprintService.getAllNonActivatedSprints(projectID));
     }
 
     @PostMapping
