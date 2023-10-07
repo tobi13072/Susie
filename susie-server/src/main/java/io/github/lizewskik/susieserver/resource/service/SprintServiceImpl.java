@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -50,18 +51,30 @@ public class SprintServiceImpl implements SprintService {
     private final SprintDTOMapper sprintDTOMapper;
 
     @Override
-    public SprintDTO getActiveSprint() {
-        if (sprintRepository.findByActive(TRUE).isPresent()) {
-            return sprintDTOMapper.map(sprintRepository.findByActive(TRUE).get());
+    public SprintDTO getActiveSprint(Integer projectID) {
+
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+
+        if (sprintRepository.findByActiveAndProject(TRUE, project).isPresent()) {
+            return sprintDTOMapper.map(sprintRepository.findByActiveAndProject(TRUE, project).get());
         }
         return null;
     }
 
     @Override
-    public List<SprintDTO> getAllNonActivatedSprints() {
-        return sprintRepository.findAll()
+    public List<SprintDTO> getAllNonActivatedSprints(Integer projectID) {
+
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+
+        if (sprintRepository.findAllByActiveAndProject(FALSE, project).isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return sprintRepository.findAllByActiveAndProject(FALSE, project)
+                .get()
                 .stream()
-                .filter(sprint -> sprint.getActive().equals(FALSE))
                 .map(sprintDTOMapper::map)
                 .collect(Collectors.toList());
     }
@@ -115,12 +128,12 @@ public class SprintServiceImpl implements SprintService {
     @Override
     public void startSprint(Integer sprintID) {
 
-        if(sprintRepository.findByActive(TRUE).isPresent()) {
-            throw new RuntimeException(ACTIVE_SPRINT_EXISTS);
-        }
-
         Sprint updated = sprintRepository.findById(ofNullable(sprintID).orElseThrow(NullIdentifierException::new))
                 .orElseThrow(() -> new IllegalArgumentException(SPRINT_DOES_NOT_EXISTS));
+
+        if(sprintRepository.findByActiveAndProject(TRUE, updated.getProject()).isPresent()) {
+            throw new RuntimeException(ACTIVE_SPRINT_EXISTS);
+        }
 
         if (updated.getSprintIssues().isEmpty()) {
             throw new RuntimeException(EMPTY_SPRINT);

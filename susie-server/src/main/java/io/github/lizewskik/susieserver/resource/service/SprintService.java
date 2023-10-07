@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface SprintService {
 
-    SprintDTO getActiveSprint();
-    List<SprintDTO> getAllNonActivatedSprints();
+    SprintDTO getActiveSprint(Integer projectID);
+    List<SprintDTO> getAllNonActivatedSprints(Integer projectID);
     SprintDTO createSprint(SprintDTO sprintDTO);
     void addIssueToSprint(Integer issueID, Integer sprintID);
     void startSprint(Integer sprintID);
