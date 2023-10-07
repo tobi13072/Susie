@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +44,7 @@ import static io.github.lizewskik.susieserver.builder.IssueBuilder.OTHER_ISSUE_E
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.OTHER_ISSUE_NAME;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createDefaultIssue;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntity;
+import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntityWithAssignee;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntityWithIssueStatus;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntityWithSprint;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueWithFakeIssuePriorityID;
@@ -60,6 +62,7 @@ import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMess
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.STATUS_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.STATUS_FLOW_ORDER_VIOLATION;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -649,6 +652,41 @@ public class IssueServiceTest {
         //then
         assertNotNull(issueStateAfterStatusChange);
         assertEquals(inProgressStatusID, issueStateAfterStatusChange.getIssueStatus().getId());
+    }
+
+    @Test
+    public void getGeneralIssuesInfoByUserID_returnsUserIssuesTest() {
+
+        //given
+        when(userService.getUserByUUID(any())).thenReturn(createCurrentLoggedInUser());
+        Issue userIssue = issueRepository.save(createIssueEntityWithAssignee(CURRENT_USER_UUID));
+        issueRepository.save(createIssueEntity());
+        int expectedReturnedListSize = 1;
+
+        //when
+        List<IssueGeneralDTO> returedList = issueService.getGeneralIssuesInfoByUserID();
+        int actualReturnedListSize = returedList.size();
+        IssueGeneralDTO actualElement = returedList.get(0);
+
+        //then
+        assertEquals(expectedReturnedListSize, actualReturnedListSize);
+        assertEquals(userIssue.getId(), actualElement.getId());
+        assertEquals(userIssue.getName(), actualElement.getName());
+        assertEquals(createCurrentLoggedInUser(), actualElement.getAssignee());
+    }
+
+    @Test
+    public void getGeneralIssuesInfoByUserID_returnsEmptyListTest() {
+
+        //given
+        List<IssueGeneralDTO> emptyList = Collections.emptyList();
+        when(userService.getUserByUUID(any())).thenReturn(createCurrentLoggedInUser());
+
+        //when
+        List<IssueGeneralDTO> returnedList = issueService.getGeneralIssuesInfoByUserID();
+
+        //then
+        assertArrayEquals(emptyList.toArray(), returnedList.toArray());
     }
 
     private Issue prepareIssueWithComments() {

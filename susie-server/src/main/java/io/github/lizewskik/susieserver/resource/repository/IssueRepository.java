@@ -12,5 +12,6 @@ import java.util.List;
 public interface IssueRepository extends JpaRepository<Issue, Integer> {
 
     List<Issue> findAllBySprint(Sprint sprint);
+    List<Issue> findAllByAssigneeID(String assigneeID);
     Issue findByCommentsContaining(Comment comment);
 }
