@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -46,9 +47,10 @@ public class Issue implements Serializable {
 
     private String assigneeID;
 
-    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
-    private Set<Comment> comments;
+    private Set<Comment> comments = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "SprintID")
@@ -56,14 +58,14 @@ public class Issue implements Serializable {
     private Sprint sprint;
 
     @ManyToOne
-    @JoinColumn(name = "IssueStatusID")
+    @JoinColumn(name = "Issue_StatusID")
     private IssueStatus issueStatus;
 
     @ManyToOne
-    @JoinColumn(name = "IssueTypeID")
+    @JoinColumn(name = "Issue_TypeID")
     private IssueType issueType;
 
     @ManyToOne
-    @JoinColumn(name = "IssuePriorityID")
+    @JoinColumn(name = "Issue_PriorityID")
     private IssuePriority issuePriority;
 }

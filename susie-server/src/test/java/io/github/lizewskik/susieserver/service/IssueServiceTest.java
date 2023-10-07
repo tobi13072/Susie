@@ -5,16 +5,19 @@ import io.github.lizewskik.susieserver.builder.SprintBuilder;
 import io.github.lizewskik.susieserver.builder.UserBuilder;
 import io.github.lizewskik.susieserver.config.TestConfiguration;
 import io.github.lizewskik.susieserver.resource.domain.Backlog;
+import io.github.lizewskik.susieserver.resource.domain.Comment;
 import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.domain.IssueStatus;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.domain.Sprint;
 import io.github.lizewskik.susieserver.resource.domain.dictionary.IssuePriorityID;
 import io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID;
+import io.github.lizewskik.susieserver.resource.dto.CommentDTO;
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
 import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
 import io.github.lizewskik.susieserver.resource.dto.request.IssueMRO;
 import io.github.lizewskik.susieserver.resource.repository.BacklogRepository;
+import io.github.lizewskik.susieserver.resource.repository.CommentRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssueRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssueStatusRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
@@ -29,10 +32,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static io.github.lizewskik.susieserver.builder.CommentBuilder.DEFAULT_COMMENT_BODY;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.OTHER_ISSUE_DESCRIPTION;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.OTHER_ISSUE_ESTIMATION;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.OTHER_ISSUE_NAME;
@@ -43,6 +48,7 @@ import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEn
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueWithFakeIssuePriorityID;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueWithFakeIssueTypeID;
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.createProjectEntity;
+import static io.github.lizewskik.susieserver.builder.UserBuilder.CURRENT_USER_UUID;
 import static io.github.lizewskik.susieserver.builder.UserBuilder.createCurrentLoggedInUser;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_EMPTY;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.IMPOSSIBLE_ISSUE_STATUS_CHANGE_SPRINT_NOT_ACTIVE;
@@ -58,6 +64,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = TestConfiguration.class)
@@ -81,6 +88,9 @@ public class IssueServiceTest {
 
     @Autowired
     private SprintRepository sprintRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @MockBean
     private UserService userService;
@@ -184,8 +194,9 @@ public class IssueServiceTest {
     public void getIssueDetails_happyPathTest() {
 
         //given
-        Issue issue = createIssueEntity();
-        issueRepository.save(issue);
+        when(userService.getUserByUUID(any())).thenReturn(createCurrentLoggedInUser());
+        Issue issue = prepareIssueWithComments();
+        int expectedCommentsArraySize = 1;
 
         //when
         IssueDTO actualReturnedIssueDetails = issueService.getIssueDetails(issue.getId());
@@ -194,6 +205,13 @@ public class IssueServiceTest {
         assertEquals(issue.getName(), actualReturnedIssueDetails.getName());
         assertEquals(issue.getDescription(), actualReturnedIssueDetails.getDescription());
         assertEquals(issue.getEstimation(), actualReturnedIssueDetails.getEstimation());
+        assertEquals(expectedCommentsArraySize, actualReturnedIssueDetails.getComments().size());
+
+        List<CommentDTO> issueComments = actualReturnedIssueDetails.getComments();
+        CommentDTO comment = issueComments.get(0);
+
+        assertEquals(DEFAULT_COMMENT_BODY, comment.getBody());
+        assertEquals(createCurrentLoggedInUser(), comment.getAuthor());
     }
 
     @Test
@@ -631,5 +649,26 @@ public class IssueServiceTest {
         //then
         assertNotNull(issueStateAfterStatusChange);
         assertEquals(inProgressStatusID, issueStateAfterStatusChange.getIssueStatus().getId());
+    }
+
+    private Issue prepareIssueWithComments() {
+
+        Date NOW = new Date();
+        Comment comment = Comment.builder()
+                .body(DEFAULT_COMMENT_BODY)
+                .build();
+        comment.setCreatedBy(CURRENT_USER_UUID);
+        comment.setCreatedDate(NOW);
+        comment.setLastModifiedBy(CURRENT_USER_UUID);
+        comment.setLastModifiedDate(NOW);
+        commentRepository.save(comment);
+
+        Issue issueWithComment = createIssueEntity();
+        Set<Comment> issueComments = issueWithComment.getComments();
+        issueComments.add(comment);
+        issueWithComment.setComments(issueComments);
+        issueRepository.save(issueWithComment);
+
+        return issueWithComment;
     }
 }

@@ -22,7 +22,7 @@ import lombok.Setter;
 public class IssuePriority {
 
     @Id
-    @Column(name = "IssuePriorityID")
+    @Column(name = "Issue_PriorityID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_priority_seq_gen")
     @SequenceGenerator(name = "issue_priority_seq_gen", sequenceName = "issue_priority_seq")
     private Integer id;

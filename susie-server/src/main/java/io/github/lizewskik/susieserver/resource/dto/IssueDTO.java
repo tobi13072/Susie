@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -20,4 +22,5 @@ public class IssueDTO {
     private Integer issueTypeID;
     private Integer issuePriorityID;
     private Integer issueStatusID;
+    private List<CommentDTO> comments;
 }

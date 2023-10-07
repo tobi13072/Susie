@@ -22,7 +22,7 @@ import lombok.Setter;
 public class IssueType {
 
     @Id
-    @Column(name = "IssueTypeID")
+    @Column(name = "Issue_TypeID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "issue_type_seq_gen")
     @SequenceGenerator(name = "issue_type_seq_gen", sequenceName = "issue_type_seq")
     private Integer id;
