@@ -1,0 +1,23 @@
+<div class="d-flex justify-content-center">
+  <p-card class="mt-5 w-25" header="Registration">
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <div class="d-flex flex-column mb-1">
+        <label for="email">Email</label>
+        <input pInputText id="email" formControlName="email" class="mb-1"/>
+
+        <label for="firstName">Firstname</label>
+        <input pInputText id="firstName" formControlName="firstName" class="mb-1"/>
+
+        <label for="lastName">Lastname</label>
+        <input pInputText id="lastName" formControlName="lastName" class="mb-1"/>
+
+        <label for="password">Password</label>
+        <input pInputText type="password" id="password" formControlName="password" class="mb-1"/>
+
+        <label for="isSM">Extended role</label>
+        <p-inputSwitch id="isSM" formControlName="isScrumMaster"></p-inputSwitch>
+      </div>
+      <button pButton pRipple label="Next" class="p-button-success mt-2"></button>
+    </form>
+  </p-card>
+</div>

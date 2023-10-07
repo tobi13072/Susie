@@ -1,0 +1,15 @@
+<div class="d-flex justify-content-center">
+  <p-card header="Login" class="w-25 mt-5">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="d-flex flex-column mb-1">
+        <label for="email">Email</label>
+        <input type="text" id="email" pInputText formControlName="email" class="mb-1"/>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" pInputText formControlName="password">
+      </div>
+      <button pButton pRipple label="Login" class="p-button-success mt-2"></button>
+    </form>
+  </p-card>
+
+</div>

@@ -14,7 +14,7 @@ export class ProjectComponent implements OnInit{
     projectID: ['']
   });
 
-  sendForm() {
+  onSubmit() {
     if (this.projectForm.valid) {
       console.log({
         name: this.projectForm.value.name,

@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { SignUpComponent } from './auth/components/sign-up/sign-up.component';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { MenubarModule } from 'primeng/menubar';
 import { ButtonModule } from "primeng/button";
 import { RouterModule } from '@angular/router';
@@ -16,12 +16,14 @@ import { HttpClientModule } from "@angular/common/http";
 import { ProjectComponent } from './components/project/project.component';
 import {KeyFilterModule} from "primeng/keyfilter";
 import {RippleModule} from "primeng/ripple";
+import { SignInComponent } from './components/sign-in/sign-in.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SignUpComponent,
-    ProjectComponent
+    ProjectComponent,
+    SignInComponent
   ],
   imports: [
     BrowserModule,

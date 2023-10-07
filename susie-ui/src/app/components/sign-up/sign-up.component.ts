@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
-import {RegistrationRequest} from "../../../types/registration-request";
+import {RegistrationRequest} from "../../types/registration-request";
 import {AuthWebInterfaceService} from "../../service/auth-web-interface.service";
 import {Router} from "@angular/router";
 
@@ -10,6 +10,13 @@ import {Router} from "@angular/router";
   styleUrls: ['./sign-up.component.scss']
 })
 export class SignUpComponent implements OnInit {
+  constructor(private _fb: FormBuilder,
+              private authService: AuthWebInterfaceService,
+              private router: Router) {
+  }
+
+  ngOnInit(): void {
+  }
 
   registrationForm = this._fb.group({
     email: ['', Validators.required],
@@ -18,14 +25,6 @@ export class SignUpComponent implements OnInit {
     lastName: ['', Validators.required],
     isScrumMaster: [false, Validators.required]
   });
-
-  constructor(private _fb: FormBuilder,
-              private authService: AuthWebInterfaceService,
-              private router: Router) {
-  }
-
-  ngOnInit(): void {
-  }
 
   private prepareDataToSend(): RegistrationRequest {
     return {
@@ -43,7 +42,7 @@ export class SignUpComponent implements OnInit {
       next: result => {
         if (result.success) {
           console.log('Registration success');
-          this.router.navigate(['']).then();
+          this.router.navigate(['project']).then();
         } else {
           console.log('Registration failure')
         }
