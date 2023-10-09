@@ -7,6 +7,7 @@ import io.github.lizewskik.susieserver.keycloak.security.dto.SimpleRoleRepresent
 import io.github.lizewskik.susieserver.keycloak.security.dto.request.RegistrationRequest;
 import io.github.lizewskik.susieserver.keycloak.security.dto.request.SignInRequest;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.AccessTokenExtendedResponse;
+import io.github.lizewskik.susieserver.keycloak.security.dto.response.AccountDeletionResponse;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.RegistrationResponse;
 import io.github.lizewskik.susieserver.keycloak.security.utils.HttpCustomClient;
 import io.github.lizewskik.susieserver.keycloak.security.utils.builder.UserRepresentationBuilder;
@@ -23,19 +24,26 @@ import org.springframework.stereotype.Service;
 import java.net.URISyntaxException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.KEYCLOAK_USER_ROLE_ALREADY_ASSIGNED;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.CLIENT_ID_REQUEST_PARAMETER;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.CLIENT_SECRET_REQUEST_PARAMETER;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.GRANT_TYPE_REQUEST_PARAMETER;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_DEVELOPER;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_PRODUCT_OWNER;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_SCRUM_MASTER;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_CLIENT_ROLE_USER;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.PO_PERMISSION_ALREADY_EXISTS;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.REFRESH_TOKEN_REQUEST_PARAMETER;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.SM_PERMISSION_ADDED_WARNING;
+import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.USER_DELETION_INFO;
 
 @Service
 @RequiredArgsConstructor
@@ -137,6 +145,53 @@ public class KeycloakService {
                 .toRepresentation();
     }
 
+    public void grantNewPermissionToUser(String uuid, String clientRole, Set<String> usersUUIDs) {
+
+        if (KEYCLOAK_CLIENT_ROLE_SCRUM_MASTER.equals(clientRole)) {
+            throw new RuntimeException(SM_PERMISSION_ADDED_WARNING);
+        }
+
+        if (KEYCLOAK_CLIENT_ROLE_PRODUCT_OWNER.equals(clientRole) && isExistAnyProductOwnerInProject(usersUUIDs)) {
+            throw new RuntimeException(PO_PERMISSION_ALREADY_EXISTS);
+        }
+
+        List<SimpleRoleRepresentation> alreadyAssignedUserRoles = getUserRolesByUserUUID(uuid);
+
+        alreadyAssignedUserRoles.forEach(role -> {
+            if (role.getName().equals(clientRole)) {
+                throw new RuntimeException(KEYCLOAK_USER_ROLE_ALREADY_ASSIGNED + clientRole);
+            }
+        });
+
+        assignRoleToUser(uuid, clientRole);
+    }
+
+    public AccountDeletionResponse deleteAccount(String uuid) {
+
+        Response response = this.keycloakConfig.getInstance()
+                .realm(keycloakConfig.getRealm())
+                .users()
+                .delete(uuid);
+
+        return AccountDeletionResponse.builder()
+                .result(USER_DELETION_INFO)
+                .internalStatus(response.getStatus())
+                .reasonPhrase(response.getStatusInfo().getReasonPhrase())
+                .success(Boolean.TRUE)
+                .build();
+    }
+
+    public void revokeUserRole(String userUUID, String clientRole) {
+        this.keycloakConfig
+                .getInstance()
+                .realm(keycloakConfig.getRealm())
+                .users()
+                .get(userUUID)
+                .roles()
+                .clientLevel(getIDForClientID(keycloakConfig.getClientId()))
+                .remove(getClientRolesByName(List.of(clientRole)));
+    }
+
     private List<RoleRepresentation> getClientRolesByName(List<String> clientRoles) {
         String entityID = getIDForClientID(keycloakConfig.getClientId());
         RealmResource realmResource = keycloakConfig.getInstance().realm(keycloakConfig.getRealm());
@@ -144,6 +199,28 @@ public class KeycloakService {
         clientRoles.forEach(role -> roles.add(Optional.of(realmResource.clients().get(entityID).roles().get(role).toRepresentation())
                 .orElseThrow(() -> new RuntimeException(ROLE_DOES_NOT_EXIST.concat(role)))));
         return roles;
+    }
+
+    private boolean isExistAnyProductOwnerInProject(Set<String> userUUIDs) {
+
+        return userUUIDs.stream()
+                .map(this::getUserRolesByUserUUID)
+                .flatMap(Collection::stream)
+                .anyMatch(srr -> KEYCLOAK_CLIENT_ROLE_PRODUCT_OWNER.equals(srr.getName()));
+    }
+
+    private List<SimpleRoleRepresentation> getUserRolesByUserUUID(String uuid) {
+        return this.keycloakConfig
+                .getInstance()
+                .realm(keycloakConfig.getRealm())
+                .users()
+                .get(uuid)
+                .roles().clientLevel(getIDForClientID(keycloakConfig.getClientId()))
+                .listAll().stream().map(role -> SimpleRoleRepresentation.builder()
+                        .id(role.getId())
+                        .name(role.getName())
+                        .build())
+                .toList();
     }
 
     private void assignRoleToUser(String userUUID, String clientRole) {

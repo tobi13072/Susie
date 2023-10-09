@@ -1,7 +1,5 @@
 package io.github.lizewskik.susieserver.resource.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +27,7 @@ import java.util.Set;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Issue implements Serializable {
+public class Issue extends Auditable implements Serializable {
 
     @Id
     @Column(name = "IssueID")
@@ -49,12 +47,12 @@ public class Issue implements Serializable {
 
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
+//    @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "SprintID")
-    @JsonBackReference
+//    @JsonBackReference
     private Sprint sprint;
 
     @ManyToOne

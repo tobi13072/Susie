@@ -7,6 +7,7 @@ public interface ExceptionMessages {
     String PROJECT_NAME_NOT_UNIQUE = "The project name is not unique within the scope of the property";
     String ACTION_NOT_ALLOWED = "Current user is not allowed to perform this action";
     String KEYCLOAK_USER_DOES_NOT_EXISTS = "Keycloak user with given email or UUID does not exist";
+    String KEYCLOAK_USER_ROLE_ALREADY_ASSIGNED = "This user has already assigned role: ";
     String STATUS_DOES_NOT_EXISTS = "Issue status with given ID does not exists";
     String ISSUE_ALREADY_HAS_SPRINT = "Given issue is assigned to another Sprint";
     String SPRINT_DOES_NOT_EXISTS = "Sprint with given ID does not exists";
@@ -24,4 +25,5 @@ public interface ExceptionMessages {
     String EMPTY_SPRINT = "It is not allowed to start sprint without any issue";
     String COMMENT_DOES_NOT_EXISTS = "Comment with given ID does not exists";
     String FORBIDDEN_COMMENT_ACCESS = "It is not allowed to modify or delete comment of another user";
+    String USERS_NUMBER_EXCEEDED = "The maximum number of users has been exceeded";
 }

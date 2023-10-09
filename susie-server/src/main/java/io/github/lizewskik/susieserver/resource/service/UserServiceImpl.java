@@ -11,8 +11,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.KEYCLOAK_USER_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_FIRSTNAME_TOKEN_CLAIM;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_LASTNAME_TOKEN_CLAIM;
 
@@ -68,5 +70,14 @@ public class UserServiceImpl implements UserService {
         Project project = projectRepository.findById(projectID).orElseThrow(RuntimeException::new);
         String projectOwnerUUID = project.getProjectOwner();
         return projectOwnerUUID.equals(currentLoggedUserUUID);
+    }
+
+    @Override
+    public Set<String> getAllProjectUsersUUIDs(Integer projectID) {
+
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+
+        return project.getUserIDs();
     }
 }

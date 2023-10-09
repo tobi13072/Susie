@@ -30,6 +30,10 @@ import java.util.UUID;
 
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.createAnotherProject;
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.createProject;
+import static io.github.lizewskik.susieserver.builder.ProjectBuilder.createProjectEntity;
+import static io.github.lizewskik.susieserver.builder.UserBuilder.CURRENT_USER_UUID;
+import static io.github.lizewskik.susieserver.builder.UserBuilder.SECOND_USER_UUID;
+import static io.github.lizewskik.susieserver.builder.UserBuilder.prepareAnotherUserMock;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ACTION_NOT_ALLOWED;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_NAME_NOT_UNIQUE;
@@ -255,5 +259,59 @@ public class ProjectServiceTest {
 
         //then
         assertEquals(PROJECT_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    @Test
+    public void deleteUserFromProject_happyPathTest() {
+
+        //given
+        when(userService.isProjectOwner(any())).thenReturn(true);
+        when(userService.getUserByUUID(SECOND_USER_UUID)).thenReturn(prepareAnotherUserMock());
+        Project project = prepareProjectWithTwoCollaborators();
+        int expectedUsersAmount = project.getUserIDs().size() - 1;
+
+        //when
+        projectService.deleteUserFromProject(SECOND_USER_UUID, project.getId());
+        int actualUsersAmount = project.getUserIDs().size();
+
+        //then
+        assertEquals(expectedUsersAmount, actualUsersAmount);
+        assertTrue(project.getUserIDs().contains(CURRENT_USER_UUID));
+    }
+
+    @Test
+    public void deleteUserFromProject_throwsActionNotAllowedExceptionTest() {
+
+        //given
+        when(userService.isProjectOwner(any())).thenReturn(false);
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> projectService.deleteUserFromProject(null, null));
+
+        //then
+        assertEquals(ACTION_NOT_ALLOWED, exception.getMessage());
+    }
+
+    @Test
+    public void deleteUserFromProject_throwsProjectDoesNotExistsExceptionTest() {
+
+        //given
+        when(userService.isProjectOwner(any())).thenReturn(true);
+        Integer fakeProjectID = 1;
+
+        //when
+        Exception exception = assertThrows(RuntimeException.class, () -> projectService.deleteUserFromProject(null, fakeProjectID));
+
+        //then
+        assertEquals(PROJECT_DOES_NOT_EXISTS, exception.getMessage());
+    }
+
+    private Project prepareProjectWithTwoCollaborators() {
+        Project project = createProjectEntity();
+        Set<String> usersAssociatedWithProject = project.getUserIDs();
+        usersAssociatedWithProject.add(SECOND_USER_UUID);
+        project.setUserIDs(usersAssociatedWithProject);
+        projectRepository.save(project);
+        return project;
     }
 }
