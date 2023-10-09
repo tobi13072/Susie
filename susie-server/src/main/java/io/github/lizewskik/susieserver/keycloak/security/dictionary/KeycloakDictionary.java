@@ -4,6 +4,9 @@ public interface KeycloakDictionary {
 
     String EMPTY_WORD = "";
     String URI_SEPARATOR = "/";
+    String USER_DELETION_INFO = "User was successfully deleted from service";
+    String SM_PERMISSION_ADDED_WARNING = "There can exist only one user with Scrum Master permission in project";
+    String PO_PERMISSION_ALREADY_EXISTS = "Product Owner permission is already assigned to one of the project collaborators";
     String KEYCLOAK_CLIENT_ROLE_USER = "client_user";
     String KEYCLOAK_CLIENT_ROLE_ADMIN = "client_admin";
     String KEYCLOAK_CLIENT_ROLE_PRODUCT_OWNER = "po";

@@ -1,6 +1,5 @@
 package io.github.lizewskik.susieserver.resource.domain;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -31,7 +30,7 @@ import java.util.Set;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Project implements Serializable {
+public class Project extends Auditable implements Serializable {
 
     @Id
     @Column(name = "ProjectID")
@@ -44,7 +43,7 @@ public class Project implements Serializable {
 
     private String description;
 
-    @JsonManagedReference
+//    @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "BacklogID", referencedColumnName = "BacklogID")
     private Backlog backlog;
@@ -57,7 +56,7 @@ public class Project implements Serializable {
     private String projectOwner;
 
     @Builder.Default
-    @JsonManagedReference
+//    @JsonManagedReference
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Sprint> sprints = new HashSet<>();
 }

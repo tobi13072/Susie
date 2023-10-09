@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ACTION_NOT_ALLOWED;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_NAME_NOT_UNIQUE;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.USERS_NUMBER_EXCEEDED;
 
 @Service
 @Transactional
@@ -122,9 +123,47 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
         String userUUID = userService.getUserByEmail(email).getUuid();
         Set<String> usersAssociatedWithProject = updated.getUserIDs();
-        usersAssociatedWithProject.add(userUUID);
+
+        Integer PROJECT_MAX_COLLABORATORS = 10;
+        if (!PROJECT_MAX_COLLABORATORS.equals(usersAssociatedWithProject.size())) {
+            usersAssociatedWithProject.add(userUUID);
+            updated.setUserIDs(usersAssociatedWithProject);
+            projectRepository.save(updated);
+        } else {
+            throw new RuntimeException(USERS_NUMBER_EXCEEDED);
+        }
+    }
+
+    @Override
+    public void deleteUserFromProject(String uuid, Integer projectID) {
+
+        if (!userService.isProjectOwner(projectID)) {
+            throw new RuntimeException(ACTION_NOT_ALLOWED);
+        }
+
+        Project updated = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+
+        // contains user existing verification
+        String userUUID = userService.getUserByUUID(uuid).getUuid();
+        Set<String> usersAssociatedWithProject = updated.getUserIDs();
+        usersAssociatedWithProject.remove(userUUID);
         updated.setUserIDs(usersAssociatedWithProject);
         projectRepository.save(updated);
+    }
+
+    @Override
+    public void deleteUserFromAllProjects(String email) {
+
+        String userUUID = userService.getUserByEmail(email).getUuid();
+        List<Project> allUsersProjects = projectRepository.findAllByUserIDsContains(email);
+        if (!allUsersProjects.isEmpty()) {
+            allUsersProjects.forEach(project -> {
+                Set<String> projectUsers = project.getUserIDs();
+                projectUsers.remove(userUUID);
+                projectRepository.save(project);
+            });
+        }
     }
 
     private List<UserDTO> mapUserUUIDsToUserDTOs(Set<String> uuids) {

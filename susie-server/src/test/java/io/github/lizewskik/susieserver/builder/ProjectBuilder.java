@@ -4,7 +4,8 @@ import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
 
-import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
 
 import static io.github.lizewskik.susieserver.builder.UserBuilder.CURRENT_USER_UUID;
 
@@ -34,7 +35,7 @@ public class ProjectBuilder {
                 .name(PROJECT_NAME)
                 .description(PROJECT_DESCRIPTION)
                 .projectOwner(CURRENT_USER_UUID)
-                .userIDs(Set.of(CURRENT_USER_UUID))
+                .userIDs(new HashSet<>(List.of(CURRENT_USER_UUID)))
                 .backlog(new Backlog())
                 .build();
     }

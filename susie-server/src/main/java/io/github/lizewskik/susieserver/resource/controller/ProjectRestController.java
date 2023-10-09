@@ -3,6 +3,7 @@ package io.github.lizewskik.susieserver.resource.controller;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDetailsDTO;
 import io.github.lizewskik.susieserver.resource.dto.UserAssociationDTO;
+import io.github.lizewskik.susieserver.resource.dto.UserExcludingDTO;
 import io.github.lizewskik.susieserver.resource.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -62,5 +63,11 @@ public class ProjectRestController {
     @PreAuthorize(SM_PERMISSION)
     public void associateUserWithProject(@RequestBody UserAssociationDTO associationRequest) {
         projectService.associateUserWithProject(associationRequest.getEmail(), associationRequest.getProjectID());
+    }
+
+    @DeleteMapping("/delete-user")
+    @PreAuthorize(SM_PERMISSION)
+    public void deleteUserFromProject(@RequestBody UserExcludingDTO exclusionRequest) {
+        projectService.deleteUserFromProject(exclusionRequest.getUserUUID(), exclusionRequest.getProjectID());
     }
 }

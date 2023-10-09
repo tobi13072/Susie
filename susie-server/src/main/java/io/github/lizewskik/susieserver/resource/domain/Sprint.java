@@ -26,7 +26,7 @@ import java.util.Set;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Sprint implements Serializable {
+public class Sprint extends Auditable implements Serializable {
 
     @Id
     @Column(name = "SprintID")
