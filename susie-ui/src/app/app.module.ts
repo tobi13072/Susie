@@ -17,13 +17,17 @@ import { ProjectComponent } from './components/project/project.component';
 import {KeyFilterModule} from "primeng/keyfilter";
 import {RippleModule} from "primeng/ripple";
 import { SignInComponent } from './components/sign-in/sign-in.component';
+import { BoardComponent } from './components/board/board.component';
+import {PanelModule} from "primeng/panel";
+import {DragDropModule} from "primeng/dragdrop";
 
 @NgModule({
   declarations: [
     AppComponent,
     SignUpComponent,
     ProjectComponent,
-    SignInComponent
+    SignInComponent,
+    BoardComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +42,9 @@ import { SignInComponent } from './components/sign-in/sign-in.component';
     CardModule,
     HttpClientModule,
     KeyFilterModule,
-    RippleModule
+    RippleModule,
+    PanelModule,
+    DragDropModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,0 +1,34 @@
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <p-card pDroppable (onDrop)="drop($event, 1)" class="flex-column ms-5">
+    <p>Test1</p>
+    <ul>
+      <li *ngFor="let issue of test1" pDraggable (onDragStart)="dragStart(issue, 1)">
+        {{issue.name}}
+      </li>
+    </ul>
+  </p-card>
+  <p-card pDroppable (onDrop)="drop($event, 2)" class="flex-column ms-5">
+    <p>Test2</p>
+    <ul *ngIf="test2">
+      <li *ngFor="let issue of test2" pDraggable (onDragStart)="dragStart(issue, 2)">
+        {{issue.name}}
+      </li>
+    </ul>
+  </p-card>
+  <p-card pDroppable (onDrop)="drop($event, 3)" class="flex-column ms-5">
+    <p>Test3</p>
+    <ul *ngIf="test3">
+      <li *ngFor="let issue of test3" pDraggable (onDragStart)="dragStart(issue, 3)">
+        {{issue.name}}
+      </li>
+    </ul>
+  </p-card>
+  <p-card pDroppable (onDrop)="drop($event, 4)" class="flex-column ms-5">
+    <p>Test4</p>
+    <ul *ngIf="test4">
+      <li *ngFor="let issue of test4" pDraggable (onDragStart)="dragStart(issue, 4)">
+        {{issue.name}}
+      </li>
+    </ul>
+  </p-card>
+</div>

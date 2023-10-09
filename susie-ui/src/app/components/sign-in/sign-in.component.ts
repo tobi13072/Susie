@@ -16,11 +16,14 @@ export class SignInComponent implements OnInit{
   }
 
   loginForm = this.fb.group({
-    email: ['', Validators.required, Validators.email],
+    email: ['', [Validators.required, Validators.email]],
     password: ['',Validators.required]
   })
 
   onSubmit(){
-    this.menuBarService.changeMenuStatus(true);
+    if(this.loginForm.valid) {
+      this.menuBarService.changeMenuStatus(true);
+      console.log({email: this.loginForm.value.email, password: this.loginForm.value.password});
+    }
   }
 }
