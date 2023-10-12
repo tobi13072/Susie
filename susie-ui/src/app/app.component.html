@@ -1,19 +1,24 @@
-<nav>
-  <p-menubar [model]="menuStructure">
-    <ng-template pTemplate="start">
-      <img src="https://primefaces.org/cdn/primeng/images/primeng.svg"
-           height="40"
-           class="mr-2"
-           alt="prime-ng-logo"
-           [routerLink]="['']"/>
-    </ng-template>
-    <ng-template pTemplate="end">
-      <p-button class="m-1"
-                [routerLink]="['sign-up']"
-                label="Sign-up"
-                styleClass="p-button-outlined p-button-secondary">
-      </p-button>
-    </ng-template>
-  </p-menubar>
-</nav>
+<p-menubar>
+  <ng-template pTemplate="start">
+    <img src="https://primefaces.org/cdn/primeng/images/primeng.svg"
+         height="40"
+         class="mr-2"
+         alt="prime-ng-logo"
+         [routerLink]="['']"/>
+  </ng-template>
+  <ng-template pTemplate="end">
+    <p-button class="m-1"
+              [routerLink]="['sign-up']"
+              label="Sign-up"
+              styleClass="p-button-outlined p-button-secondary">
+    </p-button>
+    <p-button class="m-1"
+              [routerLink]="['project']"
+              label="Project"
+              styleClass="p-button-outlined p-button-secondary"></p-button>
+    <p-button class="m-1" *ngIf="loginService.isLoggedIn()" label="logout"
+              styleClass="p-button-outlined p-button-secondary" (onClick)="loginService.logoutUser()"></p-button>
+  </ng-template>
+</p-menubar>
+
 <router-outlet></router-outlet>

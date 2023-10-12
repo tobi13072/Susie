@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {MenuItem} from "primeng/api";
+import {LoginService} from "./service/auth/login.service";
 
 
 @Component({
@@ -9,8 +9,14 @@ import {MenuItem} from "primeng/api";
 })
 export class AppComponent implements OnInit {
 
-  menuStructure: MenuItem[] | undefined;
-
+  showMenuBar: boolean = false;
   ngOnInit(): void {
+
   }
+
+  constructor(public loginService: LoginService) {
+  }
+
+
+  protected readonly Component = Component;
 }

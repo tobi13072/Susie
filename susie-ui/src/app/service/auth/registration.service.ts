@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import {RegistrationRequest} from "../types/registration-request";
+import {RegistrationRequest} from "../../types/auth/request/registration-request";
 import {Observable} from "rxjs";
-import {RegistrationResponse} from "../types/registration-response";
+import {RegistrationResponse} from "../../types/auth/response/registration-response";
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthWebInterfaceService {
+export class RegistrationService {
 
   private readonly SERVER_BASE_PATH = 'http://localhost:8081/api';
   private readonly AUTH_REGISTER_PATH = '/auth/register';

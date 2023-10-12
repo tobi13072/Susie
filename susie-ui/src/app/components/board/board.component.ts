@@ -25,7 +25,10 @@ export class BoardComponent implements OnInit {
       {id: 1, name: 'Take a shower', status: "test1"},
       {id: 2, name: 'Cook dinner', status: "test1"}
     ]
-    this.test2 = [{id: 3, name: 'pierdol angulara', status:'test2'}]
+    this.test2 = [{id: 3, name: 'angular', status:'test2'}]
+  }
+
+  constructor() {
   }
 
   dragStart(product: IssueRequest, draggedStatus: number) {
@@ -33,7 +36,7 @@ export class BoardComponent implements OnInit {
     this.draggedStatusIndex = draggedStatus;
   }
 
-  drop(event: any, newStatusIndex: number) {
+  drop(newStatusIndex: number) {
     if (this.dragged) {
       let draggedProductIndex = this.findIndex(this.dragged);
       switch (newStatusIndex) {
