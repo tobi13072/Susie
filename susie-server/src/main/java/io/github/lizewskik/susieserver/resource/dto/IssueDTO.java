@@ -22,5 +22,7 @@ public class IssueDTO {
     private Integer issueTypeID;
     private Integer issuePriorityID;
     private Integer issueStatusID;
+    private Integer projectID;
+    private Integer sprintID;
     private List<CommentDTO> comments;
 }

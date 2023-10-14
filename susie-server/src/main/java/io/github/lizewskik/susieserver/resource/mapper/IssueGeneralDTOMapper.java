@@ -24,6 +24,16 @@ public class IssueGeneralDTOMapper {
                 .issueStatusID(
                         isNull(from.getIssueStatus()) ? null : from.getIssueStatus().getId()
                 )
+                .issueTypeID(
+                        isNull(from.getIssueType()) ? null : from.getIssueType().getId()
+                )
+                .issuePriorityID(
+                        isNull(from.getIssuePriority()) ? null : from.getIssuePriority().getId()
+                )
+                .projectID(from.getProjectID())
+                .sprintID(
+                        isNull(from.getSprint()) ? null : from.getSprint().getId()
+                )
                 .build();
     }
 }

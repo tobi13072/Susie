@@ -14,6 +14,7 @@ public interface IssueService {
     IssueDTO getIssueDetails(Integer issueID);
     List<IssueGeneralDTO> getIssuesGeneral(Integer projectID);
     List<IssueGeneralDTO> getProductBacklog(Integer projectID);
+    List<IssueGeneralDTO> getBacklogHistory(Integer projectID);
     List<IssueGeneralDTO> getGeneralIssuesInfoByUserID();
     List<IssueGeneralDTO> getGeneralIssuesInfoBySprintID(Integer sprintID);
     void assignCurrentUserToIssue(Integer issueID);

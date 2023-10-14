@@ -47,4 +47,8 @@ public class Sprint extends Auditable implements Serializable {
     private Set<Issue> sprintIssues;
 
     private Boolean active;
+
+    private String sprintGoal;
+
+    private Boolean isDone;
 }

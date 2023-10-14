@@ -3,8 +3,6 @@ package io.github.lizewskik.susieserver.builder;
 import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.domain.IssueStatus;
 import io.github.lizewskik.susieserver.resource.domain.Sprint;
-import io.github.lizewskik.susieserver.resource.domain.dictionary.IssuePriorityID;
-import io.github.lizewskik.susieserver.resource.domain.dictionary.IssueTypeID;
 import io.github.lizewskik.susieserver.resource.dto.request.IssueMRO;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -12,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+
+import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssuePriorityID.CRITICAL;
+import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueTypeID.BUG;
 
 public class IssueBuilder {
 
@@ -29,8 +30,8 @@ public class IssueBuilder {
                 .name(DEFAULT_ISSUE_NAME)
                 .description(DEFAULT_ISSUE_DESCRIPTION)
                 .estimation(DEFAULT_ISSUE_ESTIMATION)
-                .issuePriorityID(IssuePriorityID.CRITICAL.getPriorityID())
-                .issueTypeID(IssueTypeID.BUG.getTypeID())
+                .issuePriorityID(CRITICAL.getPriorityID())
+                .issueTypeID(BUG.getTypeID())
                 .projectID(projectID)
                 .build();
     }

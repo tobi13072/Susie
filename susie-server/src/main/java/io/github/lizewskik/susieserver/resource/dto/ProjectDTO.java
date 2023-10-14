@@ -14,4 +14,5 @@ public class ProjectDTO {
     private Integer projectID;
     private String name;
     private String description;
+    private String projectGoal;
 }

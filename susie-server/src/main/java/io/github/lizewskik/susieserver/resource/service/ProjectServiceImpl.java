@@ -61,6 +61,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .name(projectCreationRequest.getName())
                 .description(projectCreationRequest.getDescription())
                 .projectOwner(currentLoggedUser)
+                .projectGoal(projectCreationRequest.getProjectGoal())
                 .backlog(backlog)
                 .userIDs(usersAssociatedWithProject)
                 .build();
@@ -87,6 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .projectID(updated.getId())
                 .name(updated.getName())
                 .description(updated.getDescription())
+                .projectGoal(projectDTO.getProjectGoal())
                 .build();
     }
 

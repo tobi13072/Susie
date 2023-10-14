@@ -8,7 +8,6 @@ import io.github.lizewskik.susieserver.resource.domain.IssueStatus;
 import io.github.lizewskik.susieserver.resource.domain.IssueType;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.domain.Sprint;
-import io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID;
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
 import io.github.lizewskik.susieserver.resource.dto.IssueGeneralDTO;
 import io.github.lizewskik.susieserver.resource.dto.request.IssueMRO;
@@ -37,6 +36,7 @@ import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMess
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_TYPE_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.NULL_IDENTIFIER;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_ID_EMPTY;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.STATUS_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.STATUS_FLOW_ORDER_VIOLATION;
@@ -44,6 +44,7 @@ import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueSt
 import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.DONE;
 import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.IN_PROGRESS;
 import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.IN_TESTS;
+import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.TO_DO;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
 
@@ -68,7 +69,7 @@ public class IssueServiceImpl implements IssueService{
 
         Project project = projectRepository.findById(issueDTO.getProjectID())
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
-        IssueStatus status = issueStatusRepository.findById(IssueStatusID.TO_DO.getStatusID())
+        IssueStatus status = issueStatusRepository.findById(TO_DO.getStatusID())
                 .orElseThrow(() -> new RuntimeException(STATUS_DOES_NOT_EXISTS));
 
         Optional<Integer> issueType = ofNullable(issueDTO.getIssueTypeID());
@@ -90,6 +91,7 @@ public class IssueServiceImpl implements IssueService{
                 .name(issueDTO.getName())
                 .description(issueDTO.getDescription())
                 .estimation(issueDTO.getEstimation())
+                .projectID(project.getId())
                 .reporterID(userService.getCurrentLoggedUser().getUuid())
                 .issueStatus(isNull(status) ? null : status)
                 .issueType(isNull(type) ? null : type)
@@ -132,6 +134,25 @@ public class IssueServiceImpl implements IssueService{
 
     @Override
     public void deleteIssue(Integer issueID) {
+
+        Issue issue = issueRepository.findById(issueID)
+                .orElseThrow(() -> new RuntimeException(ISSUE_DOES_NOT_EXISTS));
+
+        Integer projectID = issue.getProjectID();
+        if (isNull(projectID)) {
+            throw new RuntimeException(PROJECT_ID_EMPTY);
+        }
+
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+
+
+        Backlog backlog = project.getBacklog();
+
+        Set<Issue> backlogIssues = backlog.getIssues();
+        backlogIssues.remove(issue);
+        backlog.setIssues(backlogIssues);
+        backlogRepository.save(backlog);
         issueRepository.deleteById(issueID);
     }
 
@@ -163,6 +184,21 @@ public class IssueServiceImpl implements IssueService{
                 .getIssues()
                 .stream()
                 .filter(issue -> isNull(issue.getSprint()))
+                .filter(issue -> issue.getIssueStatus().getId().equals(TO_DO.getStatusID()))
+                .map(issueGeneralDTOMapper::map)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<IssueGeneralDTO> getBacklogHistory(Integer projectID) {
+
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+
+        return project.getBacklog()
+                .getIssues()
+                .stream()
+                .filter(issue -> DONE.getStatusID().equals(issue.getIssueType().getId()))
                 .map(issueGeneralDTOMapper::map)
                 .collect(Collectors.toList());
     }

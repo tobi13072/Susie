@@ -375,6 +375,7 @@ public class IssueServiceTest {
 
         //given
         Issue issue = createIssueEntity();
+        issue.setProjectID(defaultScrumProject.getId());
         issueRepository.save(issue);
         long expectedIssuesAmount = issueRepository.count() - 1;
 

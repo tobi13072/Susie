@@ -32,10 +32,8 @@ public class Backlog extends Auditable implements Serializable {
     private Integer id;
 
     @OneToOne(mappedBy = "backlog")
-//    @JsonManagedReference
     private Project project;
 
     @OneToMany(cascade = CascadeType.ALL)
-//    @JsonManagedReference
     private Set<Issue> issues = new HashSet<>();
 }
