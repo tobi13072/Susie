@@ -7,10 +7,13 @@ import io.github.lizewskik.susieserver.resource.dto.SprintDTO;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 
+import static java.lang.Boolean.FALSE;
+
 public class SprintBuilder {
 
     public static final String SPRINT_NAME = "Test sprint name";
     public static final ZonedDateTime SPRINT_START_TIME = ZonedDateTime.now();
+    public static final String SPRINT_GOAL = "Very important goal";
 
     public static SprintDTO createSprint(Integer projectID) {
         return SprintDTO.builder()
@@ -24,6 +27,8 @@ public class SprintBuilder {
         return Sprint.builder()
                 .name(SPRINT_NAME)
                 .startDate(SPRINT_START_TIME)
+                .isDone(FALSE)
+                .sprintGoal(SPRINT_GOAL)
                 .project(project)
                 .sprintIssues(new HashSet<>())
                 .active(active)

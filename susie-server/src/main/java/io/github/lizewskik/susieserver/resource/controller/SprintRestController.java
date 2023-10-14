@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,6 +41,11 @@ public class SprintRestController {
                 .body(sprintService.createSprint(sprintDTO));
     }
 
+    @PutMapping
+    public ResponseEntity<SprintDTO> updateSprint(@RequestBody SprintDTO sprintDTO) {
+        return ResponseEntity.ok(sprintService.updateSprint(sprintDTO));
+    }
+
     @PostMapping("/{sprintID}/issue/{issueID}")
     public void addIssueToSprint(@PathVariable Integer sprintID, @PathVariable Integer issueID) {
         sprintService.addIssueToSprint(issueID, sprintID);
@@ -60,7 +66,7 @@ public class SprintRestController {
         sprintService.startSprint(id);
     }
 
-    @PatchMapping("/stop/{id}")
+    @PatchMapping("/project/{id}/stop")
     public void stopSprint(@PathVariable Integer id) {
         sprintService.stopSprint(id);
     }

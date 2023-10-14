@@ -4,7 +4,7 @@ import io.github.lizewskik.susieserver.resource.domain.Issue;
 import io.github.lizewskik.susieserver.resource.dto.IssueDTO;
 import io.github.lizewskik.susieserver.resource.service.CommentService;
 import io.github.lizewskik.susieserver.resource.service.UserService;
-import io.github.lizewskik.susieserver.utils.CollectionsUtils;
+import io.github.lizewskik.susieserver.utils.collection.CollectionsUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +26,10 @@ public class IssueDTOMapper {
                 .description(from.getDescription())
                 .estimation(from.getEstimation())
                 .reporter(userService.getUserByUUID(from.getReporterID()))
+                .projectID(from.getProjectID())
+                .sprintID(
+                        isNull(from.getSprint()) ? null : from.getSprint().getId()
+                )
                 .assignee(
                         isNull(from.getAssigneeID()) ? null : userService.getUserByUUID(from.getAssigneeID())
                 )

@@ -2,11 +2,15 @@ package io.github.lizewskik.susieserver.service;
 
 import io.github.lizewskik.susieserver.builder.SprintBuilder;
 import io.github.lizewskik.susieserver.config.TestConfiguration;
+import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Issue;
+import io.github.lizewskik.susieserver.resource.domain.IssueStatus;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.domain.Sprint;
 import io.github.lizewskik.susieserver.resource.dto.SprintDTO;
+import io.github.lizewskik.susieserver.resource.repository.BacklogRepository;
 import io.github.lizewskik.susieserver.resource.repository.IssueRepository;
+import io.github.lizewskik.susieserver.resource.repository.IssueStatusRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import io.github.lizewskik.susieserver.resource.repository.SprintRepository;
 import io.github.lizewskik.susieserver.resource.service.SprintService;
@@ -27,8 +31,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntity;
+import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntityWithIssueStatus;
 import static io.github.lizewskik.susieserver.builder.IssueBuilder.createIssueEntityWithSprint;
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.createProjectEntity;
 import static io.github.lizewskik.susieserver.builder.SprintBuilder.SPRINT_NAME;
@@ -39,11 +45,14 @@ import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMess
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.EMPTY_SPRINT;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_ALREADY_HAS_SPRINT;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.NO_ACTIVE_SPRINT_IN_PROJECT;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_NAME_NOT_UNIQUE;
-import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_NOT_ACTIVE;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_START_DATE_IN_THE_FUTURE;
+import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.DONE;
+import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.IN_PROGRESS;
+import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.TO_DO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -59,6 +68,9 @@ public class SprintServiceTest {
     private SprintService sprintService;
 
     @Autowired
+    private BacklogRepository backlogRepository;
+
+    @Autowired
     private SprintRepository sprintRepository;
 
     @Autowired
@@ -66,6 +78,9 @@ public class SprintServiceTest {
 
     @Autowired
     private IssueRepository issueRepository;
+
+    @Autowired
+    private IssueStatusRepository issueStatusRepository;
 
     @MockBean
     private UserService userService;
@@ -158,6 +173,7 @@ public class SprintServiceTest {
         assertEquals(sprintDTO.getStartTime(), createdSprint.getStartTime());
         assertEquals(sprintDTO.getProjectID(), createdSprint.getProjectID());
         assertEquals(Boolean.FALSE, createdSprint.getActive());
+        assertEquals(sprintDTO.getSprintGoal(), createdSprint.getSprintGoal());
     }
 
     @Test
@@ -324,41 +340,47 @@ public class SprintServiceTest {
     public void stopSprint_happyPathTest() {
 
         //given
-        Integer activeSprintID = sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.TRUE)).getId();
+        SprintWithIssues preparedSprintToStop = prepareSprintWithIssuesToStop();
+        Sprint activeSprint = preparedSprintToStop.sprint();
+        Issue inProgressIssue = preparedSprintToStop.otherIssue();
+        Issue doneIssue = preparedSprintToStop.doneIssue();
 
         //when
-        sprintService.stopSprint(activeSprintID);
-        Sprint afterStop = sprintRepository.findById(activeSprintID).isPresent() ? sprintRepository.findById(activeSprintID).get() : null;
+        sprintService.stopSprint(defaultScrumProject.getId());
+        Sprint sprintAfterStopOperation = sprintRepository.findById(activeSprint.getId()).orElse(null);
 
         //then
-        assertNotNull(afterStop);
-        assertFalse(afterStop.getActive());
+        assertEquals(TO_DO.getStatusID(), inProgressIssue.getIssueStatus().getId());
+        assertEquals(DONE.getStatusID(), doneIssue.getIssueStatus().getId());
+        assertNull(inProgressIssue.getSprint());
+        assertNull(doneIssue.getSprint());
+        assertNull(sprintAfterStopOperation);
     }
 
     @Test
-    public void stopSprint_throwsSprintDoesNotExistsExceptionTest() {
+    public void stopSprint_throwsProjectDoesNotExistsExceptionTest() {
 
         //given
-        Integer fakeSprintID = -10;
+        Integer fakeProjectID = -10;
 
         //when
-        Exception exception = assertThrows(RuntimeException.class, () -> sprintService.stopSprint(fakeSprintID));
+        Exception exception = assertThrows(RuntimeException.class, () -> sprintService.stopSprint(fakeProjectID));
 
         //then
-        assertEquals(SPRINT_DOES_NOT_EXISTS, exception.getMessage());
+        assertEquals(PROJECT_DOES_NOT_EXISTS, exception.getMessage());
     }
 
     @Test
-    public void stopSprint_throwsSprintIsNotActiveExceptionTest() {
+    public void stopSprint_throwsThereIsNoActiveSprintExceptionTest() {
 
         //given
-        Integer deactivatedSprintID = sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.FALSE)).getId();
+        sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.FALSE));
 
         //when
-        Exception exception = assertThrows(RuntimeException.class, () -> sprintService.stopSprint(deactivatedSprintID));
+        Exception exception = assertThrows(RuntimeException.class, () -> sprintService.stopSprint(defaultScrumProject.getId()));
 
         //then
-        assertEquals(SPRINT_NOT_ACTIVE, exception.getMessage());
+        assertEquals(NO_ACTIVE_SPRINT_IN_PROJECT, exception.getMessage());
     }
 
     @Test
@@ -454,4 +476,36 @@ public class SprintServiceTest {
         //then
         assertEquals(ISSUE_DOES_NOT_EXISTS, exception.getMessage());
     }
+
+    private SprintWithIssues prepareSprintWithIssuesToStop() {
+
+        // get issue proper statuses
+        IssueStatus inProgressStatus = issueStatusRepository.getReferenceById(IN_PROGRESS.getStatusID());
+        IssueStatus doneStatus = issueStatusRepository.getReferenceById(DONE.getStatusID());
+
+        // create issues with statuses
+        Issue inProgressIssue = createIssueEntityWithIssueStatus(inProgressStatus);
+        Issue doneIssue = createIssueEntityWithIssueStatus(doneStatus);
+
+        //create sprint
+        Sprint activeSprint = sprintRepository.save(createSprintEntity(defaultScrumProject, Boolean.TRUE));
+
+        // assign sprint to issues
+        inProgressIssue.setSprint(activeSprint);
+        doneIssue.setSprint(activeSprint);
+        issueRepository.save(inProgressIssue);
+        issueRepository.save(doneIssue);
+
+        // locate issues in backlog and sprint
+        Backlog backlog = defaultScrumProject.getBacklog();
+        backlog.setIssues(new HashSet<>(Set.of(inProgressIssue, doneIssue)));
+        backlogRepository.save(backlog);
+        activeSprint.setSprintIssues(new HashSet<>(Set.of(inProgressIssue, doneIssue)));
+        sprintRepository.save(activeSprint);
+
+        // this returned object is only for this method purpose
+        return new SprintWithIssues(doneIssue, inProgressIssue, activeSprint);
+    }
+
+    private record SprintWithIssues(Issue doneIssue, Issue otherIssue, Sprint sprint){}
 }

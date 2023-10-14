@@ -15,4 +15,8 @@ public class IssueGeneralDTO {
     private String name;
     private UserDTO assignee;
     private Integer issueStatusID;
+    private Integer issueTypeID;
+    private Integer issuePriorityID;
+    private Integer projectID;
+    private Integer sprintID;
 }

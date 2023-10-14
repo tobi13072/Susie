@@ -37,6 +37,11 @@ public class IssueRestController {
         return ResponseEntity.ok(issueService.getProductBacklog(projectID));
     }
 
+    @GetMapping("/product-backlog-history")
+    public ResponseEntity<List<IssueGeneralDTO>> getProductBacklogHistoryByProjectID(@RequestParam Integer projectID) {
+        return ResponseEntity.ok(issueService.getBacklogHistory(projectID));
+    }
+
     @GetMapping("/user-assigned")
     public ResponseEntity<List<IssueGeneralDTO>> getGeneralIssuesInfoByUserID() {
         return ResponseEntity.ok(issueService.getGeneralIssuesInfoByUserID());

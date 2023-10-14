@@ -45,14 +45,14 @@ public class Issue extends Auditable implements Serializable {
 
     private String assigneeID;
 
+    private Integer projectID;
+
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-//    @JsonManagedReference
     private Set<Comment> comments = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "SprintID")
-//    @JsonBackReference
     private Sprint sprint;
 
     @ManyToOne

@@ -12,6 +12,7 @@ public class SprintDTOMapper {
                 .id(from.getId())
                 .name(from.getName())
                 .startTime(from.getStartDate())
+                .sprintGoal(from.getSprintGoal())
                 .active(from.getActive())
                 .projectID(from.getProject().getId())
                 .build();

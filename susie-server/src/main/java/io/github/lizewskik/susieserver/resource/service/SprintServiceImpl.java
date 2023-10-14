@@ -7,6 +7,7 @@ import io.github.lizewskik.susieserver.resource.domain.Sprint;
 import io.github.lizewskik.susieserver.resource.dto.SprintDTO;
 import io.github.lizewskik.susieserver.resource.mapper.SprintDTOMapper;
 import io.github.lizewskik.susieserver.resource.repository.IssueRepository;
+import io.github.lizewskik.susieserver.resource.repository.IssueStatusRepository;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import io.github.lizewskik.susieserver.resource.repository.SprintRepository;
 import jakarta.transaction.Transactional;
@@ -26,13 +27,16 @@ import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMess
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.EMPTY_SPRINT;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_ALREADY_HAS_SPRINT;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.ISSUE_DOES_NOT_EXISTS;
+import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.NO_ACTIVE_SPRINT_IN_PROJECT;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_ALREADY_STARTED;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_NAME_NOT_UNIQUE;
-import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_NOT_ACTIVE;
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.SPRINT_START_DATE_IN_THE_FUTURE;
+import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.DONE;
+import static io.github.lizewskik.susieserver.resource.domain.dictionary.IssueStatusID.TO_DO;
 import static io.github.lizewskik.susieserver.utils.DateUtils.reduceTimeFromZonedDateTime;
+import static io.github.lizewskik.susieserver.utils.collection.CollectionsUtils.splitSetIntoTwoSubSets;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.isNull;
@@ -48,6 +52,7 @@ public class SprintServiceImpl implements SprintService {
     private final SprintRepository sprintRepository;
     private final IssueRepository issueRepository;
     private final ProjectRepository projectRepository;
+    private final IssueStatusRepository issueStatusRepository;
     private final SprintDTOMapper sprintDTOMapper;
 
     @Override
@@ -68,11 +73,11 @@ public class SprintServiceImpl implements SprintService {
         Project project = projectRepository.findById(projectID)
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
 
-        if (sprintRepository.findAllByActiveAndProject(FALSE, project).isEmpty()) {
+        if (sprintRepository.findAllByActiveAndIsDoneAndProject(FALSE, FALSE, project).isEmpty()) {
             return new ArrayList<>();
         }
 
-        return sprintRepository.findAllByActiveAndProject(FALSE, project)
+        return sprintRepository.findAllByActiveAndIsDoneAndProject(FALSE, FALSE, project)
                 .get()
                 .stream()
                 .map(sprintDTOMapper::map)
@@ -93,11 +98,36 @@ public class SprintServiceImpl implements SprintService {
                 .name(sprintDTO.getName())
                 .startDate(sprintDTO.getStartTime())
                 .sprintIssues(new HashSet<>())
+                .sprintGoal(sprintDTO.getSprintGoal())
                 .active(FALSE)
+                .isDone(FALSE)
                 .project(project)
                 .build();
         sprintRepository.save(sprint);
         return sprintDTOMapper.map(sprint);
+    }
+
+    @Override
+    public SprintDTO updateSprint(SprintDTO sprintDTO) {
+
+        Project project = projectRepository.findById(sprintDTO.getProjectID())
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
+
+        Sprint updated = sprintRepository.findById(sprintDTO.getId())
+                .orElseThrow(() -> new RuntimeException(SPRINT_DOES_NOT_EXISTS));
+
+        if (!updated.getName().equals(sprintDTO.getName())) {
+            if (sprintRepository.existsByNameAndProject(sprintDTO.getName(), project)) {
+                throw new RuntimeException(SPRINT_NAME_NOT_UNIQUE);
+            }
+        }
+
+        updated.setName(sprintDTO.getName());
+        updated.setSprintGoal(sprintDTO.getSprintGoal());
+        updated.setStartDate(sprintDTO.getStartTime());
+
+        sprintRepository.save(updated);
+        return sprintDTOMapper.map(updated);
     }
 
     @Override
@@ -190,17 +220,36 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
-    public void stopSprint(Integer sprintID) {
+    public void stopSprint(Integer projectID) {
 
-        Sprint updated = sprintRepository.findById(ofNullable(sprintID).orElseThrow(NullIdentifierException::new))
-                .orElseThrow(() -> new IllegalArgumentException(SPRINT_DOES_NOT_EXISTS));
+        Project project = projectRepository.findById(projectID)
+                .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
 
-        if (!updated.getActive()) {
-            throw new RuntimeException(SPRINT_NOT_ACTIVE);
-        }
+        Sprint updated = sprintRepository.findByActiveAndProject(TRUE, project)
+                .orElseThrow(() -> new RuntimeException(NO_ACTIVE_SPRINT_IN_PROJECT));
+
+        Pair<Set<Issue>, Set<Issue>> dividedSet = splitSetIntoTwoSubSets(updated.getSprintIssues(), issue -> issue.getIssueStatus().getId().equals(DONE.getStatusID()));
+        Set<Issue> doneIssues = dividedSet.getKey();
+        Set<Issue> uncompletedIssues = dividedSet.getValue();
+
+        doneIssues.forEach(issue -> {
+            issue.setSprint(null);
+            issueRepository.save(issue);
+        });
+
+        uncompletedIssues.forEach(issue -> {
+            issue.setSprint(null);
+            issue.setIssueStatus(issueStatusRepository.findById(TO_DO.getStatusID()).orElseThrow());
+            issueRepository.save(issue);
+        });
+
+        updated.setSprintIssues(new HashSet<>());
+        sprintRepository.save(updated);
 
         updated.setActive(FALSE);
+        updated.setIsDone(TRUE);
         sprintRepository.save(updated);
+        sprintRepository.deleteById(updated.getId());
     }
 
     private Pair<Boolean, String> validateSprintDatesForStart(Sprint sprint) {
