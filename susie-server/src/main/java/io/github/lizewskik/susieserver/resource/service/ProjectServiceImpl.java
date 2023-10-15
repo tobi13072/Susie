@@ -40,6 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
         detailsDTO.setProjectID(project.getId());
         detailsDTO.setName(project.getName());
         detailsDTO.setDescription(project.getDescription());
+        detailsDTO.setProjectGoal(project.getProjectGoal());
         detailsDTO.setOwner(userService.getUserByUUID(project.getProjectOwner()));
         detailsDTO.setMembers(mapUserUUIDsToUserDTOs(project.getUserIDs()));
         return detailsDTO;
@@ -69,11 +70,7 @@ public class ProjectServiceImpl implements ProjectService {
         backlog.setProject(project);
         backlogRepository.save(backlog);
 
-        return ProjectDTO.builder()
-                .projectID(project.getId())
-                .name(project.getName())
-                .description(project.getDescription())
-                .build();
+        return projectDTOMapper.map(project);
     }
 
     @Override
@@ -83,13 +80,9 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
         updated.setName(projectDTO.getName());
         updated.setDescription(projectDTO.getDescription());
+        updated.setProjectGoal(projectDTO.getProjectGoal());
         projectRepository.save(updated);
-        return ProjectDTO.builder()
-                .projectID(updated.getId())
-                .name(updated.getName())
-                .description(updated.getDescription())
-                .projectGoal(projectDTO.getProjectGoal())
-                .build();
+        return projectDTOMapper.map(updated);
     }
 
     @Override
@@ -98,11 +91,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectID)
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
         projectRepository.deleteById(projectID);
-        return ProjectDTO.builder()
-                .projectID(project.getId())
-                .name(project.getName())
-                .description(project.getDescription())
-                .build();
+        return projectDTOMapper.map(project);
     }
 
     @Override
@@ -163,6 +152,7 @@ public class ProjectServiceImpl implements ProjectService {
             allUsersProjects.forEach(project -> {
                 Set<String> projectUsers = project.getUserIDs();
                 projectUsers.remove(userUUID);
+                project.setUserIDs(projectUsers);
                 projectRepository.save(project);
             });
         }

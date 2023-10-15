@@ -12,6 +12,7 @@ public class ProjectDTOMapper {
                 .projectID(from.getId())
                 .name(from.getName())
                 .description(from.getDescription())
+                .projectGoal(from.getProjectGoal())
                 .build();
     }
 }
