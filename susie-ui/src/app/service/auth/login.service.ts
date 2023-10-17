@@ -4,22 +4,20 @@ import {Router} from "@angular/router";
 import {Observable} from "rxjs";
 import {LoginRequest} from "../../types/auth/request/login-request";
 import {LoginResponse} from "../../types/auth/response/login-response";
-
+import {env} from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
 
-  private base_url: string = 'http://localhost:8081/api/auth/';
-  private readonly SM_ROLE:string = "sm";
-  private readonly PO_ROLE:string = "po";
+  private BASE_URL: string = env.apiUrl.concat("/auth");
 
   constructor(private http: HttpClient, private router: Router) {
   }
 
   loginUser(user: LoginRequest): Observable<LoginResponse> {
-    let endpoint: string = `${this.base_url}sign-in`;
+    let endpoint: string = `${this.BASE_URL}/sign-in`;
     return this.http.post<LoginResponse>(endpoint, user);
   }
 
@@ -48,7 +46,7 @@ export class LoginService {
     const roles: any = this.getUserRoles();
 
     if (!!roles) {
-      return roles.includes(this.SM_ROLE);
+      return roles.includes(env.projectRoles.scrum_master);
     } else {
       return false;
     }
@@ -58,7 +56,7 @@ export class LoginService {
     const roles: any = this.getUserRoles();
 
     if (!!roles) {
-      return roles.includes(this.PO_ROLE);
+      return roles.includes(env.projectRoles.product_owner);
     } else {
       return false;
     }

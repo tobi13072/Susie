@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {IssueRequest} from "../../types/issue-request";
+import {IssueDto} from "../../types/issue-dto";
 
 
 @Component({
@@ -8,15 +8,15 @@ import {IssueRequest} from "../../types/issue-request";
   styleUrls: ['./board.component.scss']
 })
 export class BoardComponent implements OnInit {
-  test1: IssueRequest[] = [];
+  test1: IssueDto[] = [];
 
-  test2: IssueRequest[] = [];
+  test2: IssueDto[] = [];
 
-  test3: IssueRequest[] = [];
+  test3: IssueDto[] = [];
 
-  test4: IssueRequest[] = [];
+  test4: IssueDto[] = [];
 
-  dragged: IssueRequest | undefined | null;
+  dragged: IssueDto | undefined | null;
 
   draggedStatusIndex: number = -1;
 
@@ -31,7 +31,7 @@ export class BoardComponent implements OnInit {
   constructor() {
   }
 
-  dragStart(product: IssueRequest, draggedStatus: number) {
+  dragStart(product: IssueDto, draggedStatus: number) {
     this.dragged = product;
     this.draggedStatusIndex = draggedStatus;
   }
@@ -41,16 +41,16 @@ export class BoardComponent implements OnInit {
       let draggedProductIndex = this.findIndex(this.dragged);
       switch (newStatusIndex) {
         case 1:
-          this.test1 = [...(this.test1 as IssueRequest[]), this.dragged];
+          this.test1 = [...(this.test1 as IssueDto[]), this.dragged];
           break;
         case 2:
-          this.test2 = [...(this.test2 as IssueRequest[]), this.dragged];
+          this.test2 = [...(this.test2 as IssueDto[]), this.dragged];
           break;
         case 3:
-          this.test3 = [...(this.test3 as IssueRequest[]), this.dragged];
+          this.test3 = [...(this.test3 as IssueDto[]), this.dragged];
           break;
         case 4:
-          this.test4 = [...(this.test4 as IssueRequest[]), this.dragged];
+          this.test4 = [...(this.test4 as IssueDto[]), this.dragged];
           break;
       }
 
@@ -73,22 +73,22 @@ export class BoardComponent implements OnInit {
     }
   }
 
-  findIndex(product: IssueRequest) {
+  findIndex(product: IssueDto) {
     let index = -1;
-    let tmp: IssueRequest[] = [];
+    let tmp: IssueDto[] = [];
 
     switch (this.draggedStatusIndex) {
       case 1:
-        tmp = this.test1 as IssueRequest[];
+        tmp = this.test1 as IssueDto[];
         break;
       case 2:
-        tmp = this.test2 as IssueRequest[];
+        tmp = this.test2 as IssueDto[];
         break;
       case 3:
-        tmp = this.test3 as IssueRequest[];
+        tmp = this.test3 as IssueDto[];
         break;
       case 4:
-        tmp = this.test4 as IssueRequest[];
+        tmp = this.test4 as IssueDto[];
         break;
     }
 

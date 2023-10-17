@@ -12,7 +12,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import {InputSwitchModule} from 'primeng/inputswitch';
 import {CardModule} from 'primeng/card';
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
-import {ProjectComponent} from './components/project/project.component';
+import {ProjectFormComponent} from './components/project-form/project-form.component';
 import {KeyFilterModule} from "primeng/keyfilter";
 import {RippleModule} from "primeng/ripple";
 import {SignInComponent} from './components/sign-in/sign-in.component';
@@ -20,14 +20,18 @@ import {BoardComponent} from './components/board/board.component';
 import {PanelModule} from "primeng/panel";
 import {DragDropModule} from "primeng/dragdrop";
 import {AuthInterceptor} from "./service/auth/auth.interceptor";
+import { ProjectListComponent } from './components/project-list/project-list.component';
+import {TableModule} from "primeng/table";
+import {StyleClassModule} from "primeng/styleclass";
 
 @NgModule({
   declarations: [
     AppComponent,
     SignUpComponent,
-    ProjectComponent,
+    ProjectFormComponent,
     SignInComponent,
-    BoardComponent
+    BoardComponent,
+    ProjectListComponent
   ],
   imports: [
     BrowserModule,
@@ -44,7 +48,9 @@ import {AuthInterceptor} from "./service/auth/auth.interceptor";
     KeyFilterModule,
     RippleModule,
     PanelModule,
-    DragDropModule
+    DragDropModule,
+    TableModule,
+    StyleClassModule
   ],
   providers:[
     {
