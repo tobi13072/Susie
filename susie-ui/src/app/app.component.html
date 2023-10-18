@@ -10,14 +10,17 @@
     <p-button class="m-1"
               [routerLink]="['sign-up']"
               label="Sign-up"
-              styleClass="p-button-outlined p-button-secondary">
+              [outlined]="true" severity="secondary">
     </p-button>
     <p-button class="m-1"
               [routerLink]="['project']"
               label="Project"
-              styleClass="p-button-outlined p-button-secondary"></p-button>
-    <p-button class="m-1" *ngIf="loginService.isLoggedIn()" label="logout"
-              styleClass="p-button-outlined p-button-secondary" (onClick)="loginService.logoutUser()"></p-button>
+              [outlined]="true" severity="secondary"></p-button>
+
+    <p-button class="m-1" *ngIf="loginService.isLoggedIn()"
+              label="logout"
+              [outlined]="true" severity="secondary"
+              (onClick)="loginService.logoutUser()"></p-button>
   </ng-template>
 </p-menubar>
 
