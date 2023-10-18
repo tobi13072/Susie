@@ -4,4 +4,5 @@ export const env = {
   projectRoles: {
     scrum_master: "sm",
     product_owner: "po"
-  }};
+  }
+};

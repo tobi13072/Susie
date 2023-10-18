@@ -1,20 +1,18 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
-import {ProjectWebService} from "../../service/project/project-web.service";
-import {ProjectDto} from "../../types/project-dto";
+import {ProjectWebService} from "../../../service/project/project-web.service";
+import {ProjectDto} from "../../../types/project-dto";
+import {DynamicDialogRef} from "primeng/dynamicdialog";
 
 @Component({
-  selector: 'app-project',
   templateUrl: './project-form.component.html',
-  styleUrls: ['./project-form.component.scss']
 })
 export class ProjectFormComponent implements OnInit {
 
-  constructor(private fb: FormBuilder, private projectWebService: ProjectWebService) {
+  constructor(private fb: FormBuilder, private projectWebService: ProjectWebService, public dialogRef: DynamicDialogRef) {
   }
 
   ngOnInit(): void {
-
   }
 
   projectForm = this.fb.group({
@@ -32,13 +30,11 @@ export class ProjectFormComponent implements OnInit {
     }
   }
 
-
-
-
   onSubmit() {
     if (this.projectForm.valid) {
       this.projectWebService.createProject(this.prepareDataToSend()).subscribe({
-        next: result => {
+        next: () => {
+          this.dialogRef.close()
         },
         error: err => {
           console.log(err);

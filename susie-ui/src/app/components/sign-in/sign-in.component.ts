@@ -24,17 +24,17 @@ export class SignInComponent implements OnInit {
     password: ['', Validators.required]
   })
 
-  prepareDataToSend(): LoginRequest{
+  prepareDataToSend(): LoginRequest {
     return {
       email: this.loginForm.value.email!,
       password: this.loginForm.value.password!
     }
   }
 
-  addDataToSessionStorage(result: LoginResponse){
-    sessionStorage.setItem('token',result.access_token);
-    sessionStorage.setItem('refresh_token',result.refresh_token);
-    sessionStorage.setItem('roles',result.userRoles.map((role: { name: any; }) => role.name).join(','));
+  addDataToSessionStorage(result: LoginResponse) {
+    sessionStorage.setItem('token', result.access_token);
+    sessionStorage.setItem('refresh_token', result.refresh_token);
+    sessionStorage.setItem('roles', result.userRoles.map((role: { name: any; }) => role.name).join(','));
   }
 
   onSubmit() {

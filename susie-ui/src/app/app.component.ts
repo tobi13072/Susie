@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {LoginService} from "./service/auth/login.service";
 
 
@@ -10,6 +10,7 @@ import {LoginService} from "./service/auth/login.service";
 export class AppComponent implements OnInit {
 
   showMenuBar: boolean = false;
+
   ngOnInit(): void {
 
   }

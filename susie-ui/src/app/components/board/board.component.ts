@@ -25,7 +25,7 @@ export class BoardComponent implements OnInit {
       {id: 1, name: 'Take a shower', status: "test1"},
       {id: 2, name: 'Cook dinner', status: "test1"}
     ]
-    this.test2 = [{id: 3, name: 'angular', status:'test2'}]
+    this.test2 = [{id: 3, name: 'angular', status: 'test2'}]
   }
 
   constructor() {

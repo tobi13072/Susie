@@ -1,0 +1,13 @@
+<div class="m-4">
+  <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+    <div class="d-flex flex-column">
+      <label for="name">Name</label>
+      <input type="text" id="name" pInputText formControlName="name" class="mb-1">
+      <label for="description">Description</label>
+      <input type="text" id="description" pInputText formControlName="description">
+      <label for="goal">Project goal</label>
+      <input type="text" id="goal" pInputText formControlName="projectGoal"/>
+    </div>
+    <button pButton pRipple label="Submit" class="p-button-success mt-2"></button>
+  </form>
+</div>

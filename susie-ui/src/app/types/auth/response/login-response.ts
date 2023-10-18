@@ -1,6 +1,6 @@
 import {RoleRepresentationResponse} from "./roleRepresentation-response";
 
-export interface LoginResponse{
+export interface LoginResponse {
   access_token: string;
   expires_in: number;
   refresh_expires_in: number;
