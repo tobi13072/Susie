@@ -19,12 +19,13 @@ import {SignInComponent} from './components/sign-in/sign-in.component';
 import {BoardComponent} from './components/board/board.component';
 import {PanelModule} from "primeng/panel";
 import {DragDropModule} from "primeng/dragdrop";
-import {AuthInterceptor} from "./service/auth/auth.interceptor";
+import {AuthInterceptor} from "./service/interceptors/auth.interceptor";
 import {ProjectListComponent} from './components/project/project-list/project-list.component';
 import {TableModule} from "primeng/table";
 import {StyleClassModule} from "primeng/styleclass";
 import {DynamicDialogModule} from "primeng/dynamicdialog";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     TableModule,
     StyleClassModule,
     DynamicDialogModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ConfirmDialogModule
   ],
   providers: [
     {

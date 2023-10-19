@@ -9,16 +9,17 @@ import {IssueDto} from "../../types/issue-dto";
 })
 export class BoardComponent implements OnInit {
   test1: IssueDto[] = [];
-
   test2: IssueDto[] = [];
-
   test3: IssueDto[] = [];
-
   test4: IssueDto[] = [];
 
   dragged: IssueDto | undefined | null;
 
   draggedStatusIndex: number = -1;
+
+  constructor() {
+
+  }
 
   ngOnInit() {
     this.test1 = [
@@ -26,9 +27,6 @@ export class BoardComponent implements OnInit {
       {id: 2, name: 'Cook dinner', status: "test1"}
     ]
     this.test2 = [{id: 3, name: 'angular', status: 'test2'}]
-  }
-
-  constructor() {
   }
 
   dragStart(product: IssueDto, draggedStatus: number) {

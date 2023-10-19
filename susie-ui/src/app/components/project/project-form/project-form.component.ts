@@ -1,15 +1,18 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
-import {ProjectWebService} from "../../../service/project/project-web.service";
+import {ProjectService} from "../../../service/project/project.service";
 import {ProjectDto} from "../../../types/project-dto";
 import {DynamicDialogRef} from "primeng/dynamicdialog";
+import {ConfirmationService} from "primeng/api";
 
 @Component({
   templateUrl: './project-form.component.html',
+  providers: [ConfirmationService]
 })
 export class ProjectFormComponent implements OnInit {
 
-  constructor(private fb: FormBuilder, private projectWebService: ProjectWebService, public dialogRef: DynamicDialogRef) {
+  constructor(private fb: FormBuilder, private projectWebService: ProjectService, public dialogRef: DynamicDialogRef,
+              private  confirmDialog: ConfirmationService) {
   }
 
   ngOnInit(): void {
@@ -38,6 +41,14 @@ export class ProjectFormComponent implements OnInit {
         },
         error: err => {
           console.log(err);
+          this.confirmDialog.confirm({
+            message: err.error.message,
+            header: 'Error',
+            icon: 'pi pi-exclamation-triangle',
+            acceptVisible: false,
+            rejectLabel: "OK",
+            rejectIcon: 'pi'
+          })
         }
       })
     }

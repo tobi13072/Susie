@@ -1,4 +1,4 @@
-<p-menubar>
+<p-menubar *ngIf="loginService.isLoggedIn()">
   <ng-template pTemplate="start">
     <img src="https://primefaces.org/cdn/primeng/images/primeng.svg"
          height="40"
@@ -8,16 +8,6 @@
   </ng-template>
   <ng-template pTemplate="end">
     <p-button class="m-1"
-              [routerLink]="['sign-up']"
-              label="Sign-up"
-              [outlined]="true" severity="secondary">
-    </p-button>
-    <p-button class="m-1"
-              [routerLink]="['project']"
-              label="Project"
-              [outlined]="true" severity="secondary"></p-button>
-
-    <p-button class="m-1" *ngIf="loginService.isLoggedIn()"
               label="logout"
               [outlined]="true" severity="secondary"
               (onClick)="loginService.logoutUser()"></p-button>

@@ -41,7 +41,7 @@ export class SignInComponent implements OnInit {
     this.loginService.loginUser(this.prepareDataToSend()).subscribe({
       next: result => {
         console.log(result);
-        this.router.navigate(['board']);
+        this.router.navigate(['project']).then();
         this.addDataToSessionStorage(result);
       },
       error: err => {
@@ -49,5 +49,4 @@ export class SignInComponent implements OnInit {
       }
     })
   }
-
 }

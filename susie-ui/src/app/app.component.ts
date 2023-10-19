@@ -9,10 +9,7 @@ import {LoginService} from "./service/auth/login.service";
 })
 export class AppComponent implements OnInit {
 
-  showMenuBar: boolean = false;
-
   ngOnInit(): void {
-
   }
 
   constructor(public loginService: LoginService) {

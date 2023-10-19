@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ProjectDto} from "../../../types/project-dto";
-import {ProjectWebService} from "../../../service/project/project-web.service";
+import {ProjectService} from "../../../service/project/project.service";
 import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
 import {ProjectFormComponent} from "../project-form/project-form.component";
 
@@ -19,7 +19,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
     this.getAllProjects()
   }
 
-  constructor(private projectWebService: ProjectWebService, public dialogService: DialogService) {
+  constructor(private projectWebService: ProjectService, public dialogService: DialogService) {
   }
 
   getAllProjects() {
@@ -34,13 +34,14 @@ export class ProjectListComponent implements OnDestroy, OnInit {
   }
 
   viewProjectDetails(project: ProjectDto) {
-    console.log(project);
+    console.log(project.projectID)
+    //this.router.navigate(['board']);
   }
 
   showAddProjectForm() {
     this.formDialog = this.dialogService.open(ProjectFormComponent, {
       header: "Add project",
-      width: '30%'
+      width: '500px'
     });
     this.formDialog.onClose.subscribe(() => {
       this.getAllProjects()

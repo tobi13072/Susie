@@ -7,7 +7,7 @@ import {ProjectDto} from "../../types/project-dto";
 @Injectable({
   providedIn: 'root'
 })
-export class ProjectWebService {
+export class ProjectService {
 
   private readonly PROJECT_PATH: string = env.apiUrl.concat("/scrum-project");
 
