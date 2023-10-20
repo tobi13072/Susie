@@ -12,6 +12,9 @@ import {LoginService} from "../../service/auth/login.service";
   styleUrls: ['./sign-up.component.scss']
 })
 export class SignUpComponent implements OnInit {
+
+  private readonly NAMES_REGEX: string = '^[A-Z][a-zA-Z\\s\'-]+$';
+
   constructor(private _fb: FormBuilder, private registrationService: RegistrationService, private router: Router, private loginService: LoginService) {
   }
 
@@ -21,8 +24,8 @@ export class SignUpComponent implements OnInit {
   registrationForm = this._fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
-    firstName: ['', Validators.required],
-    lastName: ['', Validators.required],
+    firstName: ['', [Validators.required, Validators.pattern(this.NAMES_REGEX)]],
+    lastName: ['', [Validators.required, Validators.pattern(this.NAMES_REGEX)]],
     isScrumMaster: [false, Validators.required]
   });
 
@@ -55,21 +58,17 @@ export class SignUpComponent implements OnInit {
 
   checkScrumMasterSwitch() {
     if (this.registrationForm.value.isScrumMaster) {
-      this.router.navigate(['project']).then();
+      this.router.navigate(['project']);
+    } else {
+      this.router.navigate(['board']);
     }
   }
 
   onSubmit() {
     this.registrationService.registerUser(this.prepareDataToSend()).subscribe({
-      next: result => {
-        if (result.success) {
-          console.log('Registration success');
-          this.loginAfterRegister();
-          this.checkScrumMasterSwitch();
-
-        } else {
-          console.log('Registration failure')
-        }
+      next: () => {
+        this.loginAfterRegister();
+        this.checkScrumMasterSwitch();
       },
       error: err => {
         console.log(err);

@@ -4,20 +4,34 @@
       <div class="d-flex flex-column mb-1">
         <label for="email">Email</label>
         <input pInputText id="email" formControlName="email" class="mb-1"/>
+        <small id="email-help" class="p-error"
+               *ngIf="registrationForm.get('email')?.invalid  && registrationForm.get('email')?.dirty">Email is
+          incorrect</small>
 
         <label for="firstName">Firstname</label>
         <input pInputText id="firstName" formControlName="firstName" class="mb-1"/>
+        <small id="firstName-help" class="p-error"
+               *ngIf="registrationForm.get('firstName')?.invalid  && registrationForm.get('firstName')?.dirty">Firstname
+          is incorrect</small>
 
         <label for="lastName">Lastname</label>
         <input pInputText id="lastName" formControlName="lastName" class="mb-1"/>
+        <small id="lastName-help" class="p-error"
+               *ngIf="registrationForm.get('lastName')?.invalid  && registrationForm.get('lastName')?.dirty">Firstname
+          is incorrect</small>
 
         <label for="password">Password</label>
-        <input pInputText type="password" id="password" formControlName="password" class="mb-1"/>
+        <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true"
+                    class="mb-1" [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}"></p-password>
+        <small id="password-help" class="p-error"
+               *ngIf="registrationForm.get('password')?.invalid  && registrationForm.get('password')?.dirty">Password
+          is required</small>
 
         <label for="isSM">Extended role</label>
         <p-inputSwitch id="isSM" formControlName="isScrumMaster"></p-inputSwitch>
       </div>
-      <button pButton pRipple label="Next" class="p-button-success mt-2"></button>
+      <button pButton pRipple label="Register" class="p-button-success mt-2"
+              [disabled]="registrationForm.invalid"></button>
     </form>
   </p-card>
 </div>

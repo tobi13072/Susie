@@ -26,6 +26,7 @@ import {StyleClassModule} from "primeng/styleclass";
 import {DynamicDialogModule} from "primeng/dynamicdialog";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {PasswordModule} from "primeng/password";
 
 @NgModule({
   declarations: [
@@ -36,28 +37,29 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
     BoardComponent,
     ProjectListComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    RouterModule,
-    MenubarModule,
-    ButtonModule,
-    NgOptimizedImage,
-    ReactiveFormsModule,
-    InputTextModule,
-    InputSwitchModule,
-    CardModule,
-    HttpClientModule,
-    KeyFilterModule,
-    RippleModule,
-    PanelModule,
-    DragDropModule,
-    TableModule,
-    StyleClassModule,
-    DynamicDialogModule,
-    BrowserAnimationsModule,
-    ConfirmDialogModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        RouterModule,
+        MenubarModule,
+        ButtonModule,
+        NgOptimizedImage,
+        ReactiveFormsModule,
+        InputTextModule,
+        InputSwitchModule,
+        CardModule,
+        HttpClientModule,
+        KeyFilterModule,
+        RippleModule,
+        PanelModule,
+        DragDropModule,
+        TableModule,
+        StyleClassModule,
+        DynamicDialogModule,
+        BrowserAnimationsModule,
+        ConfirmDialogModule,
+        PasswordModule
+    ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

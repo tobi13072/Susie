@@ -24,6 +24,7 @@ export class LoginService {
   logoutUser() {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('roles');
 
     this.router.navigate(['']);
   }

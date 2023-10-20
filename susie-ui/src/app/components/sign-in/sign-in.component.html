@@ -4,11 +4,19 @@
       <div class="d-flex flex-column mb-1">
         <label for="email">Email</label>
         <input type="text" id="email" pInputText formControlName="email" class="mb-1"/>
+        <small id="email-help" class="p-error"
+               *ngIf="loginForm.get('email')?.invalid  && loginForm.get('email')?.dirty">Email is
+          incorrect</small>
 
         <label for="password">Password</label>
-        <input type="password" id="password" pInputText formControlName="password">
+        <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true"
+                    class="mb-1" [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}"></p-password>
+        <small id="password-help" class="p-error"
+               *ngIf="loginForm.get('password')?.invalid  && loginForm.get('password')?.dirty">Password is
+          required</small>
       </div>
-      <button pButton pRipple label="Login" class="p-button-success mt-2"></button>
+
+      <p-button label="Login" severity="success" class="p-button-success mt-2" [disabled]="loginForm.invalid"></p-button>
       <p-button label="Sign up" [routerLink]="['sign-up']" severity="secondary" class="ms-2"></p-button>
     </form>
   </p-card>
