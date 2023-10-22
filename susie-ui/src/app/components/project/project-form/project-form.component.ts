@@ -40,7 +40,6 @@ export class ProjectFormComponent implements OnInit {
           this.dialogRef.close()
         },
         error: err => {
-          console.log(err);
           this.confirmDialog.confirm({
             message: err.error.message,
             header: 'Error',

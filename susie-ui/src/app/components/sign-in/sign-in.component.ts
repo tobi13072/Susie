@@ -4,15 +4,17 @@ import {LoginService} from "../../service/auth/login.service";
 import {LoginRequest} from "../../types/auth/request/login-request";
 import {Router} from "@angular/router";
 import {LoginResponse} from "../../types/auth/response/login-response";
+import {ConfirmationService} from "primeng/api";
 
 @Component({
   selector: 'app-sign-in',
   templateUrl: './sign-in.component.html',
-  styleUrls: ['./sign-in.component.scss']
+  styleUrls: ['./sign-in.component.scss'],
+  providers: [ConfirmationService]
 })
 export class SignInComponent implements OnInit {
 
-  constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router) {
+  constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router, private confirmDialog: ConfirmationService) {
 
   }
 
@@ -46,6 +48,18 @@ export class SignInComponent implements OnInit {
       },
       error: err => {
         console.log(err);
+        this.confirmDialog.confirm({
+          message: "Incorrect username or password. Please try again.",
+          header: 'Error',
+          icon: 'pi pi-exclamation-triangle',
+          acceptVisible: false,
+          rejectLabel: "OK",
+          rejectIcon: 'pi',
+          reject: () =>{
+            this.loginForm.get('password')?.setValue('');
+            this.loginForm.get('email')?.setValue('');
+          }
+        })
       }
     })
   }
