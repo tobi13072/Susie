@@ -44,31 +44,20 @@ export class SignUpComponent implements OnInit {
       email: this.registrationForm.value.email!,
       password: this.registrationForm.value.password!
     };
+
     this.loginService.loginUser(loginData).subscribe({
       next: result => {
-        sessionStorage.setItem('token', result.access_token);
-        sessionStorage.setItem('refresh_token', result.refresh_token);
-        sessionStorage.setItem('roles', result.userRoles.map((role: { name: any; }) => role.name).join(','));
-      },
-      error: err => {
-        console.log(err);
+        this.loginService.saveToken(result);
+        this.loginService.saveRoles(result);
+        this.router.navigate(['project']);
       }
     })
-  }
-
-  checkScrumMasterSwitch() {
-    if (this.registrationForm.value.isScrumMaster) {
-      this.router.navigate(['project']);
-    } else {
-      this.router.navigate(['board']);
-    }
   }
 
   onSubmit() {
     this.registrationService.registerUser(this.prepareDataToSend()).subscribe({
       next: () => {
         this.loginAfterRegister();
-        this.checkScrumMasterSwitch();
       },
       error: err => {
         console.log(err);

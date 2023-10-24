@@ -12,7 +12,7 @@ import {ConfirmationService} from "primeng/api";
 export class ProjectFormComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private projectWebService: ProjectService, public dialogRef: DynamicDialogRef,
-              private  confirmDialog: ConfirmationService) {
+              private confirmDialog: ConfirmationService) {
   }
 
   ngOnInit(): void {

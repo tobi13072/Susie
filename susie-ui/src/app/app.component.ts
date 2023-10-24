@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {LoginService} from "./service/auth/login.service";
 
 
@@ -14,7 +14,6 @@ export class AppComponent implements OnInit {
 
   constructor(public loginService: LoginService) {
   }
-
 
   protected readonly Component = Component;
 }

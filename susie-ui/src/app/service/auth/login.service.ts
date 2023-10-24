@@ -5,6 +5,7 @@ import {Observable} from "rxjs";
 import {LoginRequest} from "../../types/auth/request/login-request";
 import {LoginResponse} from "../../types/auth/response/login-response";
 import {env} from "../../../environments/environment";
+import {RefreshTokenResponse} from "../../types/auth/response/refreshToken-response";
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,23 @@ export class LoginService {
   loginUser(user: LoginRequest): Observable<LoginResponse> {
     let endpoint: string = `${this.BASE_URL}/sign-in`;
     return this.http.post<LoginResponse>(endpoint, user);
+  }
+
+  refreshToken(refreshToken: string): Observable<RefreshTokenResponse> {
+    const endpoint: string = `${this.BASE_URL}/refresh`;
+    const refreshData = new FormData;
+    refreshData.append('refreshToken', refreshToken);
+
+    return this.http.post<RefreshTokenResponse>(endpoint, refreshData);
+  }
+
+  saveToken(response: LoginResponse | RefreshTokenResponse) {
+    sessionStorage.setItem('token', response.access_token);
+    sessionStorage.setItem('refresh_token', response.refresh_token);
+  }
+
+  saveRoles(response: LoginResponse) {
+    sessionStorage.setItem('roles', response.userRoles.map((role: { name: any; }) => role.name).join(','));
   }
 
   logoutUser() {
