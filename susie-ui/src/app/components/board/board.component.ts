@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {IssueDto} from "../../types/issue-dto";
+import {ActivatedRoute} from "@angular/router";
 
 
 @Component({
@@ -17,11 +18,15 @@ export class BoardComponent implements OnInit {
 
   draggedStatusIndex: number = -1;
 
-  constructor() {
+  data: any;
 
+  constructor(private route: ActivatedRoute) {
   }
 
   ngOnInit() {
+
+    this.data = this.route.snapshot.params['projectId'];
+
     this.test1 = [
       {id: 1, name: 'Take a shower', status: "test1"},
       {id: 2, name: 'Cook dinner', status: "test1"}

@@ -4,6 +4,7 @@ import {ProjectService} from "../../../service/project/project.service";
 import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
 import {ProjectFormComponent} from "../project-form/project-form.component";
 import {AuthService} from "../../../service/auth/auth.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-project-list',
@@ -15,12 +16,13 @@ export class ProjectListComponent implements OnDestroy, OnInit {
 
   projects: ProjectDto[] = [];
   formDialog: DynamicDialogRef | undefined;
+  projectContext: boolean = true;
 
   ngOnInit(): void {
     this.getAllProjects()
   }
 
-  constructor(private projectWebService: ProjectService, public dialogService: DialogService, protected loginService: AuthService) {
+  constructor(private projectWebService: ProjectService, public dialogService: DialogService, protected loginService: AuthService, private router: Router) {
   }
 
   getAllProjects() {
@@ -35,8 +37,8 @@ export class ProjectListComponent implements OnDestroy, OnInit {
   }
 
   viewProjectDetails(project: ProjectDto) {
-    console.log(project.projectID)
-    //this.router.navigate(['board']);
+    console.log(project.projectID);
+    this.router.navigate(['board', project.projectID]);
   }
 
   showAddProjectForm() {
