@@ -3,6 +3,7 @@ import {ProjectDto} from "../../../types/project-dto";
 import {ProjectService} from "../../../service/project/project.service";
 import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
 import {ProjectFormComponent} from "../project-form/project-form.component";
+import {AuthService} from "../../../service/auth/auth.service";
 
 @Component({
   selector: 'app-project-list',
@@ -19,7 +20,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
     this.getAllProjects()
   }
 
-  constructor(private projectWebService: ProjectService, public dialogService: DialogService) {
+  constructor(private projectWebService: ProjectService, public dialogService: DialogService, protected loginService: AuthService) {
   }
 
   getAllProjects() {

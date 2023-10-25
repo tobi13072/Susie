@@ -4,7 +4,8 @@ import {RegistrationRequest} from "../../types/auth/request/registration-request
 import {RegistrationService} from "../../service/auth/registration.service";
 import {Router} from "@angular/router";
 import {LoginRequest} from "../../types/auth/request/login-request";
-import {LoginService} from "../../service/auth/login.service";
+import {AuthService} from "../../service/auth/auth.service";
+import {passwordMatchValidator} from "../../shared/password-match.validator";
 
 @Component({
   selector: 'app-sign-up',
@@ -15,7 +16,7 @@ export class SignUpComponent implements OnInit {
 
   private readonly NAMES_REGEX: string = '^[A-Z][a-zA-Z\\s\'-]+$';
 
-  constructor(private _fb: FormBuilder, private registrationService: RegistrationService, private router: Router, private loginService: LoginService) {
+  constructor(private _fb: FormBuilder, private registrationService: RegistrationService, private router: Router, private loginService: AuthService) {
   }
 
   ngOnInit(): void {
@@ -24,10 +25,14 @@ export class SignUpComponent implements OnInit {
   registrationForm = this._fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
+    confirmPassword: ['',Validators.required],
     firstName: ['', [Validators.required, Validators.pattern(this.NAMES_REGEX)]],
     lastName: ['', [Validators.required, Validators.pattern(this.NAMES_REGEX)]],
     isScrumMaster: [false, Validators.required]
+  },{
+    validators: passwordMatchValidator
   });
+
 
   private prepareDataToSend(): RegistrationRequest {
     return {

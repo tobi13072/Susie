@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {LoginService} from "./service/auth/login.service";
+import {AuthService} from "./service/auth/auth.service";
 
 
 @Component({
@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  constructor(public loginService: LoginService) {
+  constructor(public loginService: AuthService) {
   }
 
   protected readonly Component = Component;

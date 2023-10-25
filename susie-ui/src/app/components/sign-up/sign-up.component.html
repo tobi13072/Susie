@@ -27,6 +27,13 @@
                *ngIf="registrationForm.get('password')?.invalid  && registrationForm.get('password')?.dirty">Password
           is required</small>
 
+        <label for="confirmPassword">Confirm your password</label>
+        <p-password id="confirmPassword" formControlName="confirmPassword" [feedback]="false" [toggleMask]="true"
+                    class="mb-1" [style]="{'width':'100%'}" [inputStyle]="{'width':'100%'}" ></p-password>
+        <small id="confirmPassword-help" class="p-error"
+               *ngIf="registrationForm.errors?.['passwordMismatch']">Password
+          is not match</small>
+
         <label for="isSM">Extended role</label>
         <p-inputSwitch id="isSM" formControlName="isScrumMaster"></p-inputSwitch>
       </div>

@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
-import {LoginService} from "../../service/auth/login.service";
+import {AuthService} from "../../service/auth/auth.service";
 import {LoginRequest} from "../../types/auth/request/login-request";
 import {Router} from "@angular/router";
 import {ConfirmationService} from "primeng/api";
@@ -13,7 +13,7 @@ import {ConfirmationService} from "primeng/api";
 })
 export class SignInComponent implements OnInit {
 
-  constructor(private fb: FormBuilder, private loginService: LoginService, private router: Router, private confirmDialog: ConfirmationService) {
+  constructor(private fb: FormBuilder, private loginService: AuthService, private router: Router, private confirmDialog: ConfirmationService) {
 
   }
 

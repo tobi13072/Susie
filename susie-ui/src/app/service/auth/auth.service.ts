@@ -10,7 +10,7 @@ import {RefreshTokenResponse} from "../../types/auth/response/refreshToken-respo
 @Injectable({
   providedIn: 'root'
 })
-export class LoginService {
+export class AuthService {
 
   private BASE_URL: string = env.apiUrl.concat("/auth");
 
