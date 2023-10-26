@@ -14,5 +14,5 @@ public interface ProjectService {
     List<ProjectDTO> getAllProjects();
     void associateUserWithProject(String email, Integer projectID);
     void deleteUserFromProject(String uuid, Integer projectID);
-    void deleteUserFromAllProjects(String email);
+    void deleteUserFromAllProjects(String uuid);
 }

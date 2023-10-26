@@ -144,14 +144,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteUserFromAllProjects(String email) {
+    public void deleteUserFromAllProjects(String uuid) {
 
-        String userUUID = userService.getUserByEmail(email).getUuid();
-        List<Project> allUsersProjects = projectRepository.findAllByUserIDsContains(email);
+        List<Project> allUsersProjects = projectRepository.findAllByUserIDsContains(uuid);
         if (!allUsersProjects.isEmpty()) {
             allUsersProjects.forEach(project -> {
                 Set<String> projectUsers = project.getUserIDs();
-                projectUsers.remove(userUUID);
+                projectUsers.remove(uuid);
                 project.setUserIDs(projectUsers);
                 projectRepository.save(project);
             });
@@ -160,7 +159,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private List<UserDTO> mapUserUUIDsToUserDTOs(Set<String> uuids) {
         return uuids.stream()
-                .map(userService::getUserByUUID)
+                .map(userService::getUserSafely)
                 .collect(Collectors.toList());
     }
 }
