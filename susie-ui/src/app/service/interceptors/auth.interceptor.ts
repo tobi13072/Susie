@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {catchError, from, Observable, switchMap, throwError} from 'rxjs';
+import {catchError, EMPTY, from, Observable, switchMap, throwError} from 'rxjs';
 import {AuthService} from "../auth/auth.service";
 
 @Injectable()
@@ -21,6 +21,11 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     return next.handle(request).pipe(catchError(err => {
+
+      if(err instanceof  HttpErrorResponse && request.url.includes('api/auth/refresh') && err.status === 401){
+        this.loginService.logoutUser();
+        return EMPTY;
+      }
       if (err instanceof HttpErrorResponse && !request.url.includes('api/auth/sign-in') &&
         !request.url.includes('api/auth/register') && err.status === 401) {
         return this.handleAuthError(request, next);
@@ -41,12 +46,6 @@ export class AuthInterceptor implements HttpInterceptor {
             }
           });
           return next.handle(request)
-        }),
-        catchError((error) => {
-          if (error.status == 401) {
-            this.loginService.logoutUser();
-          }
-          return throwError(() => error);
         })
       )
     )
