@@ -5,11 +5,11 @@ import io.github.lizewskik.susieserver.keycloak.security.dto.request.Registratio
 import io.github.lizewskik.susieserver.keycloak.security.dto.request.SignInRequest;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.AccessTokenExtendedResponse;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.AccountDeletionResponse;
+import io.github.lizewskik.susieserver.keycloak.security.dto.response.RefreshTokenResponse;
 import io.github.lizewskik.susieserver.keycloak.security.dto.response.RegistrationResponse;
 import io.github.lizewskik.susieserver.keycloak.security.service.KeycloakService;
+import io.github.lizewskik.susieserver.keycloak.security.service.helper.KeycloakHelperService;
 import io.github.lizewskik.susieserver.resource.dto.UserDTO;
-import io.github.lizewskik.susieserver.resource.service.ProjectService;
-import io.github.lizewskik.susieserver.resource.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,8 +35,7 @@ import static io.github.lizewskik.susieserver.keycloak.security.dictionary.Keycl
 public class KeycloakController {
 
     private final KeycloakService keycloakService;
-    private final UserService userService;
-    private final ProjectService projectService;
+    private final KeycloakHelperService keycloakHelperService;
 
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@RequestBody RegistrationRequest user) {
@@ -50,19 +49,19 @@ public class KeycloakController {
     }
 
     @PostMapping("/refresh")
-    public Map<String, String> refreshToken(@RequestParam String refreshToken) throws URISyntaxException, ExecutionException, InterruptedException {
-        return keycloakService.refreshToken(refreshToken);
+    public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestParam String refreshToken) throws URISyntaxException, ExecutionException, InterruptedException {
+        return ResponseEntity.ok(keycloakService.refreshToken(refreshToken));
     }
 
     @GetMapping("/user-info")
     public ResponseEntity<UserDTO> userInfo() {
-        return ResponseEntity.ok(userService.getCurrentLoggedUser());
+        return ResponseEntity.ok(keycloakHelperService.getCurrentLoggedInUser());
     }
 
     @PreAuthorize(SM_PERMISSION)
     @PatchMapping("/user/permission")
     public void grantNewPermissionToUser(@RequestBody ExtendPermissionRequest permission) {
-        Set<String> projectUsersUUIDs = userService.getAllProjectUsersUUIDs(permission.getProjectID());
+        Set<String> projectUsersUUIDs = keycloakHelperService.getAllProjectUsersUUIDs(permission.getProjectID());
         keycloakService.grantNewPermissionToUser(permission.getUserUUID(), permission.getRoleName(), projectUsersUUIDs);
     }
 
@@ -74,7 +73,7 @@ public class KeycloakController {
 
     @DeleteMapping("/account-deletion")
     public ResponseEntity<AccountDeletionResponse> deleteAccount() {
-        projectService.deleteUserFromAllProjects(userService.getCurrentLoggedUser().getEmail());
-        return ResponseEntity.ok(keycloakService.deleteAccount(userService.getCurrentLoggedUser().getUuid()));
+        keycloakHelperService.saveAccountDataDeletion();
+        return ResponseEntity.ok(keycloakService.deleteAccount(keycloakHelperService.getCurrentLoggedInUserUUID()));
     }
 }

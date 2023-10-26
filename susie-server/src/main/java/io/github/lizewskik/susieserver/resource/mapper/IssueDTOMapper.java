@@ -25,13 +25,11 @@ public class IssueDTOMapper {
                 .name(from.getName())
                 .description(from.getDescription())
                 .estimation(from.getEstimation())
-                .reporter(userService.getUserByUUID(from.getReporterID()))
+                .reporter(userService.getUserSafely(from.getReporterID()))
+                .assignee(userService.getUserSafely(from.getAssigneeID()))
                 .projectID(from.getProjectID())
                 .sprintID(
                         isNull(from.getSprint()) ? null : from.getSprint().getId()
-                )
-                .assignee(
-                        isNull(from.getAssigneeID()) ? null : userService.getUserByUUID(from.getAssigneeID())
                 )
                 .issueTypeID(
                         isNull(from.getIssueType()) ? null : from.getIssueType().getId()

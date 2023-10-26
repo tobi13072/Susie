@@ -17,12 +17,14 @@ import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMess
 import static io.github.lizewskik.susieserver.exception.dictionary.ExceptionMessages.PROJECT_DOES_NOT_EXISTS;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_FIRSTNAME_TOKEN_CLAIM;
 import static io.github.lizewskik.susieserver.keycloak.security.dictionary.KeycloakDictionary.KEYCLOAK_LASTNAME_TOKEN_CLAIM;
+import static java.util.Objects.isNull;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final KeycloakService keycloakService;
+    private final UserMockService userMockService;
     private final ProjectRepository projectRepository;
 
     @Override
@@ -40,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByEmail(String email) {
-        UserRepresentation userRepresentation = Optional.of(keycloakService.getUserUUIDByEmail(email))
+        UserRepresentation userRepresentation = Optional.ofNullable(keycloakService.getUserUUIDByEmail(email))
                 .orElseThrow(() -> new RuntimeException(KEYCLOAK_USER_DOES_NOT_EXISTS));
         return UserDTO.builder()
                 .uuid(userRepresentation.getId())
@@ -63,6 +65,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDTO getUserSafely(String uuid) {
+
+        if (isNull(uuid)) {
+            return null;
+        }
+        return isKeycloakUserExistByUUID(uuid) ? getUserByUUID(uuid) : userMockService.mockEmptyUser();
+    }
+
+    @Override
     public boolean isProjectOwner(Integer projectID) {
 
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getCredentials();
@@ -73,11 +84,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean isAnyProjectOwner(String uuid) {
+        return projectRepository.existsByProjectOwner(uuid);
+    }
+
+    @Override
     public Set<String> getAllProjectUsersUUIDs(Integer projectID) {
 
         Project project = projectRepository.findById(projectID)
                 .orElseThrow(() -> new RuntimeException(PROJECT_DOES_NOT_EXISTS));
 
         return project.getUserIDs();
+    }
+
+    private boolean isKeycloakUserExistByUUID(String uuid) {
+        return keycloakService.isKeycloakUserExistsByUUID(uuid);
     }
 }
