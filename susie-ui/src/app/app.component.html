@@ -7,11 +7,7 @@
          [routerLink]="['']"/>
   </ng-template>
   <ng-template pTemplate="end">
-    <p-button class="m-1"
-              label="logout"
-              [outlined]="true" severity="secondary"
-              (onClick)="loginService.logoutUser()"></p-button>
+    <p-button class="m-1" label="logout" [outlined]="true" severity="secondary" (onClick)="loginService.logoutUser()"></p-button>
   </ng-template>
 </p-menubar>
-
 <router-outlet></router-outlet>

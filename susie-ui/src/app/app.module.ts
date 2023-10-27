@@ -27,6 +27,7 @@ import {DynamicDialogModule} from "primeng/dynamicdialog";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {PasswordModule} from "primeng/password";
+import {MenuModule} from "primeng/menu";
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import {PasswordModule} from "primeng/password";
     DynamicDialogModule,
     BrowserAnimationsModule,
     ConfirmDialogModule,
-    PasswordModule
+    PasswordModule,
+    MenuModule
   ],
   providers: [
     {

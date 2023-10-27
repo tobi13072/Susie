@@ -5,6 +5,7 @@ import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
 import {ProjectFormComponent} from "../project-form/project-form.component";
 import {AuthService} from "../../../service/auth/auth.service";
 import {Router} from "@angular/router";
+import {MenuItem, PrimeIcons} from "primeng/api";
 
 @Component({
   selector: 'app-project-list',
@@ -17,9 +18,21 @@ export class ProjectListComponent implements OnDestroy, OnInit {
   projects: ProjectDto[] = [];
   formDialog: DynamicDialogRef | undefined;
   projectContext: boolean = true;
+  projectMenu: MenuItem[] | undefined;
 
   ngOnInit(): void {
     this.getAllProjects()
+
+    this.projectMenu = [
+      {
+        label: 'New',
+        icon: PrimeIcons.FILE_EDIT
+      },
+      {
+        label: 'Delete',
+        icon: PrimeIcons.TRASH
+      }
+    ];
   }
 
   constructor(private projectWebService: ProjectService, public dialogService: DialogService, protected loginService: AuthService, private router: Router) {

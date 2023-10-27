@@ -2,14 +2,21 @@
   <div class="row">
     <ng-container *ngFor="let project of projects">
       <div class="col-md-3">
-        <p-card header="{{project.name}}" (click)="viewProjectDetails(project)" class="m-4">
-          {{project.description}}<br>
-          {{project.projectGoal}}
+        <p-card header="{{project.name}}" class="m-4">
+          <ng-template pTemplate="header">
+            <p-menu #menu [model]="projectMenu" [popup]="true"></p-menu>
+            <p-button icon="pi pi-ellipsis-v" (click)="menu.toggle($event)" severity="secondary" [plain]="true" [text]="true"></p-button>
+          </ng-template>
+          <div (click)="viewProjectDetails(project)">
+            {{project.description}}<br>
+            {{project.projectGoal}}
+          </div>
+
         </p-card>
       </div>
     </ng-container>
     <div class="col-md-3" *ngIf="loginService.isScrumMaster()">
-      <p-card class="m-4" (click)="showAddProjectForm()">
+      <p-card (click)="showAddProjectForm()" class="add-project-class">
         <i class="pi pi-plus d-flex justify-content-center" style="font-size: 2.5rem"></i>
       </p-card>
     </div>
