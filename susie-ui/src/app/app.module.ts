@@ -28,6 +28,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {PasswordModule} from "primeng/password";
 import {MenuModule} from "primeng/menu";
+import {SidebarModule} from "primeng/sidebar";
 
 @NgModule({
   declarations: [
@@ -60,7 +61,8 @@ import {MenuModule} from "primeng/menu";
     BrowserAnimationsModule,
     ConfirmDialogModule,
     PasswordModule,
-    MenuModule
+    MenuModule,
+    SidebarModule
   ],
   providers: [
     {

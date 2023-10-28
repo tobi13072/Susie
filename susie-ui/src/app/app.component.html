@@ -7,7 +7,15 @@
          [routerLink]="['']"/>
   </ng-template>
   <ng-template pTemplate="end">
-    <p-button class="m-1" label="logout" [outlined]="true" severity="secondary" (onClick)="loginService.logoutUser()"></p-button>
+    <p-button icon="pi pi-bars" (click)="mainMenu = true" [text]="true" severity="secondary"></p-button>
   </ng-template>
 </p-menubar>
+
+<p-sidebar [(visible)]="mainMenu" position="right" >
+  <div class="d-flex flex-column justify-content-start align-items-center" >
+    <p-button class="" [style]="{'width': '19rem'}" label="Change Project" [outlined]="true" severity="secondary" [routerLink]="'project'" *ngIf="router.url !== '/project'"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Logout" [outlined]="true" severity="secondary" (onClick)="loginService.logoutUser()"></p-button>
+  </div>
+</p-sidebar>
+
 <router-outlet></router-outlet>

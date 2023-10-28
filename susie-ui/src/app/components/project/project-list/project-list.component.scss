@@ -1,18 +1,10 @@
-:host ::ng-deep .p-card {
-  display: flex;
-  flex-direction: row-reverse;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: flex-start;
-  align-content: center;
-}
-
-:host ::ng-deep .p-card-header {
-
-}
-
-:host ::ng-deep .add-project-class {
+:host ::ng-deep .project-class{
   .p-card {
-    display: block;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-content: center;
   }
 }

@@ -2,12 +2,12 @@
   <div class="row">
     <ng-container *ngFor="let project of projects">
       <div class="col-md-3">
-        <p-card header="{{project.name}}" class="m-4">
+        <p-card header="{{project.name}}" class="m-4 project-class">
           <ng-container *ngIf="authService.isProductOwner() || authService.isScrumMaster()">
             <ng-template pTemplate="header">
               <p-menu #menu [model]="projectMenu" [popup]="true"></p-menu>
               <p-button icon="pi pi-ellipsis-v" (click)="menuActiveItem = project.projectID; menu.toggle($event)"
-                        severity="secondary" [plain]="true" [text]="true"></p-button>
+                        severity="secondary" [text]="true"></p-button>
             </ng-template>
           </ng-container>
           <div (click)="viewProjectDetails(project)">
@@ -19,7 +19,7 @@
       </div>
     </ng-container>
     <div class="col-md-3" *ngIf="loginService.isScrumMaster()">
-      <p-card (click)="showAddProjectForm()" class="add-project-class">
+      <p-card (click)="showAddProjectForm()" class="m-4">
         <i class="pi pi-plus d-flex justify-content-center" style="font-size: 2.5rem"></i>
       </p-card>
     </div>
