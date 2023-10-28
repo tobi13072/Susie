@@ -26,4 +26,7 @@ export class ProjectService {
     return this.http.put<ProjectDto>(this.PROJECT_PATH, project);
   }
 
+  removeProject(idProject: number): Observable<ProjectDto>{
+    return this.http.delete<ProjectDto>(this.PROJECT_PATH.concat(`/${idProject}`));
+  }
 }

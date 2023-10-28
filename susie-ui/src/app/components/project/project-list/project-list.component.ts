@@ -5,37 +5,43 @@ import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
 import {ProjectFormComponent} from "../project-form/project-form.component";
 import {AuthService} from "../../../service/auth/auth.service";
 import {Router} from "@angular/router";
-import {MenuItem, PrimeIcons} from "primeng/api";
+import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
+import {errorDialog} from "../../../shared/error.dialog";
 
 @Component({
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.scss'],
-  providers: [DialogService]
+  providers: [DialogService, ConfirmationService]
 })
 export class ProjectListComponent implements OnDestroy, OnInit {
 
   projects: ProjectDto[] = [];
   formDialog: DynamicDialogRef | undefined;
-  projectContext: boolean = true;
+
   projectMenu: MenuItem[] | undefined;
+  protected menuActiveItem: number | undefined;
 
   ngOnInit(): void {
     this.getAllProjects()
 
     this.projectMenu = [
       {
-        label: 'New',
+        label: 'Edit',
         icon: PrimeIcons.FILE_EDIT
       },
       {
         label: 'Delete',
-        icon: PrimeIcons.TRASH
+        icon: PrimeIcons.TRASH,
+        command: () => {
+          this.deleteProject();
+        }
       }
     ];
   }
 
-  constructor(private projectWebService: ProjectService, public dialogService: DialogService, protected loginService: AuthService, private router: Router) {
+  constructor(private projectWebService: ProjectService, public dialogService: DialogService, protected loginService: AuthService,
+              private router: Router, private confirmDialog: ConfirmationService, protected authService: AuthService) {
   }
 
   getAllProjects() {
@@ -62,6 +68,30 @@ export class ProjectListComponent implements OnDestroy, OnInit {
     this.formDialog.onClose.subscribe(() => {
       this.getAllProjects()
     });
+  }
+
+  deleteProject() {
+    const removeRequest = () => {this.projectWebService.removeProject(this.menuActiveItem!).subscribe({
+      next: () => {
+        this.getAllProjects();
+      },
+      error: err =>{
+        console.log(err)
+        this.confirmDialog.confirm(errorDialog('Something went wrong with the deletion'));
+      }
+    })
+    }
+
+    this.confirmDialog.confirm({
+      header: "Are you sure you want delete this project?",
+      message: "This will delete this project permanently. You cannot und this action.",
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: "Delete",
+      rejectLabel: "Cancel",
+      acceptIcon: 'pi',
+      rejectIcon: 'pi',
+      accept: removeRequest
+    })
   }
 
   ngOnDestroy() {

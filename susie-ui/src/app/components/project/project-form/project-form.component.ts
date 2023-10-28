@@ -4,6 +4,7 @@ import {ProjectService} from "../../../service/project/project.service";
 import {ProjectDto} from "../../../types/project-dto";
 import {DynamicDialogRef} from "primeng/dynamicdialog";
 import {ConfirmationService} from "primeng/api";
+import {errorDialog} from "../../../shared/error.dialog";
 
 @Component({
   templateUrl: './project-form.component.html',
@@ -40,14 +41,7 @@ export class ProjectFormComponent implements OnInit {
           this.dialogRef.close()
         },
         error: err => {
-          this.confirmDialog.confirm({
-            message: err.error.message,
-            header: 'Error',
-            icon: 'pi pi-exclamation-triangle',
-            acceptVisible: false,
-            rejectLabel: "OK",
-            rejectIcon: 'pi'
-          })
+         this.confirmDialog.confirm(errorDialog(err))
         }
       })
     }
