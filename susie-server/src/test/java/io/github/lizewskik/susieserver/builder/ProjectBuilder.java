@@ -16,6 +16,7 @@ public class ProjectBuilder {
     public static final String ANOTHER_PROJECT_NAME = "Another project name";
     public static final String ANOTHER_PROJECT_DESCRIPTION = "Another test project description";
     public static final String PROJECT_GOAL = "Default project goal";
+    public static final String ANOTHER_PROJECT_GOAL = "Another project goal";
 
     public static ProjectDTO createProject() {
         return ProjectDTO.builder()

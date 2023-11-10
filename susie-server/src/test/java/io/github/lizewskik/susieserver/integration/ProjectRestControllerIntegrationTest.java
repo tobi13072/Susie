@@ -5,6 +5,9 @@ import io.github.lizewskik.susieserver.config.TestConfiguration;
 import io.github.lizewskik.susieserver.resource.domain.Backlog;
 import io.github.lizewskik.susieserver.resource.domain.Project;
 import io.github.lizewskik.susieserver.resource.dto.ProjectDTO;
+import io.github.lizewskik.susieserver.resource.dto.UserAssociationDTO;
+import io.github.lizewskik.susieserver.resource.dto.UserDTO;
+import io.github.lizewskik.susieserver.resource.mapper.ProjectDTOMapper;
 import io.github.lizewskik.susieserver.resource.repository.ProjectRepository;
 import io.github.lizewskik.susieserver.resource.service.UserService;
 import jakarta.transaction.Transactional;
@@ -26,19 +29,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static io.github.lizewskik.susieserver.builder.ProjectBuilder.ANOTHER_PROJECT_DESCRIPTION;
+import static io.github.lizewskik.susieserver.builder.ProjectBuilder.ANOTHER_PROJECT_GOAL;
+import static io.github.lizewskik.susieserver.builder.ProjectBuilder.ANOTHER_PROJECT_NAME;
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.PROJECT_DESCRIPTION;
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.PROJECT_GOAL;
 import static io.github.lizewskik.susieserver.builder.ProjectBuilder.PROJECT_NAME;
 import static io.github.lizewskik.susieserver.builder.UserBuilder.createCurrentLoggedInUser;
+import static io.github.lizewskik.susieserver.builder.UserBuilder.prepareAnotherUserMock;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 @EnableJpaAuditing
@@ -59,16 +69,21 @@ public class ProjectRestControllerIntegrationTest {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private ProjectDTOMapper projectDTOMapper;
+
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() {
+
+        objectMapper = new ObjectMapper();
         when(userService.getCurrentLoggedUser()).thenReturn(createCurrentLoggedInUser());
     }
 
     @Test
     @WithMockUser(username = "scrum_master", roles = "sm")
     public void createProject_returnsProjectDTOResponseAndHttpStatusCodeCreated() throws Exception {
-
-        ObjectMapper objectMapper = new ObjectMapper();
 
         mvc.perform(post(PROJECT_CONTROLLER_BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -85,9 +100,10 @@ public class ProjectRestControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "plain_user", roles = "dev")
-    public void getAllProjects_returnsProjectDTOResponseAndReturnsHttpStatusCode200() throws Exception {
+    public void getAllProjects_returnsProjectDTOResponseAndHttpStatusCode200() throws Exception {
 
-        Project project = createDefaultProject(Set.of(createCurrentLoggedInUser().getUuid()));
+        String currentLoggedInUserUUID = createCurrentLoggedInUser().getUuid();
+        Project project = createDefaultProject(Set.of(currentLoggedInUserUUID), currentLoggedInUserUUID);
 
         mvc.perform(get(PROJECT_CONTROLLER_BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -100,6 +116,76 @@ public class ProjectRestControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].projectGoal", is(project.getProjectGoal())));
     }
 
+    @Test
+    @WithMockUser(value = "scrum_master", roles = "sm")
+    public void updateProject_returnsProjectDTOResponseAndHttpStatusCode200() throws Exception {
+
+        String currentLoggedInUserUUID = createCurrentLoggedInUser().getUuid();
+        Project project = createDefaultProject(Set.of(currentLoggedInUserUUID), currentLoggedInUserUUID);
+
+        ProjectDTO requestBody = projectDTOMapper.map(project);
+        requestBody.setName(ANOTHER_PROJECT_NAME);
+        requestBody.setDescription(ANOTHER_PROJECT_DESCRIPTION);
+        requestBody.setProjectGoal(ANOTHER_PROJECT_GOAL);
+
+        mvc.perform(put(PROJECT_CONTROLLER_BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestBody)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.projectID", is(project.getId())))
+                .andExpect(jsonPath("$.name", is(ANOTHER_PROJECT_NAME)))
+                .andExpect(jsonPath("$.description", is(ANOTHER_PROJECT_DESCRIPTION)))
+                .andExpect(jsonPath("$.projectGoal", is(ANOTHER_PROJECT_GOAL)));
+
+        List<Project> allProjects = projectRepository.findAll();
+        assertThat(allProjects).extracting(Project::getName).containsOnly(ANOTHER_PROJECT_NAME);
+    }
+
+    @Test
+    @WithMockUser(username = "scrum_master", roles = "sm")
+    public void deleteProject_returnsProjectDTOResponseAndHttpStatusCode200() throws Exception {
+
+        String currentLoggedInUserUUID = createCurrentLoggedInUser().getUuid();
+        Project project = createDefaultProject(Set.of(currentLoggedInUserUUID), currentLoggedInUserUUID);
+
+        mvc.perform(delete(PROJECT_CONTROLLER_BASE_URL.concat("/").concat(String.valueOf(project.getId().intValue())))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.projectID", is(project.getId())))
+                .andExpect(jsonPath("$.name", is(PROJECT_NAME)))
+                .andExpect(jsonPath("$.description", is(PROJECT_DESCRIPTION)))
+                .andExpect(jsonPath("$.projectGoal", is(PROJECT_GOAL)));
+
+        List<Project> allProjects = projectRepository.findAll();
+        assertThat(allProjects).isEmpty();
+    }
+
+    @Test
+    @WithMockUser(username = "scrum_master", roles = "sm")
+    public void associateUserWithProject_returnsHttpStatusCode200() throws Exception {
+
+        UserDTO anotherUser = prepareAnotherUserMock();
+        when(userService.isProjectOwner(any())).thenReturn(Boolean.TRUE);
+        when(userService.getUserByEmail(any())).thenReturn(anotherUser);
+
+        String currentLoggedInUserUUID = createCurrentLoggedInUser().getUuid();
+        Project project = createDefaultProject(Set.of(currentLoggedInUserUUID), currentLoggedInUserUUID);
+
+        UserAssociationDTO associationRequestBody = new UserAssociationDTO();
+        associationRequestBody.setEmail(anotherUser.getEmail());
+        associationRequestBody.setProjectID(project.getId());
+
+        mvc.perform(post(PROJECT_CONTROLLER_BASE_URL.concat("/user-association"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(associationRequestBody)))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        assertThat(project.getUserIDs()).hasSize(2).containsOnly(currentLoggedInUserUUID, anotherUser.getUuid());
+    }
+
     private ProjectDTO createDefaultProjectCreationBody() {
 
         return ProjectDTO.builder()
@@ -109,7 +195,7 @@ public class ProjectRestControllerIntegrationTest {
                 .build();
     }
 
-    private Project createDefaultProject(Set<String> users) {
+    private Project createDefaultProject(Set<String> users, String ownerID) {
 
         Project project = Project.builder()
                 .name(PROJECT_NAME)
@@ -118,6 +204,7 @@ public class ProjectRestControllerIntegrationTest {
                 .sprints(new HashSet<>())
                 .backlog(new Backlog())
                 .userIDs(new HashSet<>(users))
+                .projectOwner(ownerID)
                 .build();
         return projectRepository.save(project);
     }
