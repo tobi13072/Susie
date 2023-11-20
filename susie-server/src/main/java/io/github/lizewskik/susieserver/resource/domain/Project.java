@@ -58,5 +58,9 @@ public class Project extends Auditable implements Serializable {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Sprint> sprints = new HashSet<>();
 
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<CommitmentRule> dod = new HashSet<>();
+
     private String projectGoal;
 }
