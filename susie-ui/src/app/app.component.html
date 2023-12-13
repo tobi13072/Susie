@@ -14,7 +14,11 @@
 <p-sidebar [(visible)]="mainMenu" position="right" >
   <div class="d-flex flex-column justify-content-start align-items-center" >
     <p-button class="" [style]="{'width': '19rem'}" label="Change Project" [outlined]="true" severity="secondary" [routerLink]="'project'" *ngIf="router.url !== '/project'"></p-button>
-    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Logout" [outlined]="true" severity="secondary" (onClick)="loginService.logoutUser()"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Home" [outlined]="true" severity="secondary" (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Boards" [outlined]="true" severity="secondary" (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Backlog" [outlined]="true" severity="secondary" (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Dashboard" [outlined]="true" severity="secondary" (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Logout" [outlined]="true" severity="secondary" (onClick)="mainMenu = false; loginService.logoutUser()"></p-button>
   </div>
 </p-sidebar>
 

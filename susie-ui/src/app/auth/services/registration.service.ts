@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {RegistrationRequest} from "../../types/auth/request/registration-request";
+import {RegistrationRequest} from "../types/request/registration-request";
 import {Observable} from "rxjs";
-import {RegistrationResponse} from "../../types/auth/response/registration-response";
+import {RegistrationResponse} from "../types/response/registration-response";
 import {env} from "../../../environments/environment";
 
 @Injectable({

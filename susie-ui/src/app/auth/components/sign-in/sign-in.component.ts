@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
-import {AuthService} from "../../service/auth/auth.service";
-import {LoginRequest} from "../../types/auth/request/login-request";
+import {AuthService} from "../../services/auth.service";
+import {LoginRequest} from "../../types/request/login-request";
 import {Router} from "@angular/router";
 import {ConfirmationService} from "primeng/api";
 

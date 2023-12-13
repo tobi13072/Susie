@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
-import {ProjectService} from "../../../service/project/project.service";
-import {ProjectDto} from "../../../types/project-dto";
+import {ProjectService} from "../../services/project.service";
+import {ProjectDto} from "../../types/project-dto";
 import {DynamicDialogRef} from "primeng/dynamicdialog";
 import {ConfirmationService} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";

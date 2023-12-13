@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {IssueDto} from "../../types/issue-dto";
+import {IssueDto} from "../types/issue-dto";
 import {ActivatedRoute} from "@angular/router";
 
 

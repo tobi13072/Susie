@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ProjectDto} from "../../../types/project-dto";
-import {ProjectService} from "../../../service/project/project.service";
+import {ProjectDto} from "../../types/project-dto";
+import {ProjectService} from "../../services/project.service";
 import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
 import {ProjectFormComponent} from "../project-form/project-form.component";
-import {AuthService} from "../../../service/auth/auth.service";
+import {AuthService} from "../../../auth/services/auth.service";
 import {Router} from "@angular/router";
 import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";

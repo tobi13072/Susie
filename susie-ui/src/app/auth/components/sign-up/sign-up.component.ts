@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
-import {RegistrationRequest} from "../../types/auth/request/registration-request";
-import {RegistrationService} from "../../service/auth/registration.service";
+import {RegistrationRequest} from "../../types/request/registration-request";
+import {RegistrationService} from "../../services/registration.service";
 import {Router} from "@angular/router";
-import {LoginRequest} from "../../types/auth/request/login-request";
-import {AuthService} from "../../service/auth/auth.service";
-import {passwordMatchValidator} from "../../shared/password-match.validator";
+import {LoginRequest} from "../../types/request/login-request";
+import {AuthService} from "../../services/auth.service";
+import {passwordMatchValidator} from "../../../shared/password-match.validator";
 
 @Component({
   selector: 'app-sign-up',
