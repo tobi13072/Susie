@@ -6,6 +6,7 @@ import {LoginRequest} from "../types/request/login-request";
 import {LoginResponse} from "../types/response/login-response";
 import {env} from "../../../environments/environment";
 import {RefreshTokenResponse} from "../types/response/refreshToken-response";
+import {UserInfoDto} from "../types/response/user-info-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -43,6 +44,8 @@ export class AuthService {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('refresh_token');
     sessionStorage.removeItem('roles');
+    sessionStorage.removeItem('name');
+    sessionStorage.removeItem('lastName');
 
     this.router.navigate(['']);
   }
@@ -79,6 +82,20 @@ export class AuthService {
     } else {
       return false;
     }
+  }
+
+  getUserDetails(): Observable<UserInfoDto>{
+    let endpoint: string = `${this.BASE_URL}/user-info`;
+    return this.http.get<UserInfoDto>(endpoint);
+  }
+
+  setUserInfo(){
+    this.getUserDetails().subscribe({
+      next: result =>{
+        sessionStorage.setItem('name', result.firstName);
+        sessionStorage.setItem('lastName', result.lastName)
+      }
+    })
   }
 
 }

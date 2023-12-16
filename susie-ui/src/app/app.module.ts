@@ -29,6 +29,10 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {PasswordModule} from "primeng/password";
 import {MenuModule} from "primeng/menu";
 import {SidebarModule} from "primeng/sidebar";
+import { HomeComponent } from './home/components/home/home.component';
+import { DashboardComponent } from './dashboard/components/dashboard/dashboard.component';
+import { BacklogComponent } from './backlog/components/backlog/backlog.component';
+import {AvatarModule} from "primeng/avatar";
 
 @NgModule({
   declarations: [
@@ -37,33 +41,37 @@ import {SidebarModule} from "primeng/sidebar";
     ProjectFormComponent,
     SignInComponent,
     BoardComponent,
-    ProjectListComponent
+    ProjectListComponent,
+    HomeComponent,
+    DashboardComponent,
+    BacklogComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    RouterModule,
-    MenubarModule,
-    ButtonModule,
-    NgOptimizedImage,
-    ReactiveFormsModule,
-    InputTextModule,
-    InputSwitchModule,
-    CardModule,
-    HttpClientModule,
-    KeyFilterModule,
-    RippleModule,
-    PanelModule,
-    DragDropModule,
-    TableModule,
-    StyleClassModule,
-    DynamicDialogModule,
-    BrowserAnimationsModule,
-    ConfirmDialogModule,
-    PasswordModule,
-    MenuModule,
-    SidebarModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        RouterModule,
+        MenubarModule,
+        ButtonModule,
+        NgOptimizedImage,
+        ReactiveFormsModule,
+        InputTextModule,
+        InputSwitchModule,
+        CardModule,
+        HttpClientModule,
+        KeyFilterModule,
+        RippleModule,
+        PanelModule,
+        DragDropModule,
+        TableModule,
+        StyleClassModule,
+        DynamicDialogModule,
+        BrowserAnimationsModule,
+        ConfirmDialogModule,
+        PasswordModule,
+        MenuModule,
+        SidebarModule,
+        AvatarModule
+    ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

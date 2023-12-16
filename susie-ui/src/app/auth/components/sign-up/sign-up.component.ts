@@ -54,7 +54,7 @@ export class SignUpComponent implements OnInit {
       next: result => {
         this.loginService.saveToken(result);
         this.loginService.saveRoles(result);
-        this.router.navigate(['project']);
+        this.router.navigateByUrl('project');
       }
     })
   }
@@ -62,6 +62,7 @@ export class SignUpComponent implements OnInit {
   onSubmit() {
     this.registrationService.registerUser(this.prepareDataToSend()).subscribe({
       next: () => {
+        this.loginService.setUserInfo();
         this.loginAfterRegister();
       },
       error: err => {

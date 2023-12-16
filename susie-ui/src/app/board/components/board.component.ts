@@ -18,14 +18,11 @@ export class BoardComponent implements OnInit {
 
   draggedStatusIndex: number = -1;
 
-  data: any;
-  constructor(private route: ActivatedRoute) {
+  constructor() {
   }
 
   ngOnInit() {
 
-
-    this.data = this.route.snapshot.params['projectId'];
 
     this.test1 = [
       {id: 1, name: 'Take a shower', status: "test1"},

@@ -35,9 +35,10 @@ export class SignInComponent implements OnInit {
   onSubmit() {
     this.loginService.loginUser(this.prepareDataToSend()).subscribe({
       next: result => {
-        this.router.navigate(['project']);
+        this.router.navigateByUrl('project');
         this.loginService.saveToken(result);
         this.loginService.saveRoles(result);
+        this.loginService.setUserInfo()
       },
       error: err => {
         console.log(err);

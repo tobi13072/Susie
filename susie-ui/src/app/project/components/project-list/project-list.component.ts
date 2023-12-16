@@ -56,8 +56,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
   }
 
   viewProjectDetails(project: ProjectDto) {
-    console.log(project.projectID);
-    this.router.navigate(['board', project.projectID]);
+    this.router.navigateByUrl('home',{state: {projectId: project.projectID}})
   }
 
   showAddProjectForm() {

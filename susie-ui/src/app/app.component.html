@@ -1,24 +1,37 @@
 <p-menubar *ngIf="loginService.isLoggedIn()">
   <ng-template pTemplate="start">
-    <img src="https://primefaces.org/cdn/primeng/images/primeng.svg"
-         height="40"
-         class="mr-2"
-         alt="prime-ng-logo"
-         [routerLink]="['']"/>
+    Susie
   </ng-template>
   <ng-template pTemplate="end">
-    <p-button icon="pi pi-bars" (click)="mainMenu = true" [text]="true" severity="secondary"></p-button>
+    <p-button icon="pi pi-bars" (click)="mainMenu = true" [text]="true" severity="secondary"
+              *ngIf="router.url !== '/project'"></p-button>
   </ng-template>
 </p-menubar>
 
-<p-sidebar [(visible)]="mainMenu" position="right" >
-  <div class="d-flex flex-column justify-content-start align-items-center" >
-    <p-button class="" [style]="{'width': '19rem'}" label="Change Project" [outlined]="true" severity="secondary" [routerLink]="'project'" *ngIf="router.url !== '/project'"></p-button>
-    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Home" [outlined]="true" severity="secondary" (onClick)="mainMenu = false"></p-button>
-    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Boards" [outlined]="true" severity="secondary" (onClick)="mainMenu = false"></p-button>
-    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Backlog" [outlined]="true" severity="secondary" (onClick)="mainMenu = false"></p-button>
-    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Dashboard" [outlined]="true" severity="secondary" (onClick)="mainMenu = false"></p-button>
-    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Logout" [outlined]="true" severity="secondary" (onClick)="mainMenu = false; loginService.logoutUser()"></p-button>
+<p-sidebar [(visible)]="mainMenu" position="right" *ngIf="loginService.isLoggedIn()">
+  <ng-container class="menu-name" *ngIf="loginService.isLoggedIn() && router.url !== '/project'">
+    <p-avatar label="{{getUserInitials()}}" size="large" shape="circle"
+              [style]="{ 'background-color': '#2196F3', color: '#ffffff' }"></p-avatar>
+    {{ sessionStorage.getItem('name') }} {{ sessionStorage.getItem('lastName') }}
+  </ng-container>
+  <div class="d-flex flex-column justify-content-start align-items-center">
+    <p-button class="mt-4" [style]="{'width': '19rem'}" label="Change Project" [outlined]="true" severity="secondary"
+              [routerLink]="'project'"
+              (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Home" [outlined]="true" severity="secondary"
+              [routerLink]="'home'" [state]="{projectId: history.state.projectId}"
+              (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Boards" [outlined]="true" severity="secondary"
+              [routerLink]="'boards'" [state]="{projectId: history.state.projectId}"
+              (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Backlog" [outlined]="true" severity="secondary"
+              [routerLink]="'backlog'" [state]="{projectId: history.state.projectId}"
+              (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Dashboard" [outlined]="true" severity="secondary"
+              [routerLink]="'dashboard'" [state]="{projectId: history.state.projectId}"
+              (onClick)="mainMenu = false"></p-button>
+    <p-button class="mt-2" [style]="{'width': '19rem'}" label="Logout" [outlined]="true" severity="secondary"
+              (onClick)="mainMenu = false; loginService.logoutUser()"></p-button>
   </div>
 </p-sidebar>
 
