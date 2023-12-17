@@ -2,11 +2,11 @@
   <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
     <div class="d-flex flex-column">
       <label for="name">Name</label>
-      <input type="text" id="name" pInputText formControlName="name" class="mb-1">
+      <input type="text" id="name" pInputText formControlName="name" class="mb-1" maxlength="40">
       <label for="description">Description</label>
-      <input type="text" id="description" pInputText formControlName="description">
+      <input type="text" id="description" pInputText formControlName="description" maxlength="128">
       <label for="goal">Project goal</label>
-      <input type="text" id="goal" pInputText formControlName="projectGoal"/>
+      <input type="text" id="goal" pInputText formControlName="projectGoal" maxlength="128"/>
     </div>
     <button pButton pRipple label="Submit" class="p-button-success mt-2"></button>
   </form>
