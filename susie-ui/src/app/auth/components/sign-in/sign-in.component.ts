@@ -4,6 +4,7 @@ import {AuthService} from "../../services/auth.service";
 import {LoginRequest} from "../../types/request/login-request";
 import {Router} from "@angular/router";
 import {ConfirmationService} from "primeng/api";
+import {errorDialog} from "../../../shared/error.dialog";
 
 @Component({
   selector: 'app-sign-in',
@@ -38,21 +39,10 @@ export class SignInComponent implements OnInit {
         this.router.navigateByUrl('project');
         this.loginService.saveToken(result);
         this.loginService.saveRoles(result);
-        this.loginService.setUserInfo()
+        this.loginService.setUserInfo();
       },
       error: () => {
-        this.confirmDialog.confirm({
-          message: "Incorrect username or password. Please try again.",
-          header: 'Error',
-          icon: 'pi pi-exclamation-triangle',
-          acceptVisible: false,
-          rejectLabel: "OK",
-          rejectIcon: 'pi',
-          reject: () => {
-            this.loginForm.get('password')?.setValue('');
-            this.loginForm.get('email')?.setValue('');
-          }
-        })
+        this.confirmDialog.confirm(errorDialog('Incorrect username or password. Please try again.'));
       }
     })
   }

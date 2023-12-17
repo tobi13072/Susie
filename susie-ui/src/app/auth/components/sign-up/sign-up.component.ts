@@ -7,6 +7,7 @@ import {LoginRequest} from "../../types/request/login-request";
 import {AuthService} from "../../services/auth.service";
 import {passwordMatchValidator} from "../../../shared/password-match.validator";
 import {ConfirmationService} from "primeng/api";
+import {errorDialog} from "../../../shared/error.dialog";
 
 @Component({
   selector: 'app-sign-up',
@@ -69,14 +70,7 @@ export class SignUpComponent implements OnInit {
         this.loginAfterRegister();
       },
       error: () => {
-        this.confirmDialog.confirm({
-          message: "Something was wrong. Try again.",
-          header: 'Error',
-          icon: 'pi pi-exclamation-triangle',
-          acceptVisible: false,
-          rejectLabel: "OK",
-          rejectIcon: 'pi',
-        })
+        this.confirmDialog.confirm(errorDialog('Something was wrong. Try again.'));
       }
     })
   }

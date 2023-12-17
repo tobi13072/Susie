@@ -28,7 +28,10 @@ export class ProjectListComponent implements OnDestroy, OnInit {
     this.projectMenu = [
       {
         label: 'Edit',
-        icon: PrimeIcons.FILE_EDIT
+        icon: PrimeIcons.FILE_EDIT,
+        command: () => {
+          this.editProject();
+        }
       },
       {
         label: 'Delete',
@@ -69,13 +72,25 @@ export class ProjectListComponent implements OnDestroy, OnInit {
     });
   }
 
+  editProject(){
+    this.formDialog = this.dialogService.open(ProjectFormComponent, {
+      header: "Edit project",
+      width: '500px',
+      data: {
+        project: this.projects.find(project => project.projectID === this.menuActiveItem)
+      }
+    });
+    this.formDialog.onClose.subscribe(() => {
+      this.getAllProjects()
+    });
+  }
+
   deleteProject() {
     const removeRequest = () => {this.projectWebService.removeProject(this.menuActiveItem!).subscribe({
       next: () => {
         this.getAllProjects();
       },
-      error: err =>{
-        console.log(err)
+      error: () =>{
         this.confirmDialog.confirm(errorDialog('Something went wrong with the deletion'));
       }
     })

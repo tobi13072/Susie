@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
 import {ProjectService} from "../../services/project.service";
 import {ProjectDto} from "../../types/project-dto";
-import {DynamicDialogRef} from "primeng/dynamicdialog";
+import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
 import {ConfirmationService} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";
 
@@ -12,11 +12,18 @@ import {errorDialog} from "../../../shared/error.dialog";
 })
 export class ProjectFormComponent implements OnInit {
 
-  constructor(private fb: FormBuilder, private projectWebService: ProjectService, public dialogRef: DynamicDialogRef,
+  constructor(private fb: FormBuilder, private projectWebService: ProjectService, public dialogRef: DynamicDialogRef, public dialogConfig: DynamicDialogConfig,
               private confirmDialog: ConfirmationService) {
   }
 
   ngOnInit(): void {
+    if (this.dialogConfig.data) {
+      let editedProject = this.dialogConfig.data.project;
+      this.projectForm.get('name')?.setValue(editedProject?.name);
+      this.projectForm.get('description')?.setValue(editedProject?.description);
+      this.projectForm.get('projectGoal')?.setValue(editedProject?.projectGoal);
+      console.log(editedProject?.projectID)
+    }
   }
 
   projectForm = this.fb.group({
@@ -27,7 +34,7 @@ export class ProjectFormComponent implements OnInit {
 
   prepareDataToSend(): ProjectDto {
     return {
-      projectID: null!,
+      projectID: this.dialogConfig.data ? this.dialogConfig.data.project.projectID : null!,
       name: this.projectForm.value.name!,
       description: this.projectForm.value.description!,
       projectGoal: this.projectForm.value.projectGoal!
@@ -36,14 +43,33 @@ export class ProjectFormComponent implements OnInit {
 
   onSubmit() {
     if (this.projectForm.valid) {
-      this.projectWebService.createProject(this.prepareDataToSend()).subscribe({
-        next: () => {
-          this.dialogRef.close()
-        },
-        error: err => {
-         this.confirmDialog.confirm(errorDialog(err))
-        }
-      })
+      if (this.dialogConfig.data) {
+        this.onSubmitEdit();
+      } else {
+        this.onSubmitCreate();
+      }
     }
+  }
+
+  onSubmitEdit() {
+    this.projectWebService.updateProject(this.prepareDataToSend()).subscribe({
+      next: () => {
+        this.dialogRef.close()
+      },
+      error: err => {
+        this.confirmDialog.confirm(errorDialog(err))
+      }
+    })
+  }
+
+  onSubmitCreate() {
+    this.projectWebService.createProject(this.prepareDataToSend()).subscribe({
+      next: () => {
+        this.dialogRef.close()
+      },
+      error: err => {
+        this.confirmDialog.confirm(errorDialog(err))
+      }
+    })
   }
 }
