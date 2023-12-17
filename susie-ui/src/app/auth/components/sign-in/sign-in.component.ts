@@ -40,8 +40,7 @@ export class SignInComponent implements OnInit {
         this.loginService.saveRoles(result);
         this.loginService.setUserInfo()
       },
-      error: err => {
-        console.log(err);
+      error: () => {
         this.confirmDialog.confirm({
           message: "Incorrect username or password. Please try again.",
           header: 'Error',

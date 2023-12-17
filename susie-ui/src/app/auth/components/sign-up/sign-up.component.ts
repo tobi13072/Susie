@@ -6,17 +6,20 @@ import {Router} from "@angular/router";
 import {LoginRequest} from "../../types/request/login-request";
 import {AuthService} from "../../services/auth.service";
 import {passwordMatchValidator} from "../../../shared/password-match.validator";
+import {ConfirmationService} from "primeng/api";
 
 @Component({
   selector: 'app-sign-up',
   templateUrl: './sign-up.component.html',
-  styleUrls: ['./sign-up.component.scss']
+  styleUrls: ['./sign-up.component.scss'],
+  providers: [ConfirmationService]
 })
 export class SignUpComponent implements OnInit {
 
   private readonly NAMES_REGEX: string = '^[A-Z][a-zA-Z\\s\'-]+$';
 
-  constructor(private _fb: FormBuilder, private registrationService: RegistrationService, private router: Router, private loginService: AuthService) {
+  constructor(private _fb: FormBuilder, private registrationService: RegistrationService, private router: Router, private loginService: AuthService,
+              private confirmDialog: ConfirmationService) {
   }
 
   ngOnInit(): void {
@@ -65,8 +68,15 @@ export class SignUpComponent implements OnInit {
         this.loginService.setUserInfo();
         this.loginAfterRegister();
       },
-      error: err => {
-        console.log(err);
+      error: () => {
+        this.confirmDialog.confirm({
+          message: "Something was wrong. Try again.",
+          header: 'Error',
+          icon: 'pi pi-exclamation-triangle',
+          acceptVisible: false,
+          rejectLabel: "OK",
+          rejectIcon: 'pi',
+        })
       }
     })
   }

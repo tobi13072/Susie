@@ -6,7 +6,7 @@ import {LoginRequest} from "../types/request/login-request";
 import {LoginResponse} from "../types/response/login-response";
 import {env} from "../../../environments/environment";
 import {RefreshTokenResponse} from "../types/response/refreshToken-response";
-import {UserInfoDto} from "../types/response/user-info-dto";
+import {UserInfoResponse} from "../types/response/user-info-response";
 
 @Injectable({
   providedIn: 'root'
@@ -55,6 +55,11 @@ export class AuthService {
     return !!authToken;
   }
 
+  getUserDetails(): Observable<UserInfoResponse>{
+    let endpoint: string = `${this.BASE_URL}/user-info`;
+    return this.http.get<UserInfoResponse>(endpoint);
+  }
+
   private getUserRoles(): string[] | null {
     let roles = sessionStorage.getItem('roles');
     if (!!roles) {
@@ -82,11 +87,6 @@ export class AuthService {
     } else {
       return false;
     }
-  }
-
-  getUserDetails(): Observable<UserInfoDto>{
-    let endpoint: string = `${this.BASE_URL}/user-info`;
-    return this.http.get<UserInfoDto>(endpoint);
   }
 
   setUserInfo(){

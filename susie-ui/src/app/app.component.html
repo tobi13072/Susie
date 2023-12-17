@@ -3,18 +3,18 @@
     Susie
   </ng-template>
   <ng-template pTemplate="end">
-    <p-button icon="pi pi-bars" (click)="mainMenu = true" [text]="true" severity="secondary"
-              *ngIf="router.url !== '/project'"></p-button>
+    <p-button icon="pi pi-bars" (click)="mainMenu = true" [text]="true" severity="secondary"></p-button>
   </ng-template>
 </p-menubar>
 
 <p-sidebar [(visible)]="mainMenu" position="right" *ngIf="loginService.isLoggedIn()">
-  <ng-container class="menu-name" *ngIf="loginService.isLoggedIn() && router.url !== '/project'">
+  <ng-container class="menu-name" *ngIf="loginService.isLoggedIn()">
     <p-avatar label="{{getUserInitials()}}" size="large" shape="circle"
               [style]="{ 'background-color': '#2196F3', color: '#ffffff' }"></p-avatar>
     {{ sessionStorage.getItem('name') }} {{ sessionStorage.getItem('lastName') }}
   </ng-container>
   <div class="d-flex flex-column justify-content-start align-items-center">
+    <ng-container *ngIf="router.url !== '/project'">
     <p-button class="mt-4" [style]="{'width': '19rem'}" label="Change Project" [outlined]="true" severity="secondary"
               [routerLink]="'project'"
               (onClick)="mainMenu = false"></p-button>
@@ -30,6 +30,7 @@
     <p-button class="mt-2" [style]="{'width': '19rem'}" label="Dashboard" [outlined]="true" severity="secondary"
               [routerLink]="'dashboard'" [state]="{projectId: history.state.projectId}"
               (onClick)="mainMenu = false"></p-button>
+  </ng-container>
     <p-button class="mt-2" [style]="{'width': '19rem'}" label="Logout" [outlined]="true" severity="secondary"
               (onClick)="mainMenu = false; loginService.logoutUser()"></p-button>
   </div>
