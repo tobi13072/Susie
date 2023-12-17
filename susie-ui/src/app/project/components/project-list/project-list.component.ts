@@ -7,6 +7,7 @@ import {AuthService} from "../../../auth/services/auth.service";
 import {Router} from "@angular/router";
 import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";
+import {delay} from "rxjs";
 
 @Component({
   selector: 'app-project-list',
@@ -30,7 +31,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
         label: 'Edit',
         icon: PrimeIcons.FILE_EDIT,
         command: () => {
-          this.editProject();
+          this.showEditProjectForm();
         }
       },
       {
@@ -51,6 +52,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
     this.projectWebService.getProjects().subscribe({
       next: result => {
         this.projects = result;
+        this.projects.sort((a, b) => a.projectID - b.projectID);
       },
       error: err => {
         console.log(err);
@@ -59,7 +61,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
   }
 
   viewProjectDetails(project: ProjectDto) {
-    this.router.navigateByUrl('home',{state: {projectId: project.projectID}})
+    this.router.navigateByUrl('home', {state: {projectId: project.projectID}})
   }
 
   showAddProjectForm() {
@@ -72,7 +74,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
     });
   }
 
-  editProject(){
+  showEditProjectForm() {
     this.formDialog = this.dialogService.open(ProjectFormComponent, {
       header: "Edit project",
       width: '500px',
@@ -86,14 +88,15 @@ export class ProjectListComponent implements OnDestroy, OnInit {
   }
 
   deleteProject() {
-    const removeRequest = () => {this.projectWebService.removeProject(this.menuActiveItem!).subscribe({
-      next: () => {
-        this.getAllProjects();
-      },
-      error: () =>{
-        this.confirmDialog.confirm(errorDialog('Something went wrong with the deletion'));
-      }
-    })
+    const removeRequest = () => {
+      this.projectWebService.removeProject(this.menuActiveItem!).subscribe({
+        next: () => {
+          this.getAllProjects();
+        },
+        error: () => {
+          this.confirmDialog.confirm(errorDialog('Something went wrong with the deletion'));
+        }
+      })
     }
 
     this.confirmDialog.confirm({
@@ -113,4 +116,6 @@ export class ProjectListComponent implements OnDestroy, OnInit {
       this.formDialog.close();
     }
   }
+
+  protected readonly delay = delay;
 }

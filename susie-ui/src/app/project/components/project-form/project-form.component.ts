@@ -22,7 +22,6 @@ export class ProjectFormComponent implements OnInit {
       this.projectForm.get('name')?.setValue(editedProject?.name);
       this.projectForm.get('description')?.setValue(editedProject?.description);
       this.projectForm.get('projectGoal')?.setValue(editedProject?.projectGoal);
-      console.log(editedProject?.projectID)
     }
   }
 

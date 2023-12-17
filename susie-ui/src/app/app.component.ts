@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from "./auth/services/auth.service";
 import {PrimeNGConfig} from "primeng/api";
-import {ActivatedRoute, ParamMap, Router} from "@angular/router";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -21,13 +21,14 @@ export class AppComponent implements OnInit {
   }
 
   getUserInitials(){
-    let name = sessionStorage.getItem('name')
-    let lastName = sessionStorage.getItem('lastName')
-
-    return name!.charAt(0).concat(lastName!.charAt(0));
+      let name = sessionStorage.getItem('name')
+      let lastName = sessionStorage.getItem('lastName')
+    
+      return name!.charAt(0).concat(lastName!.charAt(0));
   }
 
   protected readonly Component = Component;
   protected readonly history = history;
   protected readonly sessionStorage = sessionStorage;
+
 }

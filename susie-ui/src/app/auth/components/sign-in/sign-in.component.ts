@@ -36,10 +36,10 @@ export class SignInComponent implements OnInit {
   onSubmit() {
     this.loginService.loginUser(this.prepareDataToSend()).subscribe({
       next: result => {
-        this.router.navigateByUrl('project');
         this.loginService.saveToken(result);
         this.loginService.saveRoles(result);
         this.loginService.setUserInfo();
+        this.router.navigateByUrl('project');
       },
       error: () => {
         this.confirmDialog.confirm(errorDialog('Incorrect username or password. Please try again.'));
