@@ -8,8 +8,8 @@
       <label for="goal">Project goal</label>
       <input type="text" id="goal" pInputText formControlName="projectGoal" maxlength="128"/>
     </div>
-    <button pButton pRipple label="Submit" class="p-button-success mt-2"
-            [disabled]="projectForm.invalid || !projectForm.dirty"></button>
+    <p-button type="submit" label="Submit" class="p-button-success mt-2"
+            [disabled]="projectForm.invalid || !projectForm.dirty"></p-button>
   </form>
 
   <p-confirmDialog [style]="{width: '100vw'}"></p-confirmDialog>

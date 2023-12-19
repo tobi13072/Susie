@@ -7,7 +7,6 @@ import {AuthService} from "../../../auth/services/auth.service";
 import {Router} from "@angular/router";
 import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";
-import {delay} from "rxjs";
 
 @Component({
   selector: 'app-project-list',
@@ -54,8 +53,8 @@ export class ProjectListComponent implements OnDestroy, OnInit {
         this.projects = result;
         this.projects.sort((a, b) => a.projectID - b.projectID);
       },
-      error: err => {
-        console.log(err);
+      error: () => {
+        this.confirmDialog.confirm(errorDialog('Something went wrong with retrieving the data.'));
       }
     })
   }
@@ -116,6 +115,4 @@ export class ProjectListComponent implements OnDestroy, OnInit {
       this.formDialog.close();
     }
   }
-
-  protected readonly delay = delay;
 }

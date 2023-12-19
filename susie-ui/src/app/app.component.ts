@@ -23,11 +23,10 @@ export class AppComponent implements OnInit {
   getUserInitials(){
       let name = sessionStorage.getItem('name')
       let lastName = sessionStorage.getItem('lastName')
-    
+
       return name!.charAt(0).concat(lastName!.charAt(0));
   }
 
-  protected readonly Component = Component;
   protected readonly history = history;
   protected readonly sessionStorage = sessionStorage;
 

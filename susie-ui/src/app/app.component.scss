@@ -6,6 +6,12 @@ nav {
   height: 4rem;
 }
 
+:host ::ng-deep .button-menu{
+  .p-button{
+    width: 19rem;
+  }
+}
+
 .menu-name{
   font-weight: bold;
 }

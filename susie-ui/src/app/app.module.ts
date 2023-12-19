@@ -33,6 +33,11 @@ import { HomeComponent } from './home/components/home/home.component';
 import { DashboardComponent } from './dashboard/components/dashboard/dashboard.component';
 import { BacklogComponent } from './backlog/components/backlog/backlog.component';
 import {AvatarModule} from "primeng/avatar";
+import { IssueFormComponent } from './backlog/components/issue form/issue-form.component';
+import {SliderModule} from "primeng/slider";
+import {DropdownModule} from "primeng/dropdown";
+import {TagModule} from "primeng/tag";
+import {AccordionModule} from "primeng/accordion";
 
 @NgModule({
   declarations: [
@@ -44,7 +49,8 @@ import {AvatarModule} from "primeng/avatar";
     ProjectListComponent,
     HomeComponent,
     DashboardComponent,
-    BacklogComponent
+    BacklogComponent,
+    IssueFormComponent
   ],
     imports: [
         BrowserModule,
@@ -70,7 +76,11 @@ import {AvatarModule} from "primeng/avatar";
         PasswordModule,
         MenuModule,
         SidebarModule,
-        AvatarModule
+        AvatarModule,
+        SliderModule,
+        DropdownModule,
+        TagModule,
+        AccordionModule
     ],
   providers: [
     {
