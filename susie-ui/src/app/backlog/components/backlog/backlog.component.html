@@ -1,19 +1,32 @@
-<p-accordion>
-  <ng-container *ngFor="let sprint of activeSprints">
-    <p-accordionTab header="{{sprint.name}}"></p-accordionTab>
-  </ng-container>
-  <ng-container *ngFor="let sprint of nonActiveSprints">
-    <p-accordionTab header="{{sprint.name}}"></p-accordionTab>
-  </ng-container>
-</p-accordion>
-
-<p-button label="Create new sprint" (onClick)="showSprintForm()"></p-button>
-<p-accordion [activeIndex]="[0]">
-  <p-accordionTab header="Backlog">
-    <ng-container *ngFor="let issue of issuesProductBacklog">
-      <p-card class="m-1">{{issue.name}}</p-card>
+<div class="backlog-view mt-2">
+  <p-accordion class="sprint-header">
+    <ng-container *ngFor="let sprint of activeSprints">
+      <p-accordionTab header="{{sprint.name}} (active)"></p-accordionTab>
     </ng-container>
-    <p-button label="Create new issue" (onClick)="createIssue()"></p-button>
-  </p-accordionTab>
-</p-accordion>
 
+    <ng-container *ngFor="let sprint of nonActiveSprints">
+      <p-accordionTab>
+        <ng-template pTemplate="header">
+            <div>{{ sprint.name }}</div>
+            <p-button class="ms-auto" icon="pi pi-ellipsis-v" (onClick)="$event.stopPropagation()" severity="secondary" [text]="true"></p-button>
+        </ng-template>
+      </p-accordionTab>
+    </ng-container>
+  </p-accordion>
+
+  <p-button label="Create new sprint" (onClick)="showSprintForm()" [raised]="true" [text]="true"
+            class="d-flex flex-row justify-content-center align-items-center mb-4 mt-2"></p-button>
+
+  <p-accordion [activeIndex]="[0]">
+    <p-accordionTab header="Backlog">
+      <ng-container *ngFor="let issue of issuesProductBacklog">
+        <div class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+          <div class="ms-4">{{ issue.name }}</div>
+          <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true"></p-button>
+        </div>
+      </ng-container>
+      <p-button icon="pi pi-plus" (onClick)="createIssue()" [raised]="true" [text]="true"
+                class="d-flex flex-row justify-content-center align-items-center"></p-button>
+    </p-accordionTab>
+  </p-accordion>
+</div>

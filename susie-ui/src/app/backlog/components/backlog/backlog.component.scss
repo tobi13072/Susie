@@ -1,1 +1,20 @@
+.backlog-view {
+  width: 98%;
+  margin-left: auto;
+  margin-right: auto;
+}
 
+.issue-card {
+  border: 1px solid rgba(100, 116, 139, 0.29);
+  height: 3.5rem;
+  border-radius: 6px;
+  font-weight: bold;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+:host ::ng-deep .sprint-header {
+  .p-accordion-header-link {
+    padding: 0.1rem;
+    padding-left: 1rem;
+  }
+}

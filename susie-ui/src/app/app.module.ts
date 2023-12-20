@@ -40,6 +40,7 @@ import {TagModule} from "primeng/tag";
 import {AccordionModule} from "primeng/accordion";
 import { SprintFormComponent } from './backlog/components/sprint form/sprint-form.component';
 import {CalendarModule} from "primeng/calendar";
+import {BadgeModule} from "primeng/badge";
 
 @NgModule({
   declarations: [
@@ -84,7 +85,8 @@ import {CalendarModule} from "primeng/calendar";
     DropdownModule,
     TagModule,
     AccordionModule,
-    CalendarModule
+    CalendarModule,
+    BadgeModule
   ],
   providers: [
     {
