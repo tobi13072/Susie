@@ -20,3 +20,9 @@ nav {
   background-color: #2196F3;
   color:#ffffff
 }
+
+:host ::ng-deep .avatar-click {
+  .p-avatar {
+    cursor: pointer;
+  }
+}

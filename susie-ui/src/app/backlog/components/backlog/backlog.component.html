@@ -24,9 +24,10 @@
         <div class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
           <div class="ms-4">{{ issue.name }}</div>
           <div class="d-flex flex-row align-items-center">
-            <p-avatar label="{{getInitials(issue.assignee)}}" shape="circle" class="me-2"></p-avatar>
+            <p-avatar  pRipple label="{{getInitials(issue.assignee)}}" size="large" shape="circle"
+                      class="me-2 avatar-click" (click)="menuActiveItem = issue.id; isAssignee= issue.assignee; menuAssignee.toggle($event)"></p-avatar>
             <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true"
-                    (onClick)="menuActiveItem = issue.id; menu.toggle($event)"></p-button>
+                      (onClick)="menuActiveItem = issue.id; menuIssue.toggle($event)"></p-button>
           </div>
         </div>
       </ng-container>
@@ -36,5 +37,6 @@
   </p-accordion>
 </div>
 
-<p-menu #menu [model]="backlogMenu" [popup]="true" (click)="$event.stopPropagation()"></p-menu>
+<p-menu #menuIssue [model]="issueMenu" [popup]="true" (click)="$event.stopPropagation()"></p-menu>
+<p-menu #menuAssignee [model]="assigneeMenu" [popup]="true" (click)="$event.stopPropagation()" (onShow)="generateAssignMenu()"></p-menu>
 <p-confirmDialog [style]="{width: '35vw'}" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>

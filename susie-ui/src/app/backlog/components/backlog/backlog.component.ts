@@ -23,14 +23,23 @@ export class BacklogComponent implements OnInit {
   activeSprints: SprintDto[] = [];
   nonActiveSprints: SprintDto[] = [];
 
-  backlogMenu: MenuItem[] | undefined;
+  issueMenu: MenuItem[] | undefined;
+  assigneeMenu: MenuItem[] | undefined;
+  isAssignee: any | undefined;
   menuActiveItem: number | undefined;
 
   ngOnInit() {
     this.getAllProductBacklog();
     this.getAllSprints();
+    this.generateMenus();
+  }
 
-    this.backlogMenu = [
+  constructor(private issueWebService: IssueService, private sprintWebService: SprintService, public dialogService: DialogService,
+              private confirmDialog: ConfirmationService) {}
+
+
+  generateMenus() {
+    this.issueMenu = [
       {
         label: 'Edit',
         icon: PrimeIcons.FILE_EDIT,
@@ -48,9 +57,29 @@ export class BacklogComponent implements OnInit {
     ];
   }
 
-  constructor(private issueWebService: IssueService, private sprintWebService: SprintService, public dialogService: DialogService,
-              private confirmDialog: ConfirmationService) {}
-
+  generateAssignMenu(){
+    if (this.isAssignee) {
+      this.assigneeMenu = [
+        {
+          label: 'Delete assignment',
+          icon: PrimeIcons.TIMES,
+          command: () => {
+            this.deleteAssignment()
+          }
+        }
+      ]
+    }else{
+      this.assigneeMenu = [
+        {
+          label: 'Assignee me',
+          icon: PrimeIcons.CHECK_SQUARE,
+          command: () => {
+            this.assignIssue()
+          }
+        }
+      ]
+    }
+  }
   getAllProductBacklog() {
     this.issueWebService.getIssuesFromProductBacklog(history.state.projectId).subscribe({
       next: result => {
@@ -96,7 +125,6 @@ export class BacklogComponent implements OnInit {
       isEdit: true,
       issueId: this.menuActiveItem
     }
-
     this.showIssueForm(data,'Edit');
   }
 
@@ -113,6 +141,28 @@ export class BacklogComponent implements OnInit {
       }
 
     this.confirmDialog.confirm(confirmDeletion('issue', removeIssue))
+  }
+
+  assignIssue(){
+    this.issueWebService.assignIssueToLoggedUser(this.menuActiveItem!).subscribe({
+      next: () =>{
+        this.getAllProductBacklog()
+      },
+      error: err =>{
+        console.log(err)
+      }
+    })
+  }
+
+  deleteAssignment(){
+    this.issueWebService.deleteIssueAssignment(this.menuActiveItem!).subscribe({
+      next: () =>{
+        this.getAllProductBacklog()
+      },
+      error: err =>{
+        console.log(err)
+      }
+    })
   }
 
   showIssueForm(data: Object, msg: string) {

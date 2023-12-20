@@ -32,4 +32,12 @@ export class IssueService {
   getIssueDetails(issueId: number): Observable<IssueDetailsResponse>{
     return this.http.get<IssueDetailsResponse>(this.ISSUE_PATH.concat(`/details/${issueId}`))
   }
+
+  assignIssueToLoggedUser(issueID: number):Observable<any>{
+    return this.http.post<any>(this.ISSUE_PATH.concat(`/${issueID}/assign`),{})
+  }
+
+  deleteIssueAssignment(issueID: number):Observable<any>{
+    return this.http.put(this.ISSUE_PATH.concat(`/${issueID}/delete-assignment`),{})
+  }
 }
