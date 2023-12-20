@@ -4,6 +4,8 @@ import {IssueResponse} from "../../types/resoponse/issue-response";
 import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
 import {IssueFormComponent} from "../issue form/issue-form.component";
 import {SprintFormComponent} from "../sprint form/sprint-form.component";
+import {SprintService} from "../../services/sprint.service";
+import {SprintDto} from "../../types/sprint-dto";
 
 @Component({
   selector: 'app-backlog',
@@ -14,19 +16,43 @@ import {SprintFormComponent} from "../sprint form/sprint-form.component";
 export class BacklogComponent implements OnInit {
 
   issuesProductBacklog: IssueResponse[] = [];
+  activeSprints: SprintDto[] = [];
+  nonActiveSprints: SprintDto[] = [];
 
   ngOnInit() {
-    this.getAllIssue();
+    this.getAllProductBacklog();
+    this.getAllSprints();
   }
 
-  constructor(private issueWebService: IssueService, public dialogService: DialogService) {
+  constructor(private issueWebService: IssueService,private sprintWebService:SprintService, public dialogService: DialogService) {
   }
 
-  getAllIssue() {
+  getAllProductBacklog() {
     this.issueWebService.getIssuesFromProductBacklog(history.state.projectId).subscribe({
       next: result => {
         this.issuesProductBacklog = result
         this.issuesProductBacklog.sort((a, b) => a.id - b.id);
+      },
+      error: err => {
+        console.log(err)
+      }
+    })
+  }
+
+  getAllSprints(){
+    this.sprintWebService.getNonActiveSprints(history.state.projectId).subscribe({
+      next: result =>{
+        this.nonActiveSprints = result
+        this.nonActiveSprints.sort((a, b) => a.id! - b.id!);
+      },
+      error: err => {
+        console.log(err)
+      }
+    })
+
+    this.sprintWebService.getActiveSprints(history.state.projectId).subscribe({
+      next: result =>{
+        this.activeSprints = result
       },
       error: err => {
         console.log(err)
@@ -46,25 +72,26 @@ export class BacklogComponent implements OnInit {
   }
 
   showIssueForm(data: Object) {
-    let formDialog: DynamicDialogRef | undefined;
-    formDialog = this.dialogService.open(IssueFormComponent, {
+    let formDialog = this.dialogService.open(IssueFormComponent, {
       header: 'Create new issue',
       width: '500px',
       data: data
     })
     formDialog.onClose.subscribe(() => {
-      this.getAllIssue();
+      this.getAllProductBacklog();
     })
   }
 
   showSprintForm(){
-    let formDialog: DynamicDialogRef | undefined;
-    formDialog = this.dialogService.open(SprintFormComponent,{
+    let formDialog = this.dialogService.open(SprintFormComponent,{
       header: 'Create new issue',
       width: '500px',
       data: {
         projectId: history.state.projectId
       }
+    })
+    formDialog.onClose.subscribe(() =>{
+      this.getAllSprints()
     })
   }
 }

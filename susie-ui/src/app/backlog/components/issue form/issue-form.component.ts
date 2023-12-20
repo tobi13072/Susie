@@ -30,7 +30,7 @@ export class IssueFormComponent implements OnInit{
   issueForm = this.fb.group({
     name: ['', Validators.required],
     description: ['', Validators.required],
-    estimation: ['', Validators.required],
+    estimation: [''],
     issueTypeID: ['', Validators.required],
     issuePriorityID: ['',Validators.required]
   })

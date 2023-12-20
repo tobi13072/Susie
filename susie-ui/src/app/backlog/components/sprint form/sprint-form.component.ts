@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
 import {SprintService} from "../../services/sprint.service";
-import {SprintRequest} from "../../types/request/sprint-request";
+import {SprintDto} from "../../types/sprint-dto";
 import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
 
 @Component({
@@ -24,7 +24,7 @@ export class SprintFormComponent implements OnInit{
   })
 
 
-  prepareDataToSend():SprintRequest{
+  prepareDataToSend():SprintDto{
     return {
       name: this.sprintForm.value.name!,
       startTime: this.sprintForm.value.startTime!,
@@ -38,7 +38,7 @@ export class SprintFormComponent implements OnInit{
     console.log(this.sprintForm.value.startTime)
   }
 
-  createSprint(sprint: SprintRequest){
+  createSprint(sprint: SprintDto){
     this.sprintWebService.createSprint(sprint).subscribe({
       next: result =>{
         this.dialogRef.close()

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {env} from "../../../environments/environment";
 import {Observable} from "rxjs";
-import {SprintRequest} from "../types/request/sprint-request";
+import {SprintDto} from "../types/sprint-dto";
 
 
 @Injectable({
@@ -12,11 +12,18 @@ export class SprintService {
   private readonly SPRINT_PATH: string = env.apiUrl.concat("/sprint");
   constructor(private http: HttpClient) { }
 
-  createSprint(sprint: SprintRequest):Observable<SprintRequest>{
-    return this.http.post<SprintRequest>(this.SPRINT_PATH,sprint);
+
+  getActiveSprints(projectId: number): Observable<SprintDto[]>{
+    return this.http.get<SprintDto[]>(this.SPRINT_PATH.concat(`/active/${projectId}`))
+  }
+  getNonActiveSprints(projectId: number){
+    return this.http.get<SprintDto[]>(this.SPRINT_PATH.concat(`/non-activated/${projectId}`))
+  }
+  createSprint(sprint: SprintDto):Observable<SprintDto>{
+    return this.http.post<SprintDto>(this.SPRINT_PATH,sprint);
   }
 
-  editSprint(sprint: SprintRequest):Observable<SprintRequest>{
-    return this.http.put<SprintRequest>(this.SPRINT_PATH,sprint);
+  editSprint(sprint: SprintDto):Observable<SprintDto>{
+    return this.http.put<SprintDto>(this.SPRINT_PATH,sprint);
   }
 }

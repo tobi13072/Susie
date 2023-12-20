@@ -1,4 +1,5 @@
-export interface SprintRequest{
+export interface SprintDto {
+  id?: number,
   name: string,
   startTime: string,
   active: boolean,

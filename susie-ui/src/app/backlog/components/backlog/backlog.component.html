@@ -1,3 +1,12 @@
+<p-accordion>
+  <ng-container *ngFor="let sprint of activeSprints">
+    <p-accordionTab header="{{sprint.name}}"></p-accordionTab>
+  </ng-container>
+  <ng-container *ngFor="let sprint of nonActiveSprints">
+    <p-accordionTab header="{{sprint.name}}"></p-accordionTab>
+  </ng-container>
+</p-accordion>
+
 <p-button label="Create new sprint" (onClick)="showSprintForm()"></p-button>
 <p-accordion [activeIndex]="[0]">
   <p-accordionTab header="Backlog">
