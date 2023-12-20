@@ -31,6 +31,6 @@
         </ng-template>
       </p-dropdown>
     </div>
-    <p-button type="submit" label="Submit" [disabled]="!issueForm.valid"></p-button>
+    <p-button type="submit" label="Submit" [disabled]="!issueForm.valid || !issueForm.dirty"></p-button>
   </form>
 </div>

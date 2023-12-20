@@ -26,4 +26,8 @@ export class SprintService {
   editSprint(sprint: SprintDto):Observable<SprintDto>{
     return this.http.put<SprintDto>(this.SPRINT_PATH,sprint);
   }
+
+  deleteSprint(sprintId: number):Observable<any>{
+    return this.http.delete(this.SPRINT_PATH.concat(`/${sprintId}`))
+  }
 }

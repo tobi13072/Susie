@@ -24,6 +24,7 @@ export class BacklogComponent implements OnInit {
   nonActiveSprints: SprintDto[] = [];
 
   issueMenu: MenuItem[] | undefined;
+  sprintMenu: MenuItem[] | undefined;
   assigneeMenu: MenuItem[] | undefined;
   isAssignee: any | undefined;
   menuActiveItem: number | undefined;
@@ -55,6 +56,23 @@ export class BacklogComponent implements OnInit {
         }
       }
     ];
+
+    this.sprintMenu =[
+      {
+        label: 'Edit',
+        icon: PrimeIcons.FILE_EDIT,
+        command: () => {
+          this.editSprint()
+        }
+      },
+      {
+        label: 'Delete',
+        icon: PrimeIcons.TRASH,
+        command: () => {
+          this.deleteSprint()
+        }
+      }
+    ]
   }
 
   generateAssignMenu(){
@@ -109,6 +127,28 @@ export class BacklogComponent implements OnInit {
       },
       error: err => {
         console.log(err)
+      }
+    })
+  }
+
+  createSprint(){
+    let data = {
+      projectId: history.state.projectId
+    }
+    this.showSprintForm(data,'Create new')
+  }
+  editSprint(){
+    let data= {
+      isEdit: true,
+      sprint: this.nonActiveSprints.find(sprint => sprint.id === this.menuActiveItem)
+    }
+    this.showSprintForm(data,'Edit')
+  }
+
+  deleteSprint(){
+    this.sprintWebService.deleteSprint(this.menuActiveItem!).subscribe({
+      next: () =>{
+        this.getAllSprints()
       }
     })
   }
@@ -175,13 +215,11 @@ export class BacklogComponent implements OnInit {
       this.getAllProductBacklog();
     })
   }
-  showSprintForm() {
+  showSprintForm(data: Object, msg: string) {
     let formDialog = this.dialogService.open(SprintFormComponent, {
-      header: 'Create new issue',
+      header: `${msg} sprint`,
       width: '500px',
-      data: {
-        projectId: history.state.projectId
-      }
+      data: data
     })
     formDialog.onClose.subscribe(() => {
       this.getAllSprints()
@@ -189,5 +227,4 @@ export class BacklogComponent implements OnInit {
   }
 
   protected readonly getInitials = getInitials;
-  protected readonly console = console;
 }

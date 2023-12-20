@@ -5,8 +5,8 @@
     <label for="goal">Sprint goal</label>
     <input type="text" id="goal" pInputText formControlName="sprintGoal" class="mb-1">
     <label for="date">Start Time</label>
-    <p-calendar #date appendTo="body" id="date" formControlName="startTime" [showIcon]="true" [showTime]="true" [showButtonBar]="true"
-                dateFormat="yy-mm-dd" class="mb-1"></p-calendar>
+    <p-calendar  [(ngModel)]="selectedDate" appendTo="body" id="date" formControlName="startTime" [showIcon]="true" [showTime]="true" [showButtonBar]="true"
+                dateFormat="dd-mm-yy" class="mb-1"></p-calendar>
   </div>
-  <p-button type="submit" label="Submit" [disabled]="!sprintForm.valid"></p-button>
+  <p-button type="submit" label="Submit" [disabled]="!sprintForm.valid || !sprintForm.dirty"></p-button>
 </form>
