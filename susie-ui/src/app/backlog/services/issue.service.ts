@@ -4,6 +4,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {IssueRequest} from "../types/request/issue-request";
 import {Observable} from "rxjs";
 import {IssueResponse} from "../types/resoponse/issue-response";
+import {IssueDetailsResponse} from "../types/resoponse/issueDetails-response";
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +27,9 @@ export class IssueService {
 
   deleteIssue(issueId: number): Observable<any>{
     return this.http.delete<any>(this.ISSUE_PATH.concat(`/${issueId}`))
+  }
+
+  getIssueDetails(issueId: number): Observable<IssueDetailsResponse>{
+    return this.http.get<IssueDetailsResponse>(this.ISSUE_PATH.concat(`/details/${issueId}`))
   }
 }

@@ -7,8 +7,9 @@
     <ng-container *ngFor="let sprint of nonActiveSprints">
       <p-accordionTab>
         <ng-template pTemplate="header">
-            <div>{{ sprint.name }}</div>
-            <p-button class="ms-auto" icon="pi pi-ellipsis-v" (onClick)="$event.stopPropagation()" severity="secondary" [text]="true"></p-button>
+          <div>{{ sprint.name }}</div>
+          <p-button class="ms-auto" icon="pi pi-ellipsis-v" (onClick)="$event.stopPropagation()" severity="secondary"
+                    [text]="true"></p-button>
         </ng-template>
       </p-accordionTab>
     </ng-container>
@@ -22,7 +23,11 @@
       <ng-container *ngFor="let issue of issuesProductBacklog">
         <div class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
           <div class="ms-4">{{ issue.name }}</div>
-          <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true" (onClick)="menuActiveItem = issue.id; menu.toggle($event)"></p-button>
+          <div class="d-flex flex-row align-items-center">
+            <p-avatar label="{{getInitials(issue.assignee)}}" shape="circle" class="me-2"></p-avatar>
+            <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true"
+                    (onClick)="menuActiveItem = issue.id; menu.toggle($event)"></p-button>
+          </div>
         </div>
       </ng-container>
       <p-button icon="pi pi-plus" (onClick)="createIssue()" [raised]="true" [text]="true"

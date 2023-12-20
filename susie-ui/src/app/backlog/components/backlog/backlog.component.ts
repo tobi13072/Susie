@@ -9,6 +9,7 @@ import {SprintDto} from "../../types/sprint-dto";
 import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";
 import {confirmDeletion} from "../../../shared/delete.confirm";
+import {getInitials} from "../../../shared/initials.generator";
 
 @Component({
   selector: 'app-backlog',
@@ -34,6 +35,7 @@ export class BacklogComponent implements OnInit {
         label: 'Edit',
         icon: PrimeIcons.FILE_EDIT,
         command: () => {
+          this.editIssue();
         }
       },
       {
@@ -86,11 +88,16 @@ export class BacklogComponent implements OnInit {
     let data = {
       projectId: history.state.projectId
     };
-    this.showIssueForm(data)
+    this.showIssueForm(data, 'Create new')
   }
 
   editIssue() {
+    let data = {
+      isEdit: true,
+      issueId: this.menuActiveItem
+    }
 
+    this.showIssueForm(data,'Edit');
   }
 
   deleteIssue() {
@@ -108,9 +115,9 @@ export class BacklogComponent implements OnInit {
     this.confirmDialog.confirm(confirmDeletion('issue', removeIssue))
   }
 
-  showIssueForm(data: Object) {
+  showIssueForm(data: Object, msg: string) {
     let formDialog = this.dialogService.open(IssueFormComponent, {
-      header: 'Create new issue',
+      header: `${msg} issue`,
       width: '500px',
       data: data
     })
@@ -118,7 +125,6 @@ export class BacklogComponent implements OnInit {
       this.getAllProductBacklog();
     })
   }
-
   showSprintForm() {
     let formDialog = this.dialogService.open(SprintFormComponent, {
       header: 'Create new issue',
@@ -131,4 +137,7 @@ export class BacklogComponent implements OnInit {
       this.getAllSprints()
     })
   }
+
+  protected readonly getInitials = getInitials;
+  protected readonly console = console;
 }

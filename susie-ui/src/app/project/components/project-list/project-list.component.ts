@@ -98,8 +98,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
         }
       })
     }
-
-    this.confirmDialog.confirm(confirmDeletion('project',removeProject))
+    this.confirmDialog.confirm(confirmDeletion('project', removeProject))
   }
 
   ngOnDestroy() {

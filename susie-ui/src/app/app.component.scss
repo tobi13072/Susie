@@ -6,12 +6,17 @@ nav {
   height: 4rem;
 }
 
-:host ::ng-deep .button-menu{
-  .p-button{
+:host ::ng-deep .button-menu {
+  .p-button {
     width: 19rem;
   }
 }
 
-.menu-name{
+.menu-name {
   font-weight: bold;
+}
+
+:host ::ng-deep .p-avatar {
+  background-color: #2196F3;
+  color:#ffffff
 }

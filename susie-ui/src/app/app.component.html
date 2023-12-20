@@ -9,8 +9,7 @@
 
 <p-sidebar [(visible)]="mainMenu" position="right" *ngIf="loginService.isLoggedIn()">
   <ng-container class="menu-name" *ngIf="loginService.isLoggedIn() && router.url !== ''">
-    <p-avatar label="{{getUserInitials()}}" size="large" shape="circle"
-              [style]="{ 'background-color': '#2196F3', color: '#ffffff' }"></p-avatar>
+    <p-avatar label="{{getUserInitials()}}" size="large" shape="circle"></p-avatar>
     {{ sessionStorage.getItem('name') }} {{ sessionStorage.getItem('lastName') }}
   </ng-container>
   <div class="d-flex flex-column justify-content-start align-items-center">

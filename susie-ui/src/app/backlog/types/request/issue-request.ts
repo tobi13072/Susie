@@ -1,4 +1,5 @@
 export interface IssueRequest{
+  issueID?: number
   name: string;
   description: string;
   estimation: number;
