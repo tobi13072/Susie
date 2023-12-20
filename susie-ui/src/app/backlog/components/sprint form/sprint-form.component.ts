@@ -71,7 +71,7 @@ export class SprintFormComponent implements OnInit{
 
   createSprint(sprint: SprintDto){
     this.sprintWebService.createSprint(sprint).subscribe({
-      next: result =>{
+      next: () =>{
         this.dialogRef.close()
       },
       error: err => {

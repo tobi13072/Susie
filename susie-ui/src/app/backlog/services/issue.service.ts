@@ -40,4 +40,8 @@ export class IssueService {
   deleteIssueAssignment(issueID: number):Observable<any>{
     return this.http.put(this.ISSUE_PATH.concat(`/${issueID}/delete-assignment`),{})
   }
+
+  getIssueFromSprint(sprintId: number): Observable<IssueResponse[]>{
+    return this.http.get<IssueResponse[]>(this.ISSUE_PATH.concat(`/sprint/${sprintId}`))
+  }
 }

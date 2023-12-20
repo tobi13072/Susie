@@ -1,16 +1,50 @@
 <div class="backlog-view mt-2">
-  <p-accordion class="sprint-header">
+  <p-accordion class="sprint-header" [multiple]="true">
     <ng-container *ngIf="activeSprint">
-      <p-accordionTab header="{{activeSprint.name}} (active)"></p-accordionTab>
+      <p-accordionTab>
+        <ng-template pTemplate="header">
+          <div>
+            {{ activeSprint.name }}
+            <p-tag class="ms-2" severity="success" value="active"></p-tag>
+          </div>
+          <p-button class="ms-auto" icon="pi pi-ellipsis-v"
+                    (onClick)="$event.stopPropagation(); menuActiveItem=activeSprint.id; menuSprint.toggle($event); isActive = true"
+                    severity="secondary"
+                    [text]="true"></p-button>
+        </ng-template>
+        <ng-container *ngFor="let issue of activeSprint.issues">
+          <div class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+            <div class="ms-4">{{ issue.name }}</div>
+            <div class="d-flex flex-row align-items-center">
+              <p-avatar label="{{getInitials(issue.assignee)}}" shape="circle" class="me-2"></p-avatar>
+            </div>
+          </div>
+        </ng-container>
+      </p-accordionTab>
     </ng-container>
 
     <ng-container *ngFor="let sprint of nonActiveSprints">
-      <p-accordionTab>
+      <p-accordionTab pDroppable (onDrop)="dropOnSprintAction(sprint)">
         <ng-template pTemplate="header">
           <div>{{ sprint.name }}</div>
-          <p-button class="ms-auto" icon="pi pi-ellipsis-v" (onClick)="$event.stopPropagation(); menuActiveItem=sprint.id; menuSprint.toggle($event)" severity="secondary"
+          <p-button class="ms-auto" icon="pi pi-ellipsis-v"
+                    (onClick)="$event.stopPropagation(); menuActiveItem=sprint.id; menuSprint.toggle($event); isActive = false"
+                    severity="secondary"
                     [text]="true"></p-button>
         </ng-template>
+        <ng-container *ngFor="let issue of sprint.issues">
+          <div pDraggable (onDragStart)="onDropActiveSprint=sprint; menuActiveItem=issue.id" class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+            <div class="ms-4">{{ issue.name }}</div>
+            <div class="d-flex flex-row align-items-center">
+              <p-avatar pRipple label="{{getInitials(issue.assignee)}}" shape="circle"
+                        class="me-2 avatar-click"
+                        (click)="menuActiveItem = issue.id; isAssignee= issue.assignee; menuAssignee.toggle($event)"></p-avatar>
+<!--              <p-button icon="pi pi-times" severity="secondary" [text]="true" (onClick)="menuActiveItem=issue.id; deleteIssueFromSprint(sprint.id!)"></p-button>-->
+              <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true"
+                        (onClick)="menuActiveItem = issue.id; menuIssue.toggle($event)"></p-button>
+            </div>
+          </div>
+        </ng-container>
       </p-accordionTab>
     </ng-container>
   </p-accordion>
@@ -19,13 +53,15 @@
             class="d-flex flex-row justify-content-center align-items-center mb-4 mt-2"></p-button>
 
   <p-accordion [activeIndex]="[0]">
-    <p-accordionTab header="Backlog">
+    <p-accordionTab header="Backlog" pDroppable (onDrop)="dropOnBacklogAction(onDropActiveSprint!)">
       <ng-container *ngFor="let issue of issuesProductBacklog">
-        <div class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+        <div pDraggable (onDragStart)="menuActiveItem = issue.id"
+             class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
           <div class="ms-4">{{ issue.name }}</div>
           <div class="d-flex flex-row align-items-center">
-            <p-avatar  pRipple label="{{getInitials(issue.assignee)}}" shape="circle"
-                      class="me-2 avatar-click" (click)="menuActiveItem = issue.id; isAssignee= issue.assignee; menuAssignee.toggle($event)"></p-avatar>
+            <p-avatar pRipple label="{{getInitials(issue.assignee)}}" shape="circle"
+                      class="me-2 avatar-click"
+                      (click)="menuActiveItem = issue.id; isAssignee= issue.assignee; menuAssignee.toggle($event)"></p-avatar>
             <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true"
                       (onClick)="menuActiveItem = issue.id; menuIssue.toggle($event)"></p-button>
           </div>
@@ -38,6 +74,8 @@
 </div>
 
 <p-menu #menuIssue [model]="issueMenu" [popup]="true" (click)="$event.stopPropagation()"></p-menu>
-<p-menu #menuSprint [model]="sprintMenu" [popup]="true" (click)="$event.stopPropagation()" (onShow)="generateSprintMenu()"></p-menu>
-<p-menu #menuAssignee [model]="assigneeMenu" [popup]="true" (click)="$event.stopPropagation()" (onShow)="generateAssignMenu()"></p-menu>
+<p-menu #menuSprint [model]="sprintMenu" [popup]="true" (click)="$event.stopPropagation()"
+        (onShow)="generateSprintMenu()"></p-menu>
+<p-menu #menuAssignee [model]="assigneeMenu" [popup]="true" (click)="$event.stopPropagation()"
+        (onShow)="generateAssignMenu()"></p-menu>
 <p-confirmDialog [style]="{width: '35vw'}" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>

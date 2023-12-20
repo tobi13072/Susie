@@ -120,7 +120,7 @@ export class IssueFormComponent implements OnInit {
 
   editIssue(issue: IssueRequest){
     this.issueWebService.updateIssue(issue).subscribe({
-      next: result=>{
+      next: ()=>{
         this.dialogRef.close()
       },
       error: err =>{

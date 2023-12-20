@@ -21,7 +21,5 @@ export function dateConvertFromUTC(date: string){
     hour12: false
   };
 
-  const formattedDate = inputDate.toLocaleDateString('en-US', options);
-
-  return formattedDate;
+  return inputDate.toLocaleDateString('en-US', options);
 }

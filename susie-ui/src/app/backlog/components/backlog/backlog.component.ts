@@ -10,6 +10,7 @@ import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";
 import {confirmDeletion} from "../../../shared/delete.confirm";
 import {getInitials} from "../../../shared/initials.generator";
+import {confirmStop} from "../../../shared/stop.confirm";
 
 @Component({
   selector: 'app-backlog',
@@ -29,6 +30,7 @@ export class BacklogComponent implements OnInit {
   isAssignee: any | undefined;
   isActive: any | undefined;
   menuActiveItem: number | undefined;
+  onDropActiveSprint: SprintDto | undefined;
 
   ngOnInit() {
     this.getAllData();
@@ -60,42 +62,41 @@ export class BacklogComponent implements OnInit {
   }
 
   generateSprintMenu() {
-    let startOrStopSprint;
     if (!this.isActive) {
-      startOrStopSprint = {
-        label: 'Start sprint',
-        icon: PrimeIcons.CARET_RIGHT,
-        command: () => {
-          this.startSprint()
+      this.sprintMenu = [
+        {
+          label: 'Edit',
+          icon: PrimeIcons.FILE_EDIT,
+          command: () => {
+            this.editSprint()
+          }
+        },
+        {
+          label: 'Delete',
+          icon: PrimeIcons.TRASH,
+          command: () => {
+            this.deleteSprint()
+          }
+        },
+        {
+          label: 'Start sprint',
+          icon: PrimeIcons.PLAY,
+          command: () => {
+            this.startSprint()
+          }
         }
-      }
+      ]
     } else {
-      startOrStopSprint = {
-        label: 'Stop sprint',
-        icon: PrimeIcons.CARET_RIGHT,
-        command: () => {
-          this.stopSprint()
+      this.sprintMenu = [
+        {
+          label: 'Stop sprint',
+          icon: PrimeIcons.PAUSE,
+          command: () => {
+            this.stopSprint()
+          }
         }
-      }
+      ]
     }
-
-    this.sprintMenu = [
-      {
-        label: 'Edit',
-        icon: PrimeIcons.FILE_EDIT,
-        command: () => {
-          this.editSprint()
-        }
-      },
-      {
-        label: 'Delete',
-        icon: PrimeIcons.TRASH,
-        command: () => {
-          this.deleteSprint()
-        }
-      },
-      startOrStopSprint!
-    ]
   }
 
   generateAssignMenu() {
@@ -125,7 +126,7 @@ export class BacklogComponent implements OnInit {
     ]
   }
 
-  getAllData(){
+  getAllData() {
     this.getAllProductBacklog()
     this.getAllSprints()
   }
@@ -142,11 +143,40 @@ export class BacklogComponent implements OnInit {
     })
   }
 
+  getIssuesFromSprints() {
+    if (this.nonActiveSprints) {
+      for (let sprint of this.nonActiveSprints) {
+        this.getAllIssuesFromSingleSprint(sprint.id!, false)
+      }
+    }
+    if (this.activeSprint) {
+      this.getAllIssuesFromSingleSprint(this.activeSprint.id!, true)
+    }
+  }
+
+  getAllIssuesFromSingleSprint(sprintId: number, isActive: boolean) {
+    this.issueWebService.getIssueFromSprint(sprintId).subscribe({
+      next: res => {
+        if (!isActive) {
+          const index = this.nonActiveSprints.findIndex(element => element.id === sprintId)
+          this.nonActiveSprints[index].issues = res;
+        }
+        if (isActive) {
+          this.activeSprint!.issues = res;
+        }
+      },
+      error: err => {
+        console.log(err)
+      }
+    })
+  }
+
   getAllSprints() {
     this.sprintWebService.getNonActiveSprints(history.state.projectId).subscribe({
       next: result => {
         this.nonActiveSprints = result
         this.nonActiveSprints.sort((a, b) => a.id! - b.id!);
+        this.getIssuesFromSprints()
       },
       error: err => {
         console.log(err)
@@ -179,28 +209,19 @@ export class BacklogComponent implements OnInit {
   }
 
   deleteSprint() {
-    this.sprintWebService.deleteSprint(this.menuActiveItem!).subscribe({
-      next: () => {
-        this.getAllSprints()
-      }
-    })
+    let removeSprint = () => {
+      this.sprintWebService.deleteSprint(this.menuActiveItem!).subscribe({
+        next: () => {
+          this.getAllData()
+        }
+      })
+    }
+    this.confirmDialog.confirm(confirmDeletion('sprint', removeSprint))
   }
 
-  startSprint(){
+  startSprint() {
     this.sprintWebService.startSprint(this.menuActiveItem!).subscribe({
-      next: () =>{
-        this.getAllSprints()
-      },
-      error: err => {
-        console.log(err)
-        this.confirmDialog.confirm(errorDialog(err.error.message))
-      }
-    })
-  }
-
-  stopSprint(){
-    this.sprintWebService.stopSprint(history.state.projectId).subscribe({
-      next: () =>{
+      next: () => {
         this.getAllData()
       },
       error: err => {
@@ -210,6 +231,62 @@ export class BacklogComponent implements OnInit {
     })
   }
 
+  stopSprint() {
+    let stopSprint = () => {
+      this.sprintWebService.stopSprint(history.state.projectId).subscribe({
+        next: () => {
+          this.getAllData()
+        },
+        error: err => {
+          console.log(err)
+          this.confirmDialog.confirm(errorDialog(err.error.message))
+        }
+      })
+    }
+    this.confirmDialog.confirm(confirmStop('sprint', stopSprint))
+  }
+
+  dropOnSprintAction(sprint: SprintDto) {
+    this.dynamicDeleteIssueFromSprint(sprint.id!).subscribe({
+      next: () => {
+        this.addIssueToSprint(sprint.id!)
+      }
+    })
+  }
+
+  dropOnBacklogAction(sprint: SprintDto) {
+    if (!!sprint) {
+      if (!!sprint.id) {
+        this.deleteIssueFromSprint(sprint.id!)
+      }
+    }
+  }
+
+  addIssueToSprint(sprintId: number) {
+    this.sprintWebService.addIssueToSprint(this.menuActiveItem!, sprintId).subscribe({
+      next: () => {
+        this.getAllData()
+      },
+      error: err => {
+        this.confirmDialog.confirm(errorDialog(err.error.message))
+      }
+    })
+  }
+
+  dynamicDeleteIssueFromSprint(sprintId: number) {
+    return this.sprintWebService.deleteIssueFromSprint(this.menuActiveItem!, sprintId)
+  }
+
+  deleteIssueFromSprint(sprintID: number) {
+    this.sprintWebService.deleteIssueFromSprint(this.menuActiveItem!, sprintID).subscribe({
+      next: () => {
+        this.getAllData()
+      },
+      error: err => {
+        this.confirmDialog.confirm(errorDialog(err.error.message))
+      }
+    })
+  }
 
   createIssue() {
     let data = {
@@ -229,11 +306,11 @@ export class BacklogComponent implements OnInit {
   deleteIssue() {
     const removeIssue = () => {
       this.issueWebService.deleteIssue(this.menuActiveItem!).subscribe({
-        next: result => {
-          this.getAllProductBacklog();
+        next: () => {
+          this.getAllData()
         },
         error: err => {
-          this.confirmDialog.confirm(errorDialog('Something went wrong with the deletion'));
+          this.confirmDialog.confirm(errorDialog(err.error.message));
         }
       })
     }
@@ -244,7 +321,7 @@ export class BacklogComponent implements OnInit {
   assignIssue() {
     this.issueWebService.assignIssueToLoggedUser(this.menuActiveItem!).subscribe({
       next: () => {
-        this.getAllProductBacklog()
+        this.getAllData()
       },
       error: err => {
         console.log(err)
@@ -255,7 +332,7 @@ export class BacklogComponent implements OnInit {
   deleteAssignment() {
     this.issueWebService.deleteIssueAssignment(this.menuActiveItem!).subscribe({
       next: () => {
-        this.getAllProductBacklog()
+        this.getAllData()
       },
       error: err => {
         console.log(err)
@@ -271,7 +348,7 @@ export class BacklogComponent implements OnInit {
       data: data
     })
     formDialog.onClose.subscribe(() => {
-      this.getAllProductBacklog();
+      this.getAllData();
     })
   }
 
@@ -285,5 +362,7 @@ export class BacklogComponent implements OnInit {
       this.getAllSprints()
     })
   }
+
   protected readonly getInitials = getInitials;
+  protected readonly console = console;
 }
