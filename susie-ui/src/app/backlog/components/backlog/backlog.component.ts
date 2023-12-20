@@ -20,26 +20,27 @@ import {getInitials} from "../../../shared/initials.generator";
 export class BacklogComponent implements OnInit {
 
   issuesProductBacklog: IssueResponse[] = [];
-  activeSprints: SprintDto[] = [];
+  activeSprint: SprintDto | undefined;
   nonActiveSprints: SprintDto[] = [];
 
   issueMenu: MenuItem[] | undefined;
   sprintMenu: MenuItem[] | undefined;
   assigneeMenu: MenuItem[] | undefined;
   isAssignee: any | undefined;
+  isActive: any | undefined;
   menuActiveItem: number | undefined;
 
   ngOnInit() {
-    this.getAllProductBacklog();
-    this.getAllSprints();
-    this.generateMenus();
+    this.getAllData();
+    this.generateIssueMenu();
   }
 
   constructor(private issueWebService: IssueService, private sprintWebService: SprintService, public dialogService: DialogService,
-              private confirmDialog: ConfirmationService) {}
+              private confirmDialog: ConfirmationService) {
+  }
 
 
-  generateMenus() {
+  generateIssueMenu() {
     this.issueMenu = [
       {
         label: 'Edit',
@@ -56,8 +57,29 @@ export class BacklogComponent implements OnInit {
         }
       }
     ];
+  }
 
-    this.sprintMenu =[
+  generateSprintMenu() {
+    let startOrStopSprint;
+    if (!this.isActive) {
+      startOrStopSprint = {
+        label: 'Start sprint',
+        icon: PrimeIcons.CARET_RIGHT,
+        command: () => {
+          this.startSprint()
+        }
+      }
+    } else {
+      startOrStopSprint = {
+        label: 'Stop sprint',
+        icon: PrimeIcons.CARET_RIGHT,
+        command: () => {
+          this.stopSprint()
+        }
+      }
+    }
+
+    this.sprintMenu = [
       {
         label: 'Edit',
         icon: PrimeIcons.FILE_EDIT,
@@ -71,13 +93,16 @@ export class BacklogComponent implements OnInit {
         command: () => {
           this.deleteSprint()
         }
-      }
+      },
+      startOrStopSprint!
     ]
   }
 
-  generateAssignMenu(){
+  generateAssignMenu() {
+    let assigneeOrDeleteAssignment;
+
     if (this.isAssignee) {
-      this.assigneeMenu = [
+      assigneeOrDeleteAssignment =
         {
           label: 'Delete assignment',
           icon: PrimeIcons.TIMES,
@@ -85,9 +110,8 @@ export class BacklogComponent implements OnInit {
             this.deleteAssignment()
           }
         }
-      ]
-    }else{
-      this.assigneeMenu = [
+    } else {
+      assigneeOrDeleteAssignment =
         {
           label: 'Assignee me',
           icon: PrimeIcons.CHECK_SQUARE,
@@ -95,9 +119,17 @@ export class BacklogComponent implements OnInit {
             this.assignIssue()
           }
         }
-      ]
     }
+    this.assigneeMenu = [
+      assigneeOrDeleteAssignment!
+    ]
   }
+
+  getAllData(){
+    this.getAllProductBacklog()
+    this.getAllSprints()
+  }
+
   getAllProductBacklog() {
     this.issueWebService.getIssuesFromProductBacklog(history.state.projectId).subscribe({
       next: result => {
@@ -121,9 +153,9 @@ export class BacklogComponent implements OnInit {
       }
     })
 
-    this.sprintWebService.getActiveSprints(history.state.projectId).subscribe({
+    this.sprintWebService.getActiveSprint(history.state.projectId).subscribe({
       next: result => {
-        this.activeSprints = result
+        this.activeSprint = result
       },
       error: err => {
         console.log(err)
@@ -131,27 +163,53 @@ export class BacklogComponent implements OnInit {
     })
   }
 
-  createSprint(){
+  createSprint() {
     let data = {
       projectId: history.state.projectId
     }
-    this.showSprintForm(data,'Create new')
+    this.showSprintForm(data, 'Create new')
   }
-  editSprint(){
-    let data= {
+
+  editSprint() {
+    let data = {
       isEdit: true,
       sprint: this.nonActiveSprints.find(sprint => sprint.id === this.menuActiveItem)
     }
-    this.showSprintForm(data,'Edit')
+    this.showSprintForm(data, 'Edit')
   }
 
-  deleteSprint(){
+  deleteSprint() {
     this.sprintWebService.deleteSprint(this.menuActiveItem!).subscribe({
-      next: () =>{
+      next: () => {
         this.getAllSprints()
       }
     })
   }
+
+  startSprint(){
+    this.sprintWebService.startSprint(this.menuActiveItem!).subscribe({
+      next: () =>{
+        this.getAllSprints()
+      },
+      error: err => {
+        console.log(err)
+        this.confirmDialog.confirm(errorDialog(err.error.message))
+      }
+    })
+  }
+
+  stopSprint(){
+    this.sprintWebService.stopSprint(history.state.projectId).subscribe({
+      next: () =>{
+        this.getAllData()
+      },
+      error: err => {
+        console.log(err)
+        this.confirmDialog.confirm(errorDialog(err.error.message))
+      }
+    })
+  }
+
 
   createIssue() {
     let data = {
@@ -165,7 +223,7 @@ export class BacklogComponent implements OnInit {
       isEdit: true,
       issueId: this.menuActiveItem
     }
-    this.showIssueForm(data,'Edit');
+    this.showIssueForm(data, 'Edit');
   }
 
   deleteIssue() {
@@ -178,34 +236,35 @@ export class BacklogComponent implements OnInit {
           this.confirmDialog.confirm(errorDialog('Something went wrong with the deletion'));
         }
       })
-      }
+    }
 
     this.confirmDialog.confirm(confirmDeletion('issue', removeIssue))
   }
 
-  assignIssue(){
+  assignIssue() {
     this.issueWebService.assignIssueToLoggedUser(this.menuActiveItem!).subscribe({
-      next: () =>{
+      next: () => {
         this.getAllProductBacklog()
       },
-      error: err =>{
+      error: err => {
         console.log(err)
       }
     })
   }
 
-  deleteAssignment(){
+  deleteAssignment() {
     this.issueWebService.deleteIssueAssignment(this.menuActiveItem!).subscribe({
-      next: () =>{
+      next: () => {
         this.getAllProductBacklog()
       },
-      error: err =>{
+      error: err => {
         console.log(err)
       }
     })
   }
 
-  showIssueForm(data: Object, msg: string) {
+  showIssueForm(data: Object, msg: string
+  ) {
     let formDialog = this.dialogService.open(IssueFormComponent, {
       header: `${msg} issue`,
       width: '500px',
@@ -215,6 +274,7 @@ export class BacklogComponent implements OnInit {
       this.getAllProductBacklog();
     })
   }
+
   showSprintForm(data: Object, msg: string) {
     let formDialog = this.dialogService.open(SprintFormComponent, {
       header: `${msg} sprint`,
@@ -225,6 +285,5 @@ export class BacklogComponent implements OnInit {
       this.getAllSprints()
     })
   }
-
   protected readonly getInitials = getInitials;
 }

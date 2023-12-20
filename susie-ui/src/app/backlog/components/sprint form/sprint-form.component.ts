@@ -4,11 +4,14 @@ import {SprintService} from "../../services/sprint.service";
 import {SprintDto} from "../../types/sprint-dto";
 import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
 import {dateConvertFromUTC, dateConvertToUTC} from "../../../shared/dateConvertToUTC";
+import {ConfirmationService} from "primeng/api";
+import {errorDialog} from "../../../shared/error.dialog";
 
 @Component({
   selector: 'app-sprint-form',
   templateUrl: './sprint-form.component.html',
-  styleUrls: ['./sprint-form.component.scss']
+  styleUrls: ['./sprint-form.component.scss'],
+  providers: [ConfirmationService]
 })
 export class SprintFormComponent implements OnInit{
 
@@ -25,7 +28,7 @@ export class SprintFormComponent implements OnInit{
   }
 
   constructor(private fb:FormBuilder, private sprintWebService: SprintService, public dialogRef: DynamicDialogRef,
-              public dialogConfig: DynamicDialogConfig){}
+              public dialogConfig: DynamicDialogConfig, private confirmDialog: ConfirmationService){}
 
   sprintForm = this.fb.group({
     name: ['', Validators.required],
@@ -72,7 +75,7 @@ export class SprintFormComponent implements OnInit{
         this.dialogRef.close()
       },
       error: err => {
-        console.log(err)
+        this.confirmDialog.confirm(errorDialog(err.error.message))
       }
     })
   }

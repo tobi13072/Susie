@@ -1,7 +1,7 @@
 <div class="backlog-view mt-2">
   <p-accordion class="sprint-header">
-    <ng-container *ngFor="let sprint of activeSprints">
-      <p-accordionTab header="{{sprint.name}} (active)"></p-accordionTab>
+    <ng-container *ngIf="activeSprint">
+      <p-accordionTab header="{{activeSprint.name}} (active)"></p-accordionTab>
     </ng-container>
 
     <ng-container *ngFor="let sprint of nonActiveSprints">
@@ -38,6 +38,6 @@
 </div>
 
 <p-menu #menuIssue [model]="issueMenu" [popup]="true" (click)="$event.stopPropagation()"></p-menu>
-<p-menu #menuSprint [model]="sprintMenu" [popup]="true" (click)="$event.stopPropagation()"></p-menu>
+<p-menu #menuSprint [model]="sprintMenu" [popup]="true" (click)="$event.stopPropagation()" (onShow)="generateSprintMenu()"></p-menu>
 <p-menu #menuAssignee [model]="assigneeMenu" [popup]="true" (click)="$event.stopPropagation()" (onShow)="generateAssignMenu()"></p-menu>
 <p-confirmDialog [style]="{width: '35vw'}" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>

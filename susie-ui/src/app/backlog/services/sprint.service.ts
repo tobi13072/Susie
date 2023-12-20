@@ -13,8 +13,8 @@ export class SprintService {
   constructor(private http: HttpClient) { }
 
 
-  getActiveSprints(projectId: number): Observable<SprintDto[]>{
-    return this.http.get<SprintDto[]>(this.SPRINT_PATH.concat(`/active/${projectId}`))
+  getActiveSprint(projectId: number): Observable<SprintDto>{
+    return this.http.get<SprintDto>(this.SPRINT_PATH.concat(`/active/${projectId}`))
   }
   getNonActiveSprints(projectId: number){
     return this.http.get<SprintDto[]>(this.SPRINT_PATH.concat(`/non-activated/${projectId}`))
@@ -29,5 +29,13 @@ export class SprintService {
 
   deleteSprint(sprintId: number):Observable<any>{
     return this.http.delete(this.SPRINT_PATH.concat(`/${sprintId}`))
+  }
+
+  startSprint(sprintId: number):Observable<any>{
+    return this.http.patch(this.SPRINT_PATH.concat(`/start/${sprintId}`),{})
+  }
+
+  stopSprint(projectId: number):Observable<any>{
+    return this.http.patch(this.SPRINT_PATH.concat(`/project/${projectId}/stop`),{})
   }
 }
