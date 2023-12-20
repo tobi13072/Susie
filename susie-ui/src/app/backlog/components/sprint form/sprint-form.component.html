@@ -1,0 +1,12 @@
+<form [formGroup]="sprintForm" (ngSubmit)="onSubmit()">
+  <div class="d-flex flex-column">
+    <label for="name">Name</label>
+    <input type="text" id="name" pInputText formControlName="name" class="mb-1">
+    <label for="goal">Sprint goal</label>
+    <input type="text" id="goal" pInputText formControlName="sprintGoal" class="mb-1">
+    <label for="date">Start Time</label>
+    <p-calendar #date appendTo="body" id="date" formControlName="startTime" [showIcon]="true" [showTime]="true" [showButtonBar]="true"
+                dateFormat="yy-mm-dd" class="mb-1"></p-calendar>
+  </div>
+  <p-button type="submit" label="Submit" [disabled]="!sprintForm.valid"></p-button>
+</form>

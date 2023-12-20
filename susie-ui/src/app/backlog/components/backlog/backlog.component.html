@@ -1,6 +1,9 @@
-<p-accordion [multiple]="true" class="m-5">
+<p-button label="Create new sprint" (onClick)="showSprintForm()"></p-button>
+<p-accordion [activeIndex]="[0]">
   <p-accordionTab header="Backlog">
-
+    <ng-container *ngFor="let issue of issuesProductBacklog">
+      <p-card class="m-1">{{issue.name}}</p-card>
+    </ng-container>
     <p-button label="Create new issue" (onClick)="createIssue()"></p-button>
   </p-accordionTab>
 </p-accordion>

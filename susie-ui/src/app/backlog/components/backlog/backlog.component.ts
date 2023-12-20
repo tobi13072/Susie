@@ -3,6 +3,7 @@ import {IssueService} from "../../services/issue.service";
 import {IssueResponse} from "../../types/resoponse/issue-response";
 import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
 import {IssueFormComponent} from "../issue form/issue-form.component";
+import {SprintFormComponent} from "../sprint form/sprint-form.component";
 
 @Component({
   selector: 'app-backlog',
@@ -25,6 +26,7 @@ export class BacklogComponent implements OnInit {
     this.issueWebService.getIssuesFromProductBacklog(history.state.projectId).subscribe({
       next: result => {
         this.issuesProductBacklog = result
+        this.issuesProductBacklog.sort((a, b) => a.id - b.id);
       },
       error: err => {
         console.log(err)
@@ -55,4 +57,14 @@ export class BacklogComponent implements OnInit {
     })
   }
 
+  showSprintForm(){
+    let formDialog: DynamicDialogRef | undefined;
+    formDialog = this.dialogService.open(SprintFormComponent,{
+      header: 'Create new issue',
+      width: '500px',
+      data: {
+        projectId: history.state.projectId
+      }
+    })
+  }
 }

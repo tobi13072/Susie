@@ -38,6 +38,8 @@ import {SliderModule} from "primeng/slider";
 import {DropdownModule} from "primeng/dropdown";
 import {TagModule} from "primeng/tag";
 import {AccordionModule} from "primeng/accordion";
+import { SprintFormComponent } from './backlog/components/sprint form/sprint-form.component';
+import {CalendarModule} from "primeng/calendar";
 
 @NgModule({
   declarations: [
@@ -50,38 +52,40 @@ import {AccordionModule} from "primeng/accordion";
     HomeComponent,
     DashboardComponent,
     BacklogComponent,
-    IssueFormComponent
+    IssueFormComponent,
+    SprintFormComponent
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        RouterModule,
-        MenubarModule,
-        ButtonModule,
-        NgOptimizedImage,
-        ReactiveFormsModule,
-        InputTextModule,
-        InputSwitchModule,
-        CardModule,
-        HttpClientModule,
-        KeyFilterModule,
-        RippleModule,
-        PanelModule,
-        DragDropModule,
-        TableModule,
-        StyleClassModule,
-        DynamicDialogModule,
-        BrowserAnimationsModule,
-        ConfirmDialogModule,
-        PasswordModule,
-        MenuModule,
-        SidebarModule,
-        AvatarModule,
-        SliderModule,
-        DropdownModule,
-        TagModule,
-        AccordionModule
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    RouterModule,
+    MenubarModule,
+    ButtonModule,
+    NgOptimizedImage,
+    ReactiveFormsModule,
+    InputTextModule,
+    InputSwitchModule,
+    CardModule,
+    HttpClientModule,
+    KeyFilterModule,
+    RippleModule,
+    PanelModule,
+    DragDropModule,
+    TableModule,
+    StyleClassModule,
+    DynamicDialogModule,
+    BrowserAnimationsModule,
+    ConfirmDialogModule,
+    PasswordModule,
+    MenuModule,
+    SidebarModule,
+    AvatarModule,
+    SliderModule,
+    DropdownModule,
+    TagModule,
+    AccordionModule,
+    CalendarModule
+  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
