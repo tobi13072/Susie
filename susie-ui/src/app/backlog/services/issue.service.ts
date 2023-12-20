@@ -24,4 +24,7 @@ export class IssueService {
     return this.http.put<IssueRequest>(this.ISSUE_PATH,issue);
   }
 
+  deleteIssue(issueId: number): Observable<any>{
+    return this.http.delete<any>(this.ISSUE_PATH.concat(`/${issueId}`))
+  }
 }

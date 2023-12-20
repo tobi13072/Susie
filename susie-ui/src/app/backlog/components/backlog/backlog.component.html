@@ -22,7 +22,7 @@
       <ng-container *ngFor="let issue of issuesProductBacklog">
         <div class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
           <div class="ms-4">{{ issue.name }}</div>
-          <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true"></p-button>
+          <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true" (onClick)="menuActiveItem = issue.id; menu.toggle($event)"></p-button>
         </div>
       </ng-container>
       <p-button icon="pi pi-plus" (onClick)="createIssue()" [raised]="true" [text]="true"
@@ -30,3 +30,6 @@
     </p-accordionTab>
   </p-accordion>
 </div>
+
+<p-menu #menu [model]="backlogMenu" [popup]="true" (click)="$event.stopPropagation()"></p-menu>
+<p-confirmDialog [style]="{width: '35vw'}" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>

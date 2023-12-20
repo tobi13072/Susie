@@ -1,17 +1,20 @@
 import {Component, OnInit} from '@angular/core';
 import {IssueService} from "../../services/issue.service";
 import {IssueResponse} from "../../types/resoponse/issue-response";
-import {DialogService, DynamicDialogRef} from "primeng/dynamicdialog";
+import {DialogService} from "primeng/dynamicdialog";
 import {IssueFormComponent} from "../issue form/issue-form.component";
 import {SprintFormComponent} from "../sprint form/sprint-form.component";
 import {SprintService} from "../../services/sprint.service";
 import {SprintDto} from "../../types/sprint-dto";
+import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
+import {errorDialog} from "../../../shared/error.dialog";
+import {confirmDeletion} from "../../../shared/delete.confirm";
 
 @Component({
   selector: 'app-backlog',
   templateUrl: './backlog.component.html',
   styleUrls: ['./backlog.component.scss'],
-  providers: [DialogService]
+  providers: [DialogService, ConfirmationService]
 })
 export class BacklogComponent implements OnInit {
 
@@ -19,13 +22,32 @@ export class BacklogComponent implements OnInit {
   activeSprints: SprintDto[] = [];
   nonActiveSprints: SprintDto[] = [];
 
+  backlogMenu: MenuItem[] | undefined;
+  menuActiveItem: number | undefined;
+
   ngOnInit() {
     this.getAllProductBacklog();
     this.getAllSprints();
+
+    this.backlogMenu = [
+      {
+        label: 'Edit',
+        icon: PrimeIcons.FILE_EDIT,
+        command: () => {
+        }
+      },
+      {
+        label: 'Delete',
+        icon: PrimeIcons.TRASH,
+        command: () => {
+          this.deleteIssue()
+        }
+      }
+    ];
   }
 
-  constructor(private issueWebService: IssueService,private sprintWebService:SprintService, public dialogService: DialogService) {
-  }
+  constructor(private issueWebService: IssueService, private sprintWebService: SprintService, public dialogService: DialogService,
+              private confirmDialog: ConfirmationService) {}
 
   getAllProductBacklog() {
     this.issueWebService.getIssuesFromProductBacklog(history.state.projectId).subscribe({
@@ -39,9 +61,9 @@ export class BacklogComponent implements OnInit {
     })
   }
 
-  getAllSprints(){
+  getAllSprints() {
     this.sprintWebService.getNonActiveSprints(history.state.projectId).subscribe({
-      next: result =>{
+      next: result => {
         this.nonActiveSprints = result
         this.nonActiveSprints.sort((a, b) => a.id! - b.id!);
       },
@@ -51,7 +73,7 @@ export class BacklogComponent implements OnInit {
     })
 
     this.sprintWebService.getActiveSprints(history.state.projectId).subscribe({
-      next: result =>{
+      next: result => {
         this.activeSprints = result
       },
       error: err => {
@@ -60,15 +82,30 @@ export class BacklogComponent implements OnInit {
     })
   }
 
-  createIssue(){
+  createIssue() {
     let data = {
       projectId: history.state.projectId
     };
     this.showIssueForm(data)
   }
 
-  editIssue(){
+  editIssue() {
 
+  }
+
+  deleteIssue() {
+    const removeIssue = () => {
+      this.issueWebService.deleteIssue(this.menuActiveItem!).subscribe({
+        next: result => {
+          this.getAllProductBacklog();
+        },
+        error: err => {
+          this.confirmDialog.confirm(errorDialog('Something went wrong with the deletion'));
+        }
+      })
+      }
+
+    this.confirmDialog.confirm(confirmDeletion('issue', removeIssue))
   }
 
   showIssueForm(data: Object) {
@@ -82,15 +119,15 @@ export class BacklogComponent implements OnInit {
     })
   }
 
-  showSprintForm(){
-    let formDialog = this.dialogService.open(SprintFormComponent,{
+  showSprintForm() {
+    let formDialog = this.dialogService.open(SprintFormComponent, {
       header: 'Create new issue',
       width: '500px',
       data: {
         projectId: history.state.projectId
       }
     })
-    formDialog.onClose.subscribe(() =>{
+    formDialog.onClose.subscribe(() => {
       this.getAllSprints()
     })
   }

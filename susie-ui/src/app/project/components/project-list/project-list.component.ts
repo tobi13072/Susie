@@ -7,6 +7,7 @@ import {AuthService} from "../../../auth/services/auth.service";
 import {Router} from "@angular/router";
 import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";
+import {confirmDeletion} from "../../../shared/delete.confirm";
 
 @Component({
   selector: 'app-project-list',
@@ -87,7 +88,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
   }
 
   deleteProject() {
-    const removeRequest = () => {
+    const removeProject = () => {
       this.projectWebService.removeProject(this.menuActiveItem!).subscribe({
         next: () => {
           this.getAllProjects();
@@ -98,16 +99,7 @@ export class ProjectListComponent implements OnDestroy, OnInit {
       })
     }
 
-    this.confirmDialog.confirm({
-      header: "Are you sure you want delete this project?",
-      message: "This will delete this project permanently. You cannot und this action.",
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: "Delete",
-      rejectLabel: "Cancel",
-      acceptIcon: 'pi',
-      rejectIcon: 'pi',
-      accept: removeRequest
-    })
+    this.confirmDialog.confirm(confirmDeletion('project',removeProject))
   }
 
   ngOnDestroy() {
