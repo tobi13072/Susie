@@ -7,6 +7,7 @@ import {IssuePriorityDto} from "../../../shared/types/issue-priority-dto";
 import {IssueRequest} from "../../types/request/issue-request";
 import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
 import {IssueDetailsResponse} from "../../types/resoponse/issueDetails-response";
+import {colorPriorityTagByName} from "../../../shared/tag.priority.operations";
 
 @Component({
   selector: 'app-issue-form',
@@ -77,7 +78,7 @@ export class IssueFormComponent implements OnInit {
         this.issueForm.get('name')?.setValue(res.name);
         this.issueForm.get('description')?.setValue(res.description);
         this.issueForm.get('estimation')?.setValue(res.estimation.toString())
-        this.selectedType = this.issueTypes.find(type => type.id === res.issueTypeID)!;
+        this.selectedType = this.issueTypes.find(type => type.id === res.issueTypeID);
         this.selectedPriority = this.issuePriorities.find(priority => priority.id === res.issuePriorityID);
       },
       error: err => {
@@ -93,8 +94,8 @@ export class IssueFormComponent implements OnInit {
       description: this.issueForm.value.description!,
       estimation: parseInt(this.issueForm.value.estimation!),
       projectID: this.dialogConfig.data.isEdit ? this.issueDetails!.projectID : this.dialogConfig.data.projectId,
+      issuePriorityID: this.selectedPriority!.id,
       issueTypeID: this.selectedType!.id,
-      issuePriorityID: this.selectedPriority!.id
     }
 
   }
@@ -128,4 +129,6 @@ export class IssueFormComponent implements OnInit {
       }
     })
   }
+
+  protected readonly colorPriorityTag = colorPriorityTagByName;
 }

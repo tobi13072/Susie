@@ -10,11 +10,17 @@
           <p-button class="ms-auto" icon="pi pi-ellipsis-v"
                     (onClick)="$event.stopPropagation(); menuActiveItem=activeSprint.id; menuSprint.toggle($event); isActive = true"
                     severity="secondary"
-                    [text]="true"></p-button>
+                    [text]="true"
+                    *ngIf="authService.isProductOwner() || authService.isScrumMaster()"></p-button>
         </ng-template>
         <ng-container *ngFor="let issue of activeSprint.issues">
           <div class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
-            <div class="ms-4">{{ issue.name }}</div>
+            <div class="ms-4">
+              {{ issue.name }}
+              <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                     value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+              <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+            </div>
             <div class="d-flex flex-row align-items-center">
               <p-avatar label="{{getInitials(issue.assignee)}}" shape="circle" class="me-2"></p-avatar>
             </div>
@@ -30,18 +36,26 @@
           <p-button class="ms-auto" icon="pi pi-ellipsis-v"
                     (onClick)="$event.stopPropagation(); menuActiveItem=sprint.id; menuSprint.toggle($event); isActive = false"
                     severity="secondary"
-                    [text]="true"></p-button>
+                    [text]="true" *ngIf="authService.isProductOwner() || authService.isScrumMaster()"></p-button>
         </ng-template>
         <ng-container *ngFor="let issue of sprint.issues">
-          <div pDraggable (onDragStart)="onDropActiveSprint=sprint; menuActiveItem=issue.id" class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
-            <div class="ms-4">{{ issue.name }}</div>
+          <div pDraggable (onDragStart)="onDropActiveSprint=sprint; menuActiveItem=issue.id"
+               class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+            <div class="ms-4">
+              {{ issue.name }}
+              <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                     value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+              <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+            </div>
             <div class="d-flex flex-row align-items-center">
               <p-avatar pRipple label="{{getInitials(issue.assignee)}}" shape="circle"
                         class="me-2 avatar-click"
                         (click)="menuActiveItem = issue.id; isAssignee= issue.assignee; menuAssignee.toggle($event)"></p-avatar>
-<!--              <p-button icon="pi pi-times" severity="secondary" [text]="true" (onClick)="menuActiveItem=issue.id; deleteIssueFromSprint(sprint.id!)"></p-button>-->
+              <p-button icon="pi pi-info-circle" severity="secondary" [text]="true"
+                        (onClick)="showIssueDetails(issue)"></p-button>
               <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true"
-                        (onClick)="menuActiveItem = issue.id; menuIssue.toggle($event)"></p-button>
+                        (onClick)="menuActiveItem = issue.id; menuIssue.toggle($event)"
+                        *ngIf="authService.isProductOwner() || authService.isScrumMaster()"></p-button>
             </div>
           </div>
         </ng-container>
@@ -50,25 +64,35 @@
   </p-accordion>
 
   <p-button label="Create new sprint" (onClick)="createSprint()" [raised]="true" [text]="true"
-            class="d-flex flex-row justify-content-center align-items-center mb-4 mt-2"></p-button>
+            class="d-flex flex-row justify-content-center align-items-center mb-4 mt-2"
+            *ngIf="authService.isProductOwner() || authService.isScrumMaster()"></p-button>
 
   <p-accordion [activeIndex]="[0]">
     <p-accordionTab header="Backlog" pDroppable (onDrop)="dropOnBacklogAction(onDropActiveSprint!)">
       <ng-container *ngFor="let issue of issuesProductBacklog">
         <div pDraggable (onDragStart)="menuActiveItem = issue.id"
              class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
-          <div class="ms-4">{{ issue.name }}</div>
+          <div class="ms-4">
+            {{ issue.name }}
+            <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                   value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+            <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+          </div>
           <div class="d-flex flex-row align-items-center">
             <p-avatar pRipple label="{{getInitials(issue.assignee)}}" shape="circle"
                       class="me-2 avatar-click"
                       (click)="menuActiveItem = issue.id; isAssignee= issue.assignee; menuAssignee.toggle($event)"></p-avatar>
+            <p-button icon="pi pi-info-circle" severity="secondary" [text]="true"
+                      (onClick)="showIssueDetails(issue)"></p-button>
             <p-button icon="pi pi-ellipsis-v" severity="secondary" [text]="true"
-                      (onClick)="menuActiveItem = issue.id; menuIssue.toggle($event)"></p-button>
+                      (onClick)="menuActiveItem = issue.id; menuIssue.toggle($event)"
+                      *ngIf="authService.isProductOwner() || authService.isScrumMaster()"></p-button>
           </div>
         </div>
       </ng-container>
       <p-button icon="pi pi-plus" (onClick)="createIssue()" [raised]="true" [text]="true"
-                class="d-flex flex-row justify-content-center align-items-center"></p-button>
+                class="d-flex flex-row justify-content-center align-items-center"
+                *ngIf="authService.isProductOwner() || authService.isScrumMaster()"></p-button>
     </p-accordionTab>
   </p-accordion>
 </div>

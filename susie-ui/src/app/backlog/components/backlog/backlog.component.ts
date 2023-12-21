@@ -11,6 +11,10 @@ import {errorDialog} from "../../../shared/error.dialog";
 import {confirmDeletion} from "../../../shared/delete.confirm";
 import {getInitials} from "../../../shared/initials.generator";
 import {confirmStop} from "../../../shared/stop.confirm";
+import {IssueDetailsComponent} from "../issue details/issue-details.component";
+import {colorPriorityTagById, namePriorityById} from "../../../shared/tag.priority.operations";
+import {nameTypeById} from "../../../shared/tag.type.operations";
+import {AuthService} from "../../../auth/services/auth.service";
 
 @Component({
   selector: 'app-backlog',
@@ -38,7 +42,7 @@ export class BacklogComponent implements OnInit {
   }
 
   constructor(private issueWebService: IssueService, private sprintWebService: SprintService, public dialogService: DialogService,
-              private confirmDialog: ConfirmationService) {
+              private confirmDialog: ConfirmationService, protected authService: AuthService) {
   }
 
 
@@ -144,12 +148,10 @@ export class BacklogComponent implements OnInit {
   }
 
   getIssuesFromSprints() {
-    if (this.nonActiveSprints) {
-      for (let sprint of this.nonActiveSprints) {
-        this.getAllIssuesFromSingleSprint(sprint.id!, false)
-      }
+    for (let sprint of this.nonActiveSprints) {
+      this.getAllIssuesFromSingleSprint(sprint.id!, false)
     }
-    if (this.activeSprint) {
+    if (!!this.activeSprint) {
       this.getAllIssuesFromSingleSprint(this.activeSprint.id!, true)
     }
   }
@@ -186,6 +188,7 @@ export class BacklogComponent implements OnInit {
     this.sprintWebService.getActiveSprint(history.state.projectId).subscribe({
       next: result => {
         this.activeSprint = result
+        this.getIssuesFromSprints()
       },
       error: err => {
         console.log(err)
@@ -340,11 +343,10 @@ export class BacklogComponent implements OnInit {
     })
   }
 
-  showIssueForm(data: Object, msg: string
-  ) {
+  showIssueForm(data: Object, msg: string) {
     let formDialog = this.dialogService.open(IssueFormComponent, {
       header: `${msg} issue`,
-      width: '500px',
+      width: '30rem',
       data: data
     })
     formDialog.onClose.subscribe(() => {
@@ -355,7 +357,7 @@ export class BacklogComponent implements OnInit {
   showSprintForm(data: Object, msg: string) {
     let formDialog = this.dialogService.open(SprintFormComponent, {
       header: `${msg} sprint`,
-      width: '500px',
+      width: '30rem',
       data: data
     })
     formDialog.onClose.subscribe(() => {
@@ -363,6 +365,18 @@ export class BacklogComponent implements OnInit {
     })
   }
 
+  showIssueDetails(issue: IssueResponse) {
+    this.dialogService.open(IssueDetailsComponent, {
+      header: `Details of "${issue.name}"`,
+      width: '40rem',
+      data: {
+        issueId: issue.id
+      }
+    })
+  }
+
   protected readonly getInitials = getInitials;
-  protected readonly console = console;
+  protected readonly namePriorityById = namePriorityById;
+  protected readonly colorPriorityTagById = colorPriorityTagById;
+  protected readonly nameTypeById = nameTypeById;
 }

@@ -5,7 +5,6 @@
         <p-card header="{{project.name}}" class="m-4 project-class" (click)="viewProjectDetails(project)">
           <ng-container *ngIf="authService.isProductOwner() || authService.isScrumMaster()">
             <ng-template pTemplate="header">
-              <p-menu #menu [model]="projectMenu" [popup]="true" (click)="$event.stopPropagation()"></p-menu>
               <p-button icon="pi pi-ellipsis-v" (click)="$event.stopPropagation(); menuActiveItem = project.projectID; menu.toggle($event)"
                         severity="secondary" [text]="true"></p-button>
             </ng-template>
@@ -26,5 +25,6 @@
   </div>
 </div>
 
+<p-menu #menu [model]="projectMenu" [popup]="true" (click)="$event.stopPropagation()"></p-menu>
 <p-confirmDialog [style]="{width: '35vw'}" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
 <router-outlet></router-outlet>

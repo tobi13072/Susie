@@ -7,10 +7,12 @@
       <input type="text" id="description" pInputText formControlName="description" class="mb-1">
       <label for="estimation">Estimation</label>
       {{ est.value }}
-      <p-slider #est [max]="20" id="estimation" formControlName="estimation" class="mt-2 mb-2"></p-slider>
+      <p-slider #est [max]="20" id="estimation" formControlName="estimation"
+                class="mt-2 mb-2 selectTypeOrPriorityOrEstimation"></p-slider>
       <label for="issueType">Issue type</label>
-      <p-dropdown appendTo="body" id="issueType" [(ngModel)]="selectedType" formControlName="issueTypeID" dataKey="id"
-                  [options]="issueTypes" optionLabel="type" [showClear]="true" class="mb-1"
+      <p-dropdown appendTo="body" id="issueType" [(ngModel)]="selectedType" formControlName="issueTypeID"
+                  [options]="issueTypes" optionLabel="type" [showClear]="true"
+                  class="mb-1 selectTypeOrPriorityOrEstimation"
                   placeholder="Select type of issue">
         <ng-template let-item pTemplate="item">
           <p-tag value="{{item.type}}"></p-tag>
@@ -21,13 +23,14 @@
       </p-dropdown>
       <label for="issuePriority">Issue priority</label>
       <p-dropdown appendTo="body" id="issuePriority" [(ngModel)]="selectedPriority" formControlName="issuePriorityID"
-                  dataKey="id" [options]="issuePriorities" optionLabel="priority" [showClear]="true" class="mb-1"
+                  [options]="issuePriorities" optionLabel="priority" [showClear]="true"
+                  class="mb-1 selectTypeOrPriorityOrEstimation"
                   placeholder="Select priority of issue">
         <ng-template let-item pTemplate="item">
-          <p-tag value="{{item.priority}}"></p-tag>
+          <p-tag severity="{{colorPriorityTag(item.priority)}}" value="{{item.priority}}"></p-tag>
         </ng-template>
         <ng-template pTemplate="selectedItem">
-          <p-tag *ngIf="selectedPriority" value="{{selectedPriority.priority}}"></p-tag>
+          <p-tag severity="{{colorPriorityTag(selectedPriority.priority)}}" *ngIf="selectedPriority" value="{{selectedPriority.priority}}"></p-tag>
         </ng-template>
       </p-dropdown>
     </div>

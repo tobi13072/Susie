@@ -1,0 +1,75 @@
+<ng-container *ngIf="issueDetails">
+  <p-tabView>
+    <p-tabPanel header="Details">
+
+      <div class="item">
+        <p-fieldset legend="Name">
+          {{ issueDetails.name }}
+        </p-fieldset>
+      </div>
+
+      <div class="item">
+        <p-fieldset legend="Assignee">
+          <ng-container *ngIf="!issueDetails.assignee">Brak</ng-container>
+          <ng-container *ngIf="issueDetails.assignee">
+            <p-avatar label="{{getInitials(issueDetails.assignee)}}" shape="circle"></p-avatar>
+            {{ issueDetails.assignee.firstName }} {{ issueDetails.assignee.lastName }}
+            ({{ issueDetails.assignee.email }})
+          </ng-container>
+        </p-fieldset>
+      </div>
+      <div class="item">
+        <p-fieldset legend="Description">
+          {{ issueDetails.description }}
+        </p-fieldset>
+      </div>
+      <div class="item">
+        <p-fieldset legend="Estimation">
+          {{ issueDetails.estimation }}
+          <p-slider [(ngModel)]="issueDetails.estimation" [max]="20" [disabled]="true"></p-slider>
+        </p-fieldset>
+      </div>
+      <div class="item">
+        <p-fieldset legend="Type">
+          <p-tag value="{{nameTypeById(issueDetails.issueTypeID)}}" class="ms-2"></p-tag>
+        </p-fieldset>
+      </div>
+      <div class="item">
+        <p-fieldset legend="Priority">
+          <p-tag severity="{{colorPriorityTagById(issueDetails.issuePriorityID)}}"
+                 value="{{namePriorityById(issueDetails.issuePriorityID)}}" class="ms-2"></p-tag>
+        </p-fieldset>
+      </div>
+      <div class="item">
+        <p-fieldset legend="Status">
+          <p-tag value="{{nameStatusById(issueDetails.issueStatusID)}}" class="ms-2"></p-tag>
+        </p-fieldset>
+      </div>
+      <div class="item">
+        <p-fieldset legend="Reporter">
+          <p-avatar label="{{getInitials(issueDetails.reporter)}}" shape="circle"></p-avatar>
+          {{ issueDetails.reporter.firstName }} {{ issueDetails.reporter.lastName }}
+          ({{ issueDetails.reporter.email }})
+        </p-fieldset>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Comments">
+      <ng-container *ngIf="issueDetails.comments">
+        <ng-container *ngFor="let comment of issueDetails.comments">
+          <p-card class="comment-card">
+            <ng-template pTemplate="header">
+              <div class="pb-0 pt-2 ms-2 comment-author">
+                <p-avatar label="{{getInitials(comment.author!)}}" shape="circle" size="large"></p-avatar>
+                {{ comment.author?.firstName }}
+                {{ comment.author?.lastName }}
+              </div>
+            </ng-template>
+            {{ comment.body }}
+          </p-card>
+        </ng-container>
+        <input class="col-8" type="text" [(ngModel)]="commentToSend" pInputText/>
+        <p-button label="Send" class="ms-1" [disabled]="!commentToSend" (onClick)="sendComment()"></p-button>
+      </ng-container>
+    </p-tabPanel>
+  </p-tabView>
+</ng-container>

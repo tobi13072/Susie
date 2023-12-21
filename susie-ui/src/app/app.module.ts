@@ -7,7 +7,7 @@ import {MenubarModule} from 'primeng/menubar';
 import {ButtonModule} from "primeng/button";
 import {RouterModule} from '@angular/router';
 import {NgOptimizedImage} from "@angular/common";
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {InputSwitchModule} from 'primeng/inputswitch';
 import {CardModule} from 'primeng/card';
@@ -41,6 +41,9 @@ import {AccordionModule} from "primeng/accordion";
 import { SprintFormComponent } from './backlog/components/sprint form/sprint-form.component';
 import {CalendarModule} from "primeng/calendar";
 import {BadgeModule} from "primeng/badge";
+import { IssueDetailsComponent } from './backlog/components/issue details/issue-details.component';
+import {FieldsetModule} from "primeng/fieldset";
+import {TabViewModule} from "primeng/tabview";
 
 @NgModule({
   declarations: [
@@ -54,7 +57,8 @@ import {BadgeModule} from "primeng/badge";
     DashboardComponent,
     BacklogComponent,
     IssueFormComponent,
-    SprintFormComponent
+    SprintFormComponent,
+    IssueDetailsComponent
   ],
   imports: [
     BrowserModule,
@@ -86,7 +90,10 @@ import {BadgeModule} from "primeng/badge";
     TagModule,
     AccordionModule,
     CalendarModule,
-    BadgeModule
+    BadgeModule,
+    FieldsetModule,
+    FormsModule,
+    TabViewModule
   ],
   providers: [
     {

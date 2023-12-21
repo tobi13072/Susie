@@ -1,4 +1,5 @@
 import {UserInfoResponse} from "../../../auth/types/response/user-info-response";
+import {CommentDto} from "../comment-dto";
 
 export interface IssueDetailsResponse{
   issueID: number,
@@ -12,4 +13,5 @@ export interface IssueDetailsResponse{
   issueStatusID: number,
   projectID: number,
   sprintID: number,
+  comments: CommentDto[]
 }
