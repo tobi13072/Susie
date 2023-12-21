@@ -8,12 +8,16 @@ import {nameStatusById} from "../../../shared/tag.status.operations";
 import {CommentsService} from "../../services/comments.service";
 import {CommentDto} from "../../types/comment-dto";
 import {getInitials} from "../../../shared/initials.generator";
+import {ConfirmationService} from "primeng/api";
+import {errorDialog} from "../../../shared/error.dialog";
+import {confirmDeletion} from "../../../shared/delete.confirm";
 
 
 @Component({
   selector: 'app-issue-details',
   templateUrl: './issue-details.component.html',
-  styleUrls: ['./issue-details.component.scss']
+  styleUrls: ['./issue-details.component.scss'],
+  providers: [ConfirmationService]
 })
 export class IssueDetailsComponent implements OnInit {
 
@@ -24,7 +28,8 @@ export class IssueDetailsComponent implements OnInit {
     this.getIssueDetails()
   }
 
-  constructor(private issueWebService: IssueService, private commentWebService: CommentsService, public dialogConfig: DynamicDialogConfig) {
+  constructor(private issueWebService: IssueService, private commentWebService: CommentsService, public dialogConfig: DynamicDialogConfig,
+              private confirmDialog: ConfirmationService) {
   }
 
   getIssueDetails() {
@@ -56,6 +61,20 @@ export class IssueDetailsComponent implements OnInit {
         console.log(err)
       }
     })
+  }
+
+  deleteComment(commentId: number) {
+    let deleteCommentFun = () => {
+      this.commentWebService.deleteComment(commentId).subscribe({
+        next: () => {
+          this.getIssueDetails()
+        },
+        error: err => {
+          this.confirmDialog.confirm(errorDialog(err.error.message))
+        }
+      })
+    }
+    this.confirmDialog.confirm(confirmDeletion('comment',deleteCommentFun))
   }
 
   protected readonly nameTypeById = nameTypeById;

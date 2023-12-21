@@ -14,4 +14,8 @@ export class CommentsService {
   sendComment(comment: CommentDto): Observable<CommentDto>{
     return this.http.post<CommentDto>(this.COMMENT_PATH, comment)
   }
+
+  deleteComment(commentId: number): Observable<any>{
+    return this.http.delete<any>(this.COMMENT_PATH.concat(`/${commentId}`))
+  }
 }

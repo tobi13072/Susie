@@ -59,9 +59,14 @@
           <p-card class="comment-card">
             <ng-template pTemplate="header">
               <div class="pb-0 pt-2 ms-2 comment-author">
-                <p-avatar label="{{getInitials(comment.author!)}}" shape="circle" size="large"></p-avatar>
-                {{ comment.author?.firstName }}
-                {{ comment.author?.lastName }}
+                <div>
+                  <p-avatar label="{{getInitials(comment.author!)}}" shape="circle" size="large"></p-avatar>
+                  {{ comment.author?.firstName }}
+                  {{ comment.author?.lastName }}
+                </div>
+                <div>
+                  <p-button icon="pi pi-times" severity="secondary" [text]="true" (onClick)="deleteComment(comment.commentID!)"></p-button>
+                </div>
               </div>
             </ng-template>
             {{ comment.body }}
@@ -73,3 +78,5 @@
     </p-tabPanel>
   </p-tabView>
 </ng-container>
+
+<p-confirmDialog appendTo="body" [style]="{width: '35vw'}" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
