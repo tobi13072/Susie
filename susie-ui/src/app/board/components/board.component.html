@@ -1,35 +1,91 @@
+<ng-container *ngIf="!!activeSprint">
+  <div class="kanban-board" cdkDropListGroup>
+    <div class="kanban-column" cdkDropList [cdkDropListData]="toDo" (cdkDropListDropped)="drop($event)">
+      <h2>To Do</h2>
 
-<div class="d-flex justify-content-center align-items-center vh-100">
-  <p-card pDroppable (onDrop)="drop(1)" class="flex-column ms-5">
-    <p>Test1</p>
-    <ul>
-      <li *ngFor="let issue of test1" pDraggable (onDragStart)="dragStart(issue, 1)">
-        {{issue.name}}
-      </li>
-    </ul>
-  </p-card>
-  <p-card pDroppable (onDrop)="drop(2)" class="flex-column ms-5">
-    <p>Test2</p>
-    <ul *ngIf="test2">
-      <li *ngFor="let issue of test2" pDraggable (onDragStart)="dragStart(issue, 2)">
-        {{issue.name}}
-      </li>
-    </ul>
-  </p-card>
-  <p-card pDroppable (onDrop)="drop(3)" class="flex-column ms-5">
-    <p>Test3</p>
-    <ul *ngIf="test3">
-      <li *ngFor="let issue of test3" pDraggable (onDragStart)="dragStart(issue, 3)">
-        {{issue.name}}
-      </li>
-    </ul>
-  </p-card>
-  <p-card pDroppable (onDrop)="drop(4)" class="flex-column ms-5">
-    <p>Test4</p>
-    <ul *ngIf="test4">
-      <li *ngFor="let issue of test4" pDraggable (onDragStart)="dragStart(issue, 4)">
-        {{issue.name}}
-      </li>
-    </ul>
-  </p-card>
-</div>
+      <ng-container *ngFor="let issue of toDo">
+        <div cdkDrag class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+          <div class="ms-4">
+            {{ issue.name }}
+            <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                   value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+            <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <div class="kanban-column" cdkDropList [cdkDropListData]="inProgress" (cdkDropListDropped)="drop($event)">
+      <h2>In Progress</h2>
+
+      <ng-container *ngFor="let issue of inProgress">
+        <div cdkDrag class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+          <div class="ms-4">
+            {{ issue.name }}
+            <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                   value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+            <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <div class="kanban-column" cdkDropList [cdkDropListData]="codeReview" (cdkDropListDropped)="drop($event)">
+      <h2>Code Review</h2>
+
+      <ng-container *ngFor="let issue of codeReview">
+        <div cdkDrag class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+          <div class="ms-4">
+            {{ issue.name }}
+            <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                   value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+            <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+    <div class="kanban-column" cdkDropList [cdkDropListData]="inTest" (cdkDropListDropped)="drop($event)">
+      <h2>In Test</h2>
+      <ng-container *ngFor="let issue of inTest">
+        <div cdkDrag class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+          <div class="ms-4">
+            {{ issue.name }}
+            <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                   value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+            <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="kanban-column" cdkDropList [cdkDropListData]="done" (cdkDropListDropped)="drop($event)">
+      <h2>Done</h2>
+
+      <ng-container *ngFor="let issue of done">
+        <div cdkDrag class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+          <div class="ms-4">
+            {{ issue.name }}
+            <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                   value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+            <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+  <p-confirmDialog [style]="{width: '35vw'}" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
+</ng-container>
+<ng-container *ngIf="!activeSprint">
+  <div class="message-container">
+    <div>
+      <span class="sad-face">;(</span>
+      <span class="oops">Oops!</span>
+    </div>
+    <div class="message">No active sprint</div>
+  </div>
+</ng-container>
+

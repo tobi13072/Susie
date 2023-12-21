@@ -44,6 +44,7 @@ import {BadgeModule} from "primeng/badge";
 import { IssueDetailsComponent } from './backlog/components/issue details/issue-details.component';
 import {FieldsetModule} from "primeng/fieldset";
 import {TabViewModule} from "primeng/tabview";
+import {CdkDrag, CdkDropList, CdkDropListGroup} from "@angular/cdk/drag-drop";
 
 @NgModule({
   declarations: [
@@ -93,7 +94,10 @@ import {TabViewModule} from "primeng/tabview";
     BadgeModule,
     FieldsetModule,
     FormsModule,
-    TabViewModule
+    TabViewModule,
+    CdkDropList,
+    CdkDrag,
+    CdkDropListGroup
   ],
   providers: [
     {

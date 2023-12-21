@@ -40,8 +40,8 @@
                  value="{{namePriorityById(issueDetails.issuePriorityID)}}" class="ms-2"></p-tag>
         </p-fieldset>
       </div>
-      <div class="item">
-        <p-fieldset legend="Status">
+      <div class="item" >
+        <p-fieldset legend="Status" *ngIf="!dialogConfig.data.isFromBacklog">
           <p-tag value="{{nameStatusById(issueDetails.issueStatusID)}}" class="ms-2"></p-tag>
         </p-fieldset>
       </div>

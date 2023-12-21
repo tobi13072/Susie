@@ -265,8 +265,12 @@ export class BacklogComponent implements OnInit {
     }
   }
 
-  addIssueToSprint(sprintId: number) {
-    this.sprintWebService.addIssueToSprint(this.menuActiveItem!, sprintId).subscribe({
+  dynamicDeleteIssueFromSprint(sprintId: number) {
+    return this.sprintWebService.deleteIssueFromSprint(this.menuActiveItem!, sprintId)
+  }
+
+  deleteIssueFromSprint(sprintID: number) {
+    this.sprintWebService.deleteIssueFromSprint(this.menuActiveItem!, sprintID).subscribe({
       next: () => {
         this.getAllData()
       },
@@ -276,12 +280,8 @@ export class BacklogComponent implements OnInit {
     })
   }
 
-  dynamicDeleteIssueFromSprint(sprintId: number) {
-    return this.sprintWebService.deleteIssueFromSprint(this.menuActiveItem!, sprintId)
-  }
-
-  deleteIssueFromSprint(sprintID: number) {
-    this.sprintWebService.deleteIssueFromSprint(this.menuActiveItem!, sprintID).subscribe({
+  addIssueToSprint(sprintId: number) {
+    this.sprintWebService.addIssueToSprint(this.menuActiveItem!, sprintId).subscribe({
       next: () => {
         this.getAllData()
       },
@@ -365,11 +365,12 @@ export class BacklogComponent implements OnInit {
     })
   }
 
-  showIssueDetails(issue: IssueResponse) {
+  showIssueDetails(issue: IssueResponse, isBacklog: boolean) {
     this.dialogService.open(IssueDetailsComponent, {
       header: `Details of "${issue.name}"`,
       width: '40rem',
       data: {
+        isFromBacklog: isBacklog,
         issueId: issue.id
       }
     })

@@ -44,4 +44,8 @@ export class IssueService {
   getIssueFromSprint(sprintId: number): Observable<IssueResponse[]>{
     return this.http.get<IssueResponse[]>(this.ISSUE_PATH.concat(`/sprint/${sprintId}`))
   }
+
+  changeIssueStatus(issueId: number, statusId: number):Observable<any>{
+    return this.http.patch<any>(this.ISSUE_PATH.concat(`/${issueId}/status/${statusId}`),{})
+  }
 }

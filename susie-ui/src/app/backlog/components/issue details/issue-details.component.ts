@@ -23,7 +23,6 @@ export class IssueDetailsComponent implements OnInit {
 
   issueDetails: IssueDetailsResponse | undefined;
   commentToSend: string | undefined;
-
   ngOnInit() {
     this.getIssueDetails()
   }
