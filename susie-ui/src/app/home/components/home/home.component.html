@@ -1,0 +1,31 @@
+<div class="home-view">
+  <div>
+    <div class="dod-card">
+      <div class="d-flex flex-row justify-content-between align-items-start">
+        <div class="title ms-3 mt-3">Definition of done</div>
+        <div class="mt-3 me-3" *ngIf="authService.isProductOwner() || authService.isScrumMaster()">
+          <p-button label="Edit" [text]="true" [raised]="true" severity="secondary" (onClick)="editDod()"></p-button>
+        </div>
+      </div>
+      <div class="ms-4 mt-2">
+        <ng-container *ngFor="let rule of dod">
+          <li class="mb-2">{{ rule.ruleName }}</li>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+  <div class="issue-view">
+    <div class="title"> Your issues</div>
+    <ng-container *ngFor="let issue of assignedIssue">
+      <div class="issue-card mb-2 d-flex flex-row justify-content-between align-items-center">
+        <div class="ms-4">
+          {{ issue.name }}
+          <p-tag severity="info" value="{{nameStatusById(issue.issueStatusID)}}" class="ms-2"></p-tag>
+          <p-tag severity="{{colorPriorityTagById(issue.issuePriorityID)}}"
+                 value="{{namePriorityById(issue.issuePriorityID)}}" class="ms-2"></p-tag>
+          <p-tag value="{{nameTypeById(issue.issueTypeID)}}" class="ms-2"></p-tag>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

@@ -45,6 +45,7 @@ import { IssueDetailsComponent } from './backlog/components/issue details/issue-
 import {FieldsetModule} from "primeng/fieldset";
 import {TabViewModule} from "primeng/tabview";
 import {CdkDrag, CdkDropList, CdkDropListGroup} from "@angular/cdk/drag-drop";
+import { DodEditComponent } from './home/components/dod edit/dod-edit.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import {CdkDrag, CdkDropList, CdkDropListGroup} from "@angular/cdk/drag-drop";
     BacklogComponent,
     IssueFormComponent,
     SprintFormComponent,
-    IssueDetailsComponent
+    IssueDetailsComponent,
+    DodEditComponent
   ],
   imports: [
     BrowserModule,
