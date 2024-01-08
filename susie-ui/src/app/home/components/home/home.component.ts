@@ -40,7 +40,7 @@ export class HomeComponent implements OnInit{
     this.homeWebService.getDod(history.state.projectId).subscribe({
       next: res =>{
         this.dod = res;
-        console.log(this.dod)
+        this.dod.sort((a, b) => a.ruleID - b.ruleID);
       }
     })
   }

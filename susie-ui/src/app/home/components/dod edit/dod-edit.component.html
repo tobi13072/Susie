@@ -5,12 +5,30 @@
         {{ rule.ruleName }}
       </div>
       <div>
-        <p-button icon="pi pi-times" severity="secondary" [text]="true" (onClick)="deleteDod(rule.ruleID)"></p-button>
+        <p-button icon="pi pi-pencil" severity="secondary" [text]="true"
+                  (onClick)="isEdit=true; ruleIdToEdit = rule.ruleID; dodToSend = rule.ruleName"></p-button>
+        <p-button icon="pi pi-times" severity="secondary" [text]="true"
+                  (onClick)="deleteSingleRule(rule.ruleID)"></p-button>
       </div>
     </div>
   </ng-container>
 
-  <input class="input-rule" pInputText type="text" [(ngModel)]="dodToSend">
-  <p-button class="ms-2" icon="pi pi-plus" [disabled]="!dodToSend" severity="secondary" [text]="true" [raised]="true"
-            (onClick)="sendRule()"></p-button>
+  <ng-container [ngSwitch]="isEdit">
+    <div *ngSwitchCase="false">
+      <input class="input-rule" pInputText type="text" [(ngModel)]="dodToSend">
+      <p-button class="ms-2" icon="pi pi-plus" [disabled]="!dodToSend" severity="secondary" [text]="true"
+                [raised]="true"
+                (onClick)="sendRule()"></p-button>
+    </div>
+    <div *ngSwitchCase="true">
+      <input class="input-rule" pInputText type="text" [(ngModel)]="dodToSend" aria-describedby="dod-edit">
+      <p-button class="ms-2" icon="pi pi-pencil" [disabled]="!dodToSend" severity="secondary" [text]="true"
+                [raised]="true"
+                (onClick)="editSingleRule(ruleIdToEdit!)"></p-button>
+      <small id="dod-edit" class="d-flex flex-row align-items-center">
+        You are editing a rule. To cancel, press:
+        <p-button icon="pi pi-times-circle" [text]="true" severity="secondary" size="small" (onClick)="cancelEdit()"></p-button>
+      </small>
+    </div>
+  </ng-container>
 </div>

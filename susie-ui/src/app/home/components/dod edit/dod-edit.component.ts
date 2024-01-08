@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {DynamicDialogConfig, DynamicDialogRef} from "primeng/dynamicdialog";
+import {DynamicDialogConfig} from "primeng/dynamicdialog";
 import {DodDto} from "../../types/dod-dto";
 import {HomeService} from "../../services/home.service";
 
@@ -12,7 +12,10 @@ export class DodEditComponent implements OnInit{
 
   dod: DodDto[] = [];
   dodToSend: string | undefined;
-  constructor(private homeWebService: HomeService, public dialogRef: DynamicDialogRef, public dialogConfig: DynamicDialogConfig){}
+  isEdit: boolean = false;
+  ruleIdToEdit: number | undefined;
+
+  constructor(private homeWebService: HomeService, public dialogConfig: DynamicDialogConfig){}
   ngOnInit() {
     this.dod = this.dialogConfig.data.dod
     console.log(this.dod)
@@ -31,14 +34,29 @@ export class DodEditComponent implements OnInit{
     this.homeWebService.getDod(history.state.projectId).subscribe({
       next: res =>{
         this.dod = res;
+        this.dod.sort((a, b) => a.ruleID - b.ruleID);
       }
     })
   }
 
-  deleteDod(ruleId: number){
+  deleteSingleRule(ruleId: number){
     this.homeWebService.deleteSingleRule(history.state.projectId, ruleId).subscribe({
       next: () =>{
         this.getDod()
+      }
+    })
+  }
+
+  cancelEdit(){
+    this.isEdit = false;
+    this.dodToSend = '';
+  }
+
+  editSingleRule(ruleId: number){
+    this.homeWebService.editSingleRule(ruleId, this.dodToSend!).subscribe({
+      next: () =>{
+        this.cancelEdit();
+        this.getDod();
       }
     })
   }

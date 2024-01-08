@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {env} from "../../../environments/environment";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {IssueResponse} from "../../backlog/types/resoponse/issue-response";
 import {DodDto} from "../types/dod-dto";
@@ -30,5 +30,11 @@ export class HomeService {
 
   deleteSingleRule(projectId: number, ruleId: number):Observable<any>{
     return this.http.delete<any>(this.DOD_PATH.concat(`/project/${projectId}/rule/${ruleId}`))
+  }
+
+  editSingleRule(ruleId: number, rule: string):Observable<any>{
+    const ruleData = new FormData;
+    ruleData.append('rule', rule);
+    return this.http.patch<any>(this.DOD_PATH.concat(`/rule/${ruleId}`), ruleData)
   }
 }
