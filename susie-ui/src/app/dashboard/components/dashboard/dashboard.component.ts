@@ -77,9 +77,10 @@ export class DashboardComponent implements OnInit{
   }
 
   prepareDataToDelete(userID: string): ProjectMembersDto{
+    let projectID: number = history.state.projectId
     return {
       userUUID: userID,
-      projectID: history.state.projectId
+      projectID: projectID
     }
   }
   addUserToProject(){

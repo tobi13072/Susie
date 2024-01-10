@@ -21,7 +21,7 @@ export class MembersService {
     return this.http.post<ProjectMembersDto>(this.PATH.concat('/user-association'), data);
   }
 
-  deleteUserFromProject(data: Object): Observable<ProjectMembersDto>{
-    return this.http.delete<ProjectMembersDto>(this.PATH.concat('/delete-user'), data);
+  deleteUserFromProject(data: Object): Observable<any>{
+    return this.http.delete<any>(this.PATH.concat('/delete-user'),{body: data});
   }
 }
