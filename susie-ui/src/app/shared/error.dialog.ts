@@ -1,5 +1,4 @@
 export function errorDialog(err: any){
-
   return {
     message: typeof err === 'string' ? err : err.error.message,
     header: 'Error',

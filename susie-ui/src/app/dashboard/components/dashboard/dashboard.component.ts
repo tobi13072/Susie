@@ -5,6 +5,9 @@ import {ProjectMembersDto} from "../../types/projectMembers-dto";
 import {FormBuilder, Validators} from "@angular/forms";
 import {ConfirmationService, MenuItem, PrimeIcons} from "primeng/api";
 import {errorDialog} from "../../../shared/error.dialog";
+import {env} from "../../../../environments/environment";
+import {AuthService} from "../../../auth/services/auth.service";
+import {getInitials} from "../../../shared/initials.generator";
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +22,7 @@ export class DashboardComponent implements OnInit{
   menuUser: MenuItem[] | undefined;
   activeUserId: string | undefined;
 
-  constructor(private memberWebService: MembersService, private fb: FormBuilder, private confirmDialog: ConfirmationService){}
+  constructor(private memberWebService: MembersService, private fb: FormBuilder, private confirmDialog: ConfirmationService, protected authService: AuthService){}
   ngOnInit() {
     this.getMembers();
   }
@@ -35,16 +38,18 @@ export class DashboardComponent implements OnInit{
     }
 
     let assignSmRole = {
-      label: 'Assign the role \'Scrum Master\'',
+      label: 'Assign the role \'Product Owner\'',
       icon: PrimeIcons.USER_EDIT,
       command: () => {
+        this.assigneeUserPoRole(this.activeUserId!)
       }
     }
 
     let revokeSmRole = {
-      label: 'Revoke the role \'Scrum Master\'',
+      label: 'Revoke the role \'Product Owner\'',
       icon: PrimeIcons.USER_EDIT,
       command: () => {
+        this.revokeUserPoRole(this.activeUserId!)
       }
     }
 
@@ -83,6 +88,15 @@ export class DashboardComponent implements OnInit{
       projectID: projectID
     }
   }
+
+  prepareDataToChangePoRole(userID: string): ProjectMembersDto{
+    let projectID: number = history.state.projectId
+    return {
+      userUUID: userID,
+      projectID: projectID,
+      roleName: env.projectRoles.product_owner
+    }
+  }
   addUserToProject(){
    this.memberWebService.addUserToProject(this.prepareDataToAdd()).subscribe({
      next: () =>{
@@ -98,7 +112,6 @@ export class DashboardComponent implements OnInit{
   }
 
   deleteUserFromProject(userID: string){
-    console.log(this.prepareDataToDelete(userID))
     this.memberWebService.deleteUserFromProject(this.prepareDataToDelete(userID)).subscribe({
       next: () =>{
         this.getMembers()
@@ -108,4 +121,22 @@ export class DashboardComponent implements OnInit{
       }
     })
   }
+
+  assigneeUserPoRole(userID: string){
+    this.memberWebService.assigneeUserRole(this.prepareDataToChangePoRole(userID)).subscribe({
+      error: err =>{
+        this.confirmDialog.confirm(errorDialog(err.error.message))
+      }
+    })
+  }
+
+  revokeUserPoRole(userID: string){
+    this.memberWebService.revokeUserRole(this.prepareDataToChangePoRole(userID)).subscribe({
+      error: err =>{
+        this.confirmDialog.confirm(errorDialog(err.error.message))
+      }
+    })
+  }
+
+  protected readonly getInitials = getInitials;
 }

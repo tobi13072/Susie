@@ -24,4 +24,12 @@ export class MembersService {
   deleteUserFromProject(data: Object): Observable<any>{
     return this.http.delete<any>(this.PATH.concat('/delete-user'),{body: data});
   }
+
+  assigneeUserRole(data: Object): Observable<any>{
+    return this.http.patch<any>('http://localhost:8081/api/auth/user/permission', data);
+  }
+  revokeUserRole(data: Object): Observable<any>{
+    return this.http.patch<any>('http://localhost:8081/api/auth/user/permission-revoke', data);
+  }
+
 }
