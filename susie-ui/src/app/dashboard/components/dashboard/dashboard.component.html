@@ -1,1 +1,23 @@
+Members
+<br>{{owner?.firstName}} {{owner?.lastName}} {{owner?.email}}
+<ng-container *ngFor="let member of members">
+  <br>{{member.firstName}} {{member.lastName}} {{member.email}}
+  <p-button class="ms-auto" icon="pi pi-ellipsis-v"
+            (onClick)="activeUserId = member.uuid ; menu.toggle($event)"
+            severity="secondary"
+            [text]="true">
+<!--            *ngIf="authService.isProductOwner() || authService.isScrumMaster()"--></p-button>
+</ng-container>
+<br>
 
+<form [formGroup]="addUserLabel" (ngSubmit)="addUserToProject()">
+  <label for="email">Email</label>
+  <input pInputText id="email" formControlName="email" class="mb-1"/>
+  <small id="email-help" class="p-error"
+         *ngIf="addUserLabel.get('email')?.invalid  && addUserLabel.get('email')?.dirty">Email is incorrect</small>
+</form>
+<p-button type="submit" label="Add member" (onClick)="addUserToProject()" [disabled]="addUserLabel.invalid"></p-button>
+
+
+<p-menu #menu [model]="menuUser" [popup]="true" (onShow)="generateUserMenu()"></p-menu>
+<p-confirmDialog [style]="{width: '50vw'}"></p-confirmDialog>
